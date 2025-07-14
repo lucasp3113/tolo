@@ -1,12 +1,33 @@
-# React + Vite
+=======
+# TOLO - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 🚀 Tecnologías usadas
+- [React](https://reactjs.org/) - Librería para construir interfaces de usuario.
+- [Tailwind CSS](https://tailwindcss.com/docs) - Framework de CSS
 
-Currently, two official plugins are available:
+## 📁 Estructura del proyecto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```txt
+frontend/
+├── public/              # Acá van imágenes que no se cambian (como íconos)
+├── src/                 # Acá está todo el código principal
+│   ├── assets/          # Imágenes que usamos dentro del código
+│   ├── components/      # Acá se hacen los componentes
+│   ├── App.jsx          # Es como el cuerpo principal de la página
+│   ├── App.css          # Estilos solo para App.jsx
+│   ├── index.css        # Estilos generales (y la config de Tailwind)
+│   └── main.jsx         # Arranca la aplicación y muestra App.jsx en pantalla
+├── index.html           # El archivo base donde se carga todo
+├── package.json         # Lista de las cosas que usamos y comandos útiles
+├── vite.config.js       # Configuración especial de Vite (el que inicia todo)
+```
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Se q da miedo ver todo eso, pero por ahora solo usen la carpeta src. Dentro esta la carpeta components. Estos (los componentes) se usan en el componente principal, App.jsx. Todo lo otro, no le den importancia por ahora
+
+# ✅ ¿Cómo correr la aplicación?
+`npm run dev`
+
+## ⚠️ IMPORTANTE
+**NO VAMOS A USAR CSS NORMAL, SOLO VAMOS A USAR TAILWIND CSS**
+
