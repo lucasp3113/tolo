@@ -1,3 +1,30 @@
+ /*
+🔘 Button — Botón interactivo con soporte para tamaños, colores y animaciones al hacer hover
+
+🧩 Uso:
+   Se utiliza para renderizar un botón personalizable que ejecuta una acción al hacer clic. 
+   Admite múltiples colores y tamaños predefinidos, y cuenta con animación de escala 
+   al pasar el cursor. Ideal para formularios, acciones destacadas o navegación.
+
+🔧 Props:
+  - onClick: función que se ejecuta al hacer clic en el botón.
+  - color: cadena que define el color del botón. Valores posibles:
+      • green, red, yellow, blue, purple, sky, black
+  - size: cadena que define el tamaño del botón. Valores posibles:
+      • sm (pequeño), md (mediano), lg (grande)
+  - text: texto que se muestra dentro del botón.
+
+📌 Ejemplo de uso:
+
+<Button 
+  onClick={() => alert("Botón clickeado")}
+  color="green"
+  size="md"
+  text="Confirmar"
+/>
+*/
+
+ 
  import React from "react";
 
 export default function Button ({
