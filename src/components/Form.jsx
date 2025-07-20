@@ -34,16 +34,33 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import logoToloBlue from "../assets/logoToloBlue.png"
+import { FcGoogle } from "react-icons/fc";
+import Input from './Input';
 
-export default function Form({ fields, onSubmit, button, title, description, logo, className }) {
+
+export default function Form({ fields, onSubmit, button, title, description, logo, className, google, remember }) {
     const { register, handleSubmit, watch, formState: { errors } } = useForm()
     return (
-        <form action="" onSubmit={handleSubmit((data) => onSubmit(data, watch))} className={`w-75 bg-white m-auto p-3 shadow rounded-xl ${className}`}>
+        <form action="" onSubmit={handleSubmit((data) => onSubmit(data, watch))} className={`w-75 bg-white p-3 shadow rounded-xl ${className}`}>
             {logo ? <img src={logoToloBlue} className='w-16 h-10 object-contain'></img> : ""}
-            <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>{title}</h2>
-            <p className="text-sm text-gray-600">{description}</p>
+            <div className="flex flex-col mt-3 ml-3 items-start ">
+                <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>{title}</h2>
+                <p className="text-sm whitespace-nowrap
+ text-gray-600">{description}</p>
+            </div>
             {fields.map((input, index) => React.cloneElement(input, { register, errors, watch, key: index }))}
+            {remember ?
+                <div className='flex items-center ml-4'>
+                    <input className="cursor-pointer mr-2" type="checkbox" name='remember' />
+                    <label htmlFor="remember">Recuérdame</label>
+                    <span className='text-md cursor-pointer text-sky-700 hover:text-gray-700 hover:underline'>¿Olvidaste tu contraseña?</span>
+                </div> : undefined}
             {button}
+            {google ? <div className="flex flex-col items-center justify-center mt-3">
+                <span>O ingresa por:</span>
+                <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200 " />
+
+            </div> : undefined}
         </form>
     )
 }
