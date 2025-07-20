@@ -5,7 +5,7 @@ import { FaHome } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import Carrito3d from '../components/Carrito3d'
+import Carrito3d from '../components/Model3D'
 
 export default function HeaderNav() {
   const navigate = useNavigate();
