@@ -33,7 +33,7 @@
 
 import React from 'react';
 
-export default function Menu({elements}) {
+export default function Menu({elements, model3d}) {
     return (
             <ul className="m-3 flex items-center justify-between">
                 {elements.map((element, index) => (
@@ -56,6 +56,7 @@ export default function Menu({elements}) {
                         {element.icon.name}
                     </li>
                 ))}
+            {model3d ? model3d : undefined}
             </ul>
     );
 }

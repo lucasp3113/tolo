@@ -64,16 +64,20 @@ export default function Input({
   onChange,
   placeholder,
   label,
+  icon,
+  options = [],
   className = '',
 }) {
+  const Component = type === "select" ? "select" : "input"
 
   return (
-    <div className='flex flex-col m-3'>
-      <label htmlFor={name} className="text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
-        type={type}
+    <div className={type === "checkbox" ? "flex items-center gap-2 m-3" : "flex flex-col-reverse m-3 relative items-start"}>
+      {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
+      {type === "checkbox" ? undefined : <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+        {icon}
+      </button>}
+      <Component
+        {...(type !== "select" ? { type } : {})}
         name={name}
         id={name}
         value={value}
@@ -97,12 +101,16 @@ export default function Input({
             value: pattern.regex,
             message: pattern.message
           } : undefined
-
-
         })}
-        className={`${errors?.[name] && "border-red-600 border-2"} w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${className}`}
-      />
-      {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
+        className={`${errors?.[name] && "border-red-600 border-2"} ${type === "checkbox" ? "w-4 h-4 accent-blue-600" : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"} text-sm ${className}`}
+      >
+        {type === "select" ? options.map((option, index) => (
+          <option key={index} value={option}>{option}</option>
+        )) : undefined}
+      </Component>
+      <label htmlFor={name} className="text-sm font-medium text-gray-700">
+        {label}
+      </label>
     </div>
   );
 }
