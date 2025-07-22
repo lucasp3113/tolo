@@ -11,7 +11,7 @@ export default function HeaderNav() {
   const navigate = useNavigate();
   return (
     <header className='bg-sky-800 h-20 shadow-2xl sm:h-12 md:h-20 lg:h-32 flex items-center justify-between'>
-      <img src={logoTolo} alt="Logo Tolo" className='w-26 h-36 sm:w-12 sm:h-12 md:w-32 md:h-36 lg:w-40 lg:h-40' />
+      <img src={logoTolo} alt="Logo Tolo" className='w-26 h-36 sm:w-12 sm:h-12 md:w-32 md:h-36 lg:w-34 lg:h-40' />
       <Menu model3d={<Carrito3d src={"/carrito.glb"} className={"w-[100px] h-[60px] cursor-pointer"} cameraOrbit={"90deg 75deg auto"} onClick={() => navigate("")}/>} elements={[
         {
           "title": "Inicio",
