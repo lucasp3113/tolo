@@ -7,7 +7,7 @@ export default function Modelo3D({ onClick, src, className, cameraOrbit, autoRot
   useEffect(() => {
     if (modelRef.current) {
       // Setear la velocidad de rotación en segundos
-      modelRef.current.rotationPerSecond = 20; // más rápido que el default (1)
+      modelRef.current.rotationPerSecond = 100; // más rápido que el default (1)
     }
   }, []);
 
