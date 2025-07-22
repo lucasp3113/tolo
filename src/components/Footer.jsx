@@ -1,0 +1,57 @@
+import React from "react";
+import { FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaFacebookSquare } from "react-icons/fa";
+
+export default function Footer() {
+  const handleFbClick = () => {
+    window.open("https://www.facebook.com", "_blank");
+  };
+
+  const handleIgClick = () => {
+    window.open("https://www.instagram.com", "_blank");
+  };
+
+  const handleXClick = () => {
+    window.open("https://www.x.com", "_blank");
+  };
+
+  const handlePoliciesClick = () => {
+    window.open(
+      "https://support.google.com/webmasters/answer/2445990?hl=es",
+      "_blank"
+    );
+  };
+
+  return (
+    <footer className="w-full flex flex-col items-center justify-center mt-10 border-t border-gray-300 p-4 bg-sky-800 text-gray-400">
+      <p className="text-center text-sm mb-4 max-w-4xl">
+        © 2025 Valve Corporation. Todos los derechos reservados. Todas las marcas
+        registradas pertenecen a sus respectivos dueños en EE. UU. y otros países.
+        Todos los precios incluyen IVA (donde sea aplicable).
+      </p>
+
+      <nav className="flex gap-6 items-center justify-center">
+        <FaFacebookSquare
+          className="md:text-4xl cursor-pointer hover:text-sky-600 transition-all duration-300"
+          onClick={handleFbClick}
+        />
+        <FaInstagram
+          className="md:text-4xl cursor-pointer hover:text-pink-500 transition-all duration-300"
+          onClick={handleIgClick}
+        />
+        <FaXTwitter
+          className="md:text-4xl cursor-pointer hover:text-black transition-all duration-300"
+          onClick={handleXClick}
+        />
+        <button
+          onClick={handlePoliciesClick}
+          className="text-sm hover:text-sky-500 hover:underline transition-colors duration-300"
+        >
+          Políticas de Privacidad
+        </button>
+      </nav>
+    </footer>
+  );
+}
+
