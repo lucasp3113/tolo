@@ -26,6 +26,7 @@ export default function HeaderNav() {
               name: (
                 <FaHome className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
               ),
+              
               expand: true,
             },
             animation: false,
