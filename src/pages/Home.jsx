@@ -20,10 +20,10 @@ export default function Home() {
         ]}
       />
       <Dropdown
+        size="30" /*tamaño del icono*/
         text=""
-        cnhamburger="h-10" /*características adicionales del hamburger (tamaño maximo: h-10)*/
-        cndiv="ml-6"
-        theme="" /*hay solo dos hamburger: uno blanco (white) y uno negro (black, que es el predeterminado)*/
+        cnhamburger="" /*características adicionales del icono hamburger*/
+        cndiv="ml-15" /*Características del dropdown*/
         options={[
           /*opciones del dropdown*/ { label: "Iniciar Sesión", to: "/Login" },
           {

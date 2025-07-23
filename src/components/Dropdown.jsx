@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import blackHamburger from "../assets/blackHamburger.png";
-import whiteHamburger from "../assets/whiteHamburger.png";
+import { RxHamburgerMenu } from "react-icons/rx";
 
 const Dropdown = ({
+  size = "30",
   text = "",
   options = [],
   className = "",
@@ -30,15 +30,14 @@ const Dropdown = ({
         onClick={toggleDropdown}
         className={`${
           text === ""
-            ? "w-10 h-10 flex items-center justify-center"
+            ? "flex items-center justify-center cursor-pointer"
             : "flex items-center px-4 py-2"
         } ${className}`}
       >
         {text === "" ? (
-          <img
-            src={theme === "white" ? whiteHamburger : blackHamburger}
-            className={`object-contain ${cnhamburger}`}
-            alt="menu"
+          <RxHamburgerMenu
+            size={size}
+            className={`${cnhamburger}`}
           />
         ) : (
           <>
@@ -56,10 +55,12 @@ const Dropdown = ({
       </button>
 
       <ul
-        className={`absolute mt-1 z-20 ${
+       className={`absolute mt-1 z-20 ${
           text === "" ? "left-1/2 -translate-x-1/2" : "left-0"
         } w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out
-        ${isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"}`}
+        ${isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"} pointer-events-${
+          isOpen ? "auto" : "none"
+        }`}
       >
         {options.map((item, index) => (
           <li
