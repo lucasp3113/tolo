@@ -1,14 +1,13 @@
-import React from 'react'
-import logoTolo from "../assets/logoTolo.png"
-import Menu from './Menu'
-import { FaHome } from "react-icons/fa";
-import { FaUserCircle } from "react-icons/fa";
-import { FaUserPlus } from "react-icons/fa";
+import React from 'react';
+// import logoTolo from "../assets/logoTolo.png"
+import Menu from './Menu';
 import { useNavigate } from 'react-router-dom';
-import Carrito3d from '../components/Model3D'
+import Model3D from '../components/Model3D';
+import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 
 export default function HeaderNav() {
   const navigate = useNavigate();
+<<<<<<< HEAD
   return (
     <header className='bg-sky-800 h-20 shadow-2xl sm:h-12 md:h-20 lg:h-32 flex items-center justify-between'>
       <img src={logoTolo} alt="Logo Tolo" className='w-26 h-36 sm:w-12 sm:h-12 md:w-32 md:h-36 lg:w-34 lg:h-40' />
@@ -21,27 +20,57 @@ export default function HeaderNav() {
           },
           "animation": false,
           "onClick": () => navigate('/')
+=======
+>>>>>>> ffe6fd171ad29d42028109418b31183a351c3034
 
-        },
-        {
-          "title": "Iniciar Sesión",
-          "icon": {
-            "name": <FaUserCircle className='text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]' />,
-            "expand": true
+  return (
+    <header className="bg-sky-800 h-20 shadow-2xl sm:h-12 md:h-20 lg:h-32 flex items-center justify-between">
+      <Model3D
+        src="/tolo3D.glb"
+        className="w-[80px] h-full cursor-pointer scale-110"
+        cameraOrbit="10deg 85deg auto"
+        onClick={() => navigate('/')}
+      />
+
+      <Menu
+        model3d={[]}
+        elements={[
+          {
+            title: 'Inicio',
+            icon: {
+              name: (
+                <FaHome className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
+              ),
+              
+              expand: true,
+            },
+            animation: false,
+            onClick: () => navigate('/'),
           },
-          "animation": false,
-          "onClick": () => navigate("/login")
-        },
-        {
-          "title": "Crear cuenta",
-          "icon": {
-            "name": <FaUserPlus className='text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]' />,
-            "expand": true
+          {
+            title: 'Iniciar Sesión',
+            icon: {
+              name: (
+                <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
+              ),
+              expand: true,
+            },
+            animation: false,
+            onClick: () => navigate('/login'),
           },
-          "animation": false,
-          "onClick": () => navigate("/register")
-        },
-      ]}></Menu>
+          {
+            title: 'Crear cuenta',
+            icon: {
+              name: (
+                <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
+              ),
+              expand: true,
+            },
+            animation: false,
+            onClick: () => navigate('/register'),
+          },
+        ]}
+      />
     </header>
-  )
+  );
 }
