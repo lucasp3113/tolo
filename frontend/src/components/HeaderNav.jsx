@@ -1,5 +1,5 @@
 import React from 'react';
-// import logoTolo from "../assets/logoTolo.png"
+import logoTolo from "../assets/logoTolo.png"
 import Menu from './Menu';
 import { useNavigate } from 'react-router-dom';
 import Model3D from '../components/Model3D';
@@ -10,13 +10,7 @@ export default function HeaderNav() {
 
   return (
     <header className="bg-sky-800 h-20 shadow-2xl sm:h-12 md:h-20 lg:h-32 flex items-center justify-between">
-      <Model3D
-        src="/tolo3D.glb"
-        className="w-[80px] h-full cursor-pointer scale-110"
-        cameraOrbit="10deg 85deg auto"
-        onClick={() => navigate('/')}
-      />
-
+      <img src={logoTolo} onClick={() => navigate("/")}/>
       <Menu
         model3d={[]}
         elements={[
