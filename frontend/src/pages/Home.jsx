@@ -13,7 +13,6 @@ export default function Home() {
         <Input type={"text"}
          name={"search"} className='pr-10' icon={<IoSearch className='text-2xl text-gray-600'/>} placeholder={"Buscar"}/>
       ]}/>
-      <Tes/>
     </div>
   )
 }
