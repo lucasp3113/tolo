@@ -47,7 +47,7 @@
 />
 */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export default function Input({
   register,
@@ -70,12 +70,26 @@ export default function Input({
 }) {
   const Component = type === "select" ? "select" : "input"
 
+  const errorActual = errors?.[name];
+
+  useEffect(() => {
+    if (errorActual && 'vibrate' in navigator) {
+      navigator.vibrate(300);
+    }
+  }, [errorActual]);
+
   return (
     <div className={type === "checkbox" ? "flex items-center gap-2 m-3" : "flex flex-col-reverse m-3 relative items-start"}>
       {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
-      {type === "checkbox" ? undefined : <span className={errors[name] ?`absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400` : `absolute text-2xl right-3 top-1/2 text-gray-400`}>
-        {icon}
-      </span>}
+
+      {type === "checkbox" ? undefined : (
+        <span className={errors[name]
+          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400"
+          : "absolute text-2xl right-3 top-1/2 text-gray-400"}>
+          {icon}
+        </span>
+      )}
+
       <Component
         {...(type !== "select" ? { type } : {})}
         name={name}
@@ -103,17 +117,16 @@ export default function Input({
           } : undefined
         })}
         className={`w-full px-3 py-2 rounded-lg focus:outline-none
-  ${errors?.[name]
+          ${errors?.[name]
             ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
             : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'}
-  ${className}`}
-
-
+          ${className}`}
       >
         {type === "select" ? options.map((option, index) => (
           <option key={index} value={option}>{option}</option>
         )) : undefined}
       </Component>
+
       <label htmlFor={name} className="text-sm font-medium text-gray-700">
         {label}
       </label>
