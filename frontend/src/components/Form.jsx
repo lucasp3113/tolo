@@ -38,7 +38,7 @@ import { FcGoogle } from "react-icons/fc";
 import Input from './Input';
 
 
-export default function Form({ fields, onSubmit, button, title, description, logo, className, google, remember }) {
+export default function Form({ fields, onSubmit, button, title, description, logo, className, remember}) {
     const { register, handleSubmit, watch, formState: { errors } } = useForm()
     return (
         <form action="" onSubmit={handleSubmit((data) => onSubmit(data, watch))} className={`w-75 bg-white p-3 shadow rounded-xl ${className}`}>
@@ -56,11 +56,6 @@ export default function Form({ fields, onSubmit, button, title, description, log
                     <span className='text-md cursor-pointer text-sky-700 hover:text-gray-700 hover:underline'>¿Olvidaste tu contraseña?</span>
                 </div> : undefined}
             {button}
-            {google ? <div className="flex flex-col items-center justify-center mt-3">
-                <span>O ingresa por:</span>
-                <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200 " />
-
-            </div> : undefined}
         </form>
     )
 }

@@ -73,14 +73,14 @@ export default function Input({
   return (
     <div className={type === "checkbox" ? "flex items-center gap-2 m-3" : "flex flex-col-reverse m-3 relative items-start"}>
       {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
-      {type === "checkbox" ? undefined : <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+      {type === "checkbox" ? undefined : <span className={errors[name] ?`absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400` : `absolute text-2xl right-3 top-1/2 text-gray-400`}>
         {icon}
-      </button>}
+      </span>}
       <Component
         {...(type !== "select" ? { type } : {})}
         name={name}
         id={name}
-        value={value}
+        {...(type !== 'file' ? { value } : {})}
         onChange={onChange}
         placeholder={placeholder}
         {...register(`${name}`, {
@@ -102,7 +102,13 @@ export default function Input({
             message: pattern.message
           } : undefined
         })}
-        className={`${errors?.[name] && "border-red-600 border-2"} ${type === "checkbox" ? "w-4 h-4 accent-blue-600" : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"} text-sm ${className}`}
+        className={`w-full px-3 py-2 rounded-lg focus:outline-none
+  ${errors?.[name]
+            ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
+            : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'}
+  ${className}`}
+
+
       >
         {type === "select" ? options.map((option, index) => (
           <option key={index} value={option}>{option}</option>

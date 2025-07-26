@@ -10,7 +10,7 @@ export default function HeaderNav() {
 
   return (
     <header className="bg-sky-800 h-20 shadow-2xl sm:h-12 md:h-20 lg:h-32 flex items-center justify-between">
-      <img src={logoTolo} onClick={() => navigate("/")}/>
+      <img src={logoTolo} className='w-20 md:w-25 lg:w-25:' onClick={() => navigate("/")}/>
       <Menu
         model3d={[]}
         elements={[
