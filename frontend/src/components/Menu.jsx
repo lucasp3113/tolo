@@ -32,20 +32,32 @@
 
 
 import React from 'react';
+import { useState, useEffect } from 'react';
 
-export default function Menu({ elements, model3d }) {
+
+export default function Menu({ elements, model3d, className = "" }) {
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+          window.addEventListener("resize", handleResize);
+          
+          return () => {
+            window.removeEventListener("resize", handleResize);
+          };
+      }, [windowWidth])
+    const [selected, setSelected] = useState(null)
     return (
-        <ul className="m-3 flex items-center justify-between">
+        <ul className={`m-3 flex items-center justify-between ${className}`}>
             {elements.map((element, index) => (
                 <li onClick={element.onClick}
-                    className={`group text-white cursor-pointer flex items-center m-3 
+                    className={` group text-white cursor-pointer flex items-center m-3 
                         ${element.animation
                             ? "relative leading-none transition-transform duration-300 hover:scale-110 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-[3px] after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-700 hover:after:w-full"
                             : ""
                         }`}
                     key={index}
                 >
-                    <span
+                    <span 
                         className={`${element.icon.expand
                             ? "opacity-0 max-w-0 overflow-hidden group-hover:opacity-100 group-hover:sm:max-w-[100px] group-hover:md:max-w-[150px] group-hover:lg:max-w-[200px] transition-all duration-900 ease-in-out whitespace-nowrap inline-block font-[Montserrat,sans-serif] m-2 sm:text-[8px] md:text-[20px] lg:text-[20px]"
                             : ""
@@ -53,7 +65,19 @@ export default function Menu({ elements, model3d }) {
                     >
                         {element.title}
                     </span>
-                    {element.icon.name}
+                    <div className="flex flex-col items-center h-full justify-center">
+                        {React.cloneElement(
+                        element.icon.name,
+                        {
+                            className: `${element.icon.name.props.className || ""} ${selected === index ? "scale-140 mb-1" : undefined}`,
+                            onClick: () => element.onClick && windowWidth < 500 ? setSelected(index) : undefined
+
+                        }
+                    )}
+                    {selected === index ? <span className='absolute translate-y-8 '>{element.title}</span> : undefined}
+                    </div>
+
+
                 </li>
             ))}
             {model3d?.map((model, index) => (

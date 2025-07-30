@@ -27,7 +27,7 @@ export default function Register() {
     }, [selected]);
 
     return (
-        <form encType='multipart/form-data' onSubmit={handleSubmit(data => console.log(data))} className="w-75 m-auto mt-5 bg-white p-3 shadow rounded-xl">
+        <form encType='multipart/form-data' onSubmit={handleSubmit(data => console.log(data))} className="w-85 mb-52 m-auto mt-5 bg-white p-3 shadow rounded-xl">
             <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
             <div className="flex flex-col mt-3 ml-3 items-start ">
                 <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>Registro</h2>
