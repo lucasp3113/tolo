@@ -33,19 +33,29 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 
 export default function Menu({ elements, model3d, className = "" }) {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
-          window.addEventListener("resize", handleResize);
-          
-          return () => {
+        window.addEventListener("resize", handleResize);
+
+        return () => {
             window.removeEventListener("resize", handleResize);
-          };
-      }, [windowWidth])
+        };
+    }, [windowWidth])
     const [selected, setSelected] = useState(null)
+    const location = useLocation()
+    useEffect(() => {
+        const foundIndex = elements.findIndex(elements => elements.url === location.pathname);
+        if (foundIndex !== -1) {
+            setSelected(foundIndex);
+        }
+    }, [location.pathname, elements]);
+
+
     return (
         <ul className={`m-3 flex items-center justify-between ${className}`}>
             {elements.map((element, index) => (
@@ -57,7 +67,7 @@ export default function Menu({ elements, model3d, className = "" }) {
                         }`}
                     key={index}
                 >
-                    <span 
+                    <span
                         className={`${element.icon.expand
                             ? "opacity-0 max-w-0 overflow-hidden group-hover:opacity-100 group-hover:sm:max-w-[100px] group-hover:md:max-w-[150px] group-hover:lg:max-w-[200px] transition-all duration-900 ease-in-out whitespace-nowrap inline-block font-[Montserrat,sans-serif] m-2 sm:text-[8px] md:text-[20px] lg:text-[20px]"
                             : ""
@@ -67,14 +77,14 @@ export default function Menu({ elements, model3d, className = "" }) {
                     </span>
                     <div className="flex flex-col items-center h-full justify-center">
                         {React.cloneElement(
-                        element.icon.name,
-                        {
-                            className: `${element.icon.name.props.className || ""} ${selected === index ? "scale-140 mb-1" : undefined}`,
-                            onClick: () => element.onClick && windowWidth < 500 ? setSelected(index) : undefined
+                            element.icon.name,
+                            {
+                                className: `${element.icon.name.props.className || ""} ${selected === index ? "scale-140 mb-1" : undefined}`,
+                                onClick: () => element.onClick && windowWidth < 500 ? setSelected(index) : undefined
 
-                        }
-                    )}
-                    {selected === index ? <span className='absolute translate-y-8 '>{element.title}</span> : undefined}
+                            }
+                        )}
+                        {selected === index ? <span className='absolute translate-y-8 '>{element.title}</span> : undefined}
                     </div>
 
 
