@@ -84,7 +84,8 @@ export default function Menu({ elements, model3d, className = "" }) {
 
                             }
                         )}
-                        {selected === index ? <span className='absolute translate-y-8 '>{element.title}</span> : undefined}
+                        {selected === index ? <span className='absolute translate-y-8 font-mono text-xs tracking-tighter font-
+ '>{element.title}</span> : undefined}
                     </div>
 
 
