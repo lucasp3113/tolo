@@ -13,6 +13,7 @@ export default function MovileNav() {
             elements={[
                 {
                     title: 'Inicio',
+                    url: "/",
                     icon: {
                         name: <FaHome className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />,
                         expand: true,
@@ -22,6 +23,7 @@ export default function MovileNav() {
                 },
                 {
                     title: 'Iniciar Sesión',
+                    url: "/login",
                     icon: {
                         name: <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />,
                         expand: true,
@@ -31,6 +33,7 @@ export default function MovileNav() {
                 },
                 {
                     title: 'Crear cuenta',
+                    url: "/register",
                     icon: {
                         name: <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />,
                         expand: true,
