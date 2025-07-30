@@ -18,7 +18,7 @@ export default function MovileNav() {
                         expand: true,
                     },
                     animation: false,
-                    onClick: () => navigate('/'),
+                    onClick: () => navigate('/')
                 },
                 {
                     title: 'Iniciar Sesión',
