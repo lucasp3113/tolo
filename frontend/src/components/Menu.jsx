@@ -33,12 +33,12 @@
 
 import React from 'react';
 
-export default function Menu({ elements, model3d }) {
+export default function Menu({ elements, model3d, className = ""}) {
     return (
-        <ul className="m-3 flex items-center justify-between">
+        <ul className={`m-3 flex items-center justify-between ${className}`}>
             {elements.map((element, index) => (
                 <li onClick={element.onClick}
-                    className={`group text-white cursor-pointer flex items-center m-3 
+                    className={` group text-white cursor-pointer flex items-center m-3 
                         ${element.animation
                             ? "relative leading-none transition-transform duration-300 hover:scale-110 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-[3px] after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-700 hover:after:w-full"
                             : ""

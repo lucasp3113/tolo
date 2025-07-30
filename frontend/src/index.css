@@ -10,4 +10,7 @@
   animation: shake 0.8s ease-in-out;
 }
 
+body{
+  background-color: aliceblue;
+}
 
