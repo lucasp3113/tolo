@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import Form from '../components/Form'
 import Input from '../components/Input'
 import Button from '../components/Button'
 import { useForm } from 'react-hook-form'
@@ -151,7 +150,7 @@ export default function Register() {
             <div className="flex flex-col items-center justify-center mt-3">
                 <span>O ingresa por:</span>
                 <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200" />
-                <h1 className={message && message[1] ? "text-green-600": "text-red-600"}>{message ? message[0]: undefined}</h1>
+                <span className={message && message[1] ? "text-green-600": "text-red-600"}>{message ? message[0]: undefined}</span>
             </div>
         </form>
     )

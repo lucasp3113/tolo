@@ -41,7 +41,7 @@ import Input from './Input';
 export default function Form({ fields, onSubmit, button, title, description, logo, className, remember, google = false }) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm()
   return (
-    <form action="" onSubmit={handleSubmit((data) => onSubmit(data, watch))} className={`w-85 bg-white p-3 shadow rounded-xl ${className}`}>
+    <form action="" onSubmit={handleSubmit(onSubmit)} className={`w-85 bg-white p-3 shadow rounded-xl ${className}`}>
       {logo ? <img src={logoToloBlue} className='w-16 h-10 object-contain'></img> : ""}
       <div className="flex flex-col mt-3 ml-3 items-start ">
         <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>{title}</h2>
