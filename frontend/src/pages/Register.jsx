@@ -10,7 +10,7 @@ import { HiMail, HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import axios from 'axios'
 
 export default function Register() {
-    const [message, setMessage] = useState(undefined);
+    const [message, setMessage] = useState(null);
 
     const { register, watch, handleSubmit, formState: { errors } } = useForm()
     const selected = watch("select")
@@ -31,11 +31,9 @@ export default function Register() {
     function registrationRequest(data) {
         axios.post("/api/register.php", data)
             .then((res) => (
-                setMessage(["Cuenta creada con éxito", true]),
-                console.log(res.data)
+                setMessage([res.data.message, res.data.success])
             ))
-            .catch(() => setMessage(["Error, vuelve a intentarlo", false]))
-
+            .catch((err) => setMessage([err.response.data.message, err.response.data.success]))
     }
         
 
