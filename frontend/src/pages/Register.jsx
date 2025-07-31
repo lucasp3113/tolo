@@ -7,8 +7,11 @@ import { FcGoogle } from 'react-icons/fc'
 import logoToloBlue from '../assets/LogoToloBlue.png'
 import { FaUserCircle } from 'react-icons/fa'
 import { HiMail, HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
+import axios from 'axios'
 
 export default function Register() {
+    const [message, setMessage] = useState(undefined);
+
     const { register, watch, handleSubmit, formState: { errors } } = useForm()
     const selected = watch("select")
 
@@ -25,9 +28,21 @@ export default function Register() {
             setTimeout(() => setShowEcommerce(false), 50);
         }
     }, [selected]);
+    function registrationRequest(data) {
+        axios.post("/api/register.php", data)
+            .then((res) => (
+                setMessage(["Cuenta creada con éxito", true]),
+                console.log(res.data)
+            ))
+            .catch(() => setMessage(["Error, vuelve a intentarlo", false]))
+
+    }
+        
 
     return (
-        <form encType='multipart/form-data' onSubmit={handleSubmit(data => console.log(data))} className="w-85 mb-52 m-auto mt-5 bg-white p-3 shadow rounded-xl">
+        <form 
+        onSubmit={handleSubmit(registrationRequest)} 
+        className="w-85 mb-52 m-auto mt-5 bg-white p-3 shadow rounded-xl">
             <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
             <div className="flex flex-col mt-3 ml-3 items-start ">
                 <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>Registro</h2>
@@ -138,6 +153,7 @@ export default function Register() {
             <div className="flex flex-col items-center justify-center mt-3">
                 <span>O ingresa por:</span>
                 <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200" />
+                <h1 className={message && message[1] ? "text-green-600": "text-red-600"}>{message ? message[0]: undefined}</h1>
             </div>
         </form>
     )
