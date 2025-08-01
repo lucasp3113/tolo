@@ -1,6 +1,7 @@
 import React from 'react'
 import Form from '../components/Form';
 import Input from '../components/Input'
+import Dropdown from '../components/Dropdown'
 import { IoSearch } from "react-icons/io5";
 import { useState, useEffect } from 'react';
 
@@ -22,7 +23,17 @@ export default function Home() {
          name={"search"} className='pr-10' icon={<IoSearch className='-translate-y-1/2 text-2xl text-gray-600'/>} placeholder={"Buscar"}/>
       ]}/>
       ) : undefined}
-      
+      <Dropdown 
+      options={[
+    { label: "Mantons" },
+    { label: "Madelrey" },
+    { label: "Mantinx" },
+  ]}
+      direction = "r"
+/>
+
+
     </div>
+    
   )
 }
