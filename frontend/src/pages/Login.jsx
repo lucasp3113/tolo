@@ -1,62 +1,77 @@
 import React from 'react'
-import Form from '../components/Form'
+import { useForm } from 'react-hook-form'
 import Input from '../components/Input'
 import Button from '../components/Button'
 import { useState } from 'react'
 import { FaUserCircle } from 'react-icons/fa'
 import { HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
+import { FcGoogle } from 'react-icons/fc'
+import logoToloBlue from '../assets/logoToloBlue.png'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
+    const navigate = useNavigate()
+
     const [showPassword, setShowPassword] = useState(false)
 
     const [message, setMessage] = useState(null);
 
+    const { register, handleSubmit, formState: { errors }, setError } = useForm()
+
     function loginRequest(data) {
         axios.post("/api/login.php", data)
             .then((res) => {
-                setMessage([res.data.message, res.data.success])
+                localStorage.setItem("token", res.data.token);
+                navigate("/seller_dashboard")
             })
-            .catch((err) => setMessage([err.response.data.message, err.response.data.success]))
+            .catch((err) => {
+                setMessage([err.response.data.message, err.response.data.success])
+                message && message[1] ? undefined: setError(err.response.data.input, {
+                    type: "manual",
+                    message: err.response.data.message
+                }) 
+            })
     }
     return (
-        <div className="flex items-center justify-center m-5">
-            <Form 
-            onSubmit={loginRequest}
-            google={true} 
-            remember={true} 
-            logo={true} 
-            button={<Button className={"w-50"} 
-            color={"blue"} 
-            size={"md"} 
-            text={"Iniciar sesión"} />} 
-            className={" "} 
-            title={"Login"} 
-            description={"Completá el formulario para iniciar sesion."} 
-            fields={[
-                <Input
-                    icon={<FaUserCircle/>}
-                    type={"text"}
-                    name={"user"}
-                    placeholder={"Usuario"}
-                    required={true}
-                    label={"Usuario"}
-                />,
-                <Input
-                    icon={
-                        <div onClick={() => setShowPassword(!showPassword)} className="cursor-pointer">
-                            {showPassword ? <HiEye /> : <HiEyeOff />}
-                        </div>
-                    }
-                    label={"Contraseña"}
-                    type={showPassword ? "text" : "password"}
-                    name={"password"}
-                    placeholder={"Contraseña"}
-                    required={true}
-                />,
+        <form
+            onSubmit={handleSubmit(loginRequest)}
+            className="w-85 mb-52 m-auto mt-5 bg-white p-3 shadow rounded-xl">
+            <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
+            <div className="flex flex-col mt-3 ml-3 items-start ">
+                <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>Login</h2>
+                <p className="text-sm whitespace-nowrap text-gray-600">Completá el formulario para iniciar sesión.</p>
+            </div>
+            <Input
+                icon={<FaUserCircle />}
+                type={"text"}
+                name={"user"}
+                placeholder={"Usuario"}
+                required={true}
+                label={"Usuario"}
+                register={register}
+                errors={errors}
+            />
+            <Input
+                icon={
+                    <div onClick={() => setShowPassword(!showPassword)} className="cursor-pointer">
+                        {showPassword ? <HiEye /> : <HiEyeOff />}
+                    </div>
+                }
+                label={"Contraseña"}
+                type={showPassword ? "text" : "password"}
+                name={"password"}
+                placeholder={"Contraseña"}
+                required={true}
+                register={register}
+                errors={errors}
+            />
+            <Button className={"w-50"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
 
-            ]} />
-        <span className={message && message[1] ? "text-green-600": "text-red-600"}>{message ? message[0]: undefined}</span>
-        </div>
+            <div className="flex flex-col items-center justify-center mt-3">
+                <span>O ingresa por:</span>
+                <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200" />
+            </div>
+        </form>
     )
 }
