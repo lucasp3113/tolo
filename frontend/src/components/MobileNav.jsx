@@ -1,27 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import { BiLogOut } from "react-icons/bi";
 import Menu from './Menu';
 import { MdSpaceDashboard } from "react-icons/md";
+import { AuthContext } from '../context/AuthContext';
 
 
 export default function MovileNav() {
   const navigate = useNavigate();
-  const [isTokenValid, setIsTokenValid] = useState(false);
+  const { isLoggedIn, logout } = useContext(AuthContext);
 
-  useEffect(() => {
-    const expirationTime = localStorage.getItem("token_expiration");
-    const now = Math.floor(Date.now() / 1000);
-
-    if (!expirationTime || now > parseInt(expirationTime)) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("token_expiration");
-      setIsTokenValid(false);
-    } else {
-      setIsTokenValid(true);
-    }
-  }, []);
 
   const elements = [
     {
@@ -34,7 +23,7 @@ export default function MovileNav() {
       animation: false,
       onClick: () => navigate('/')
     },
-    !isTokenValid && {
+    !isLoggedIn && {
       title: 'Iniciar Sesión',
       url: "/login",
       icon: {
@@ -44,7 +33,7 @@ export default function MovileNav() {
       animation: false,
       onClick: () => navigate('/login'),
     },
-    !isTokenValid && {
+    !isLoggedIn && {
       title: 'Crear cuenta',
       url: "/register",
       icon: {
@@ -54,7 +43,7 @@ export default function MovileNav() {
       animation: false,
       onClick: () => navigate('/register'),
     },
-    isTokenValid && {
+    isLoggedIn && {
       title: 'Penel de control',
       icon: {
         name: <MdSpaceDashboard className="text-white text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
@@ -65,17 +54,17 @@ export default function MovileNav() {
         navigate('/seller_dashboard');
       }
     },
-    isTokenValid && {
+    isLoggedIn && {
       title: 'Cerrar sesión',
       icon: {
-        name: <BiLogOut className="text-white text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
+        name: <BiLogOut className="text-red-400 text-[35px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
         expand: true,
       },
       animation: false,
       onClick: () => {
         localStorage.removeItem("token");
         localStorage.removeItem("token_expiration");
-        setIsTokenValid(false);
+        logout()
         navigate('/');
       }
     },
