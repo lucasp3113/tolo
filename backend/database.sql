@@ -20,6 +20,8 @@ CREATE TABLE usuarios (
 
 DELETE FROM usuarios;
 
+SELECT nombre_usuario, contraseña FROM usuarios WHERE nombre_usuario = "Lucas";
+
 ALTER TABLE usuarios AUTO_INCREMENT = 1;
 
 SELECT * FROM usuarios;

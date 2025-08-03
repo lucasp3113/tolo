@@ -58,7 +58,7 @@ export default function Form({ fields, onSubmit, button, title, description, log
       {button}
       {google ? (
         <div className="flex flex-col items-center justify-center mt-3">
-        <span>O ingresa por:</span>
+        <span className=''>O ingresa por:</span>
         <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200" />
       </div>
       ) : undefined}
