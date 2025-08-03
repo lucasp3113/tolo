@@ -7,9 +7,12 @@ import logoToloBlue from '../assets/LogoToloBlue.png'
 import { FaUserCircle } from 'react-icons/fa'
 import { HiMail, HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 export default function Register() {
     const [message, setMessage] = useState(null);
+
+    const navigate = useNavigate()
 
     const { register, watch, handleSubmit, formState: { errors } } = useForm()
     const selected = watch("select")
@@ -29,9 +32,10 @@ export default function Register() {
     }, [selected]);
     function registrationRequest(data) {
         axios.post("/api/register.php", data)
-            .then((res) => (
-                setMessage([res.data.message, res.data.success])
-            ))
+            .then((res) => {
+                localStorage.setItem("token", res.data.token);
+                navigate("/seller_dashboard")
+            })
             .catch((err) => setMessage([err.response.data.message, err.response.data.success]))
     }
         

@@ -1,13 +1,35 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import axios from "axios";
 
 export default function RutaProtegida({ children }) {
-  const token = localStorage.getItem("token");
+  const [validando, setValidando] = useState(true);
+  const [valido, setValido] = useState(false);
 
-  if (!token) {
-    // Si no hay token, redirige al login
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setValido(false);
+      setValidando(false);
+      return;
+    }
 
-  // Si hay token, deja pasar
+    axios
+      .get(`/api/verify_token.php?token=${token}`)
+      .then(() => {
+        setValido(true);
+        setValidando(false);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        setValido(false);
+        setValidando(false);
+      });
+  }, []);
+
+  if (validando) return <p>Cargando...</p>;
+
+  if (!valido) return <Navigate to="/login" replace />;
+
   return children;
 }
