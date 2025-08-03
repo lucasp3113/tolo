@@ -1,13 +1,9 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { AuthContext } from "../context/AuthContext";
 
-// Crear el contexto
-export const AuthContext = createContext();
-
-// Provider para envolver la app y dar acceso al contexto
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Chequea expiración del token en localStorage
   useEffect(() => {
     const expiration = localStorage.getItem("token_expiration");
     const now = Math.floor(Date.now() / 1000);
@@ -21,14 +17,12 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Función para loguear (guardar token + expiración)
   function login(token, expiration) {
     localStorage.setItem("token", token);
     localStorage.setItem("token_expiration", expiration);
     setIsLoggedIn(true);
   }
 
-  // Función para desloguear
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("token_expiration");
