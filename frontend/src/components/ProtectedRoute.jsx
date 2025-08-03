@@ -27,7 +27,7 @@ export default function RutaProtegida({ children }) {
       });
   }, []);
 
-  if (validando) return <p>Cargando...</p>;
+  if (validando) return null
 
   if (!valido) return <Navigate to="/login" replace />;
 

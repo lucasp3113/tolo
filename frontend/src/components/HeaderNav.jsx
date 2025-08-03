@@ -79,7 +79,7 @@ export default function HeaderNav() {
                 isLoggedIn && {
                   title: 'Panel de control',
                   icon: {
-                    name: <MdSpaceDashboard className="text-white text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
+                    name: <MdSpaceDashboard className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px]" />,
                     expand: true,
                   },
                   animation: false,
@@ -90,7 +90,7 @@ export default function HeaderNav() {
                 isLoggedIn && {
                   title: 'Cerrar sesión',
                   icon: {
-                    name: <BiLogOut className="text-white text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
+                    name: <BiLogOut className="text-red-400 text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
                     expand: true,
                   },
                   animation: false,
