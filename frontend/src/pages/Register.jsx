@@ -11,6 +11,7 @@ import { HiMail, HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
+
 export default function Register() {
     const { login } = useContext(AuthContext);
     const [message, setMessage] = useState(null);
