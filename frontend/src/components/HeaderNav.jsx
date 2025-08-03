@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
+import { BiLogOut } from "react-icons/bi";
 import { IoSearch } from 'react-icons/io5';
-
 import logoTolo from "../assets/logoTolo.png";
 import Menu from './Menu';
 import Input from './Input';
 import Form from './Form';
+import { AuthContext } from '../context/AuthContext';
+import { MdSpaceDashboard } from 'react-icons/md';
 
 export default function HeaderNav() {
-  const navigate = useNavigate();
+  const { isLoggedIn, logout } = useContext(AuthContext);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
@@ -30,7 +30,7 @@ export default function HeaderNav() {
         onClick={() => navigate("/")}
         style={{ cursor: 'pointer' }}
       />
-      {windowWidth >= 500 ? (
+      {windowWidth >= 500 && (
         <>
           <Form
             className="!bg-transparent !shadow-none !rounded-none p-0 m-0 !outline-none !border-none w-100 absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 "
@@ -58,7 +58,7 @@ export default function HeaderNav() {
                   animation: false,
                   onClick: () => navigate('/'),
                 },
-                {
+                !isLoggedIn && {
                   title: 'Iniciar Sesión',
                   icon: {
                     name: <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />,
@@ -67,7 +67,7 @@ export default function HeaderNav() {
                   animation: false,
                   onClick: () => navigate('/login'),
                 },
-                {
+                !isLoggedIn && {
                   title: 'Crear cuenta',
                   icon: {
                     name: <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />,
@@ -76,11 +76,34 @@ export default function HeaderNav() {
                   animation: false,
                   onClick: () => navigate('/register'),
                 },
-              ]}
+                isLoggedIn && {
+                  title: 'Panel de control',
+                  icon: {
+                    name: <MdSpaceDashboard className="text-white text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
+                    expand: true,
+                  },
+                  animation: false,
+                  onClick: () => {
+                    navigate('/seller_dashboard');
+                  }
+                },
+                isLoggedIn && {
+                  title: 'Cerrar sesión',
+                  icon: {
+                    name: <BiLogOut className="text-white text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
+                    expand: true,
+                  },
+                  animation: false,
+                  onClick: () => {
+                    logout()
+                    navigate('/');
+                  },
+                }
+              ].filter(Boolean)}
             />
           </nav>
         </>
-      ) : null}
+      )}
     </header>
   );
 }

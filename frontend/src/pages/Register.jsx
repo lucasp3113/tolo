@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext';
 import Input from '../components/Input'
 import Button from '../components/Button'
 import { useForm } from 'react-hook-form'
@@ -10,6 +12,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 export default function Register() {
+    const { login } = useContext(AuthContext);
     const [message, setMessage] = useState(null);
 
     const navigate = useNavigate()
@@ -33,7 +36,9 @@ export default function Register() {
     function registrationRequest(data) {
         axios.post("/api/register.php", data)
             .then((res) => {
-                localStorage.setItem("token", res.data.token);
+                const token = res.data.token
+                const expiration = res.data.expiration
+                login(token, expiration);
                 navigate("/seller_dashboard")
             })
             .catch((err) => setMessage([err.response.data.message, err.response.data.success]))

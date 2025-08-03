@@ -6,47 +6,50 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import SellerDashboard from './pages/SellerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
     <div className="Tolo">
       <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Layout>
-                <Home />
-              </Layout>
-            }
-          />
-          <Route
-            path="/login/"
-            element={
-              <Layout>
-                <Login />
-              </Layout>
-            }
-          />
-          <Route
-            path="/register/"
-            element={
-              <Layout>
-                <Register />
-              </Layout>
-            }
-          />
-          <Route
-            path="/seller_dashboard/"
-            element={
-              <Layout>
-                <ProtectedRoute>
-                  <SellerDashboard />
-                </ProtectedRoute>
-              </Layout>
-            }
-          />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Layout>
+                  <Home />
+                </Layout>
+              }
+            />
+            <Route
+              path="/login/"
+              element={
+                <Layout>
+                  <Login />
+                </Layout>
+              }
+            />
+            <Route
+              path="/register/"
+              element={
+                <Layout>
+                  <Register />
+                </Layout>
+              }
+            />
+            <Route
+              path="/seller_dashboard/"
+              element={
+                <Layout>
+                  <ProtectedRoute>
+                    <SellerDashboard />
+                  </ProtectedRoute>
+                </Layout>
+              }
+            />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </div>
   );

@@ -1,4 +1,6 @@
 import React from 'react'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext';
 import { useForm } from 'react-hook-form'
 import Input from '../components/Input'
 import Button from '../components/Button'
@@ -11,6 +13,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate()
 
     const [showPassword, setShowPassword] = useState(false)
@@ -22,7 +25,9 @@ export default function Login() {
     function loginRequest(data) {
         axios.post("/api/login.php", data)
             .then((res) => {
-                localStorage.setItem("token", res.data.token);
+                const token = res.data.token
+                const expiration = res.data.expiration
+                login(token, expiration);
                 navigate("/seller_dashboard")
             })
             .catch((err) => {
