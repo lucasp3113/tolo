@@ -9,7 +9,6 @@ const Dropdown = ({
   className = "",
   cnhamburger = "",
   cndiv = "",
-  theme = "black",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();

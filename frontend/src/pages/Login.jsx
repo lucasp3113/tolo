@@ -27,8 +27,16 @@ export default function Login() {
             .then((res) => {
                 const token = res.data.token
                 const expiration = res.data.expiration
+                const userType = res.data.user_type
                 login(token, expiration);
-                navigate("/seller_dashboard")
+                const urls = {
+                    ecommerce: "/ecommerce_dashboard",
+                    vendedor_particular: "/seller_dashboard",
+                    cliente: "/client_dashboard"
+
+                }
+                navigate(urls[userType])
+                
             })
             .catch((err) => {
                 setMessage([err.response.data.message, err.response.data.success])
