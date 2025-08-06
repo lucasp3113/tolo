@@ -13,7 +13,6 @@ import Button from '../components/Button'
 export default function EcommerceDashboard() {
     const navigate = useNavigate()
 
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [ecommerceName, setEcommerceName] = useState(null);
     const [cumulativeBilling, setCumulativeBilling] = useState(0);
     const [currentRange, setCurrentRange] = useState(null);
@@ -21,6 +20,8 @@ export default function EcommerceDashboard() {
     const [commissionPercentage, setCommissionPercentage] = useState(null);
     const [nextRange, setNextRange] = useState(null)
     const [nextPercentage, setNextPercentage] = useState(null)
+
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
@@ -76,6 +77,9 @@ export default function EcommerceDashboard() {
     return (
         <div className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
             <Card className={`w-full max-w-md text-center  ${windowWidth < 500 ? "m-auto" : ""}`}>
+                <h1 className='text-5xl font-bold font-mono tracking-tight 
+        mb-2'>{ecommerceName}</h1>
+        <hr className='mb-2' />
                 <h2 className="text-3xl font-bold font-mono tracking-tight 
         mb-2">Rango actual</h2>
                 <h3 className={`text-3xl font-semibold ${colorsCurrentRange[currentRange] || 'text-gray-700'}`}>
@@ -105,7 +109,7 @@ export default function EcommerceDashboard() {
                     <h2 className='text-3xl font-bold font-mono tracking-tight mb-2'>Ganancias totales</h2>
                     <p className='font-semibold text-2xl'>{cumulativeBilling}$</p>
                 </Card>
-                <Button className={"mb-28 mt-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/")}/>
+                <Button className={"mb-28 mt-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/product/")}/>
                 
             </section>
         </div>

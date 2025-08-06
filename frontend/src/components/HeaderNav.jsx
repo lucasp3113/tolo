@@ -4,6 +4,7 @@ import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import { BiLogOut } from "react-icons/bi";
 import { IoSearch } from 'react-icons/io5';
 import { MdSpaceDashboard } from 'react-icons/md';
+import axios from 'axios';
 
 import logoTolo from "../assets/logoTolo.png";
 import Menu from './Menu';
@@ -22,6 +23,28 @@ export default function HeaderNav() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    let user = null;
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      user = payload.user;
+    }
+    axios.post("/api/type_user.php", {
+      usuario: user
+    })
+      .then((res) => {
+        setUserType(res.data.user_type);
+        console.log(res.data.user_type)
+      })
+      .catch((err) => {
+        console.error("Error al obtener datos del ecommerce:", err);
+      });
+  }, []);
+
+  const [userType, setUserType] = useState(null);
+
   return (
     <header className="bg-sky-800 relative h-20 shadow-2xl sm:h-12 md:h-20 lg:h-20 flex items-center justify-between">
       <img
@@ -33,7 +56,7 @@ export default function HeaderNav() {
       />
 
       <Form
-        className={`!bg-transparent !shadow-none !rounded-none p-0 m-0 !outline-none !border-none  ${windowWidth <500 ? "w-[400px]" : "w-100 absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2"}`}
+        className={`!bg-transparent !shadow-none !rounded-none p-0 m-0 !outline-none !border-none  ${windowWidth < 500 ? "w-[400px]" : "w-100 absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2"}`}
         fields={[
           <Input
             key="search"
@@ -85,7 +108,7 @@ export default function HeaderNav() {
                   expand: true,
                 },
                 animation: false,
-                onClick: () => navigate('/seller_dashboard'),
+                onClick: () => navigate(userType === "ecommerce" ? "/ecommerce_dashboard/" : "/seller_dashboard/"),
               },
               isLoggedIn && {
                 title: 'Cerrar sesión',
@@ -95,6 +118,8 @@ export default function HeaderNav() {
                 },
                 animation: false,
                 onClick: () => {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("token_expiration");
                   logout();
                   navigate('/');
                 },
