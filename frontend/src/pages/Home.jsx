@@ -17,18 +17,24 @@ export default function Home() {
     };
   }, []);
   return (
-    <div className='flex items-center flex-col justify-center'>
+    <section className='flex items-center flex-col justify-center'>
       {windowWidth < 500 ? (
-        <Form className={"!bg-transparent !shadow-none !border-none !rounded-none"} fields={[
-          <Input type={"text"}
-            name={"search"} className='pr-10' icon={<IoSearch className='-translate-y-1/2 text-2xl text-gray-600' />} placeholder={"Buscar"} />
-        ]} />
-      ) : undefined}
-      <div className="flex w-full items-center justify-center">
+        <>
+          <section className="flex flex-col w-full mb-20 items-center justify-center">
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={0} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={101} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={30} freeShipping={true} phone={true} />
+          </section>
+        </>
+      ) : <section className="flex mb-20 w-full items-center justify-center">
         <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
-        
-      </div>
+        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
 
-    </div>
+      </section>}
+
+
+    </section>
   )
 }

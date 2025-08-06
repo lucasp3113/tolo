@@ -71,7 +71,7 @@ export default function MovileNav() {
   ].filter(Boolean);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-center w-full">
+    <nav className="fixed h-22 bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-center w-full">
       <Menu className="w-75" model3d={[]} elements={elements} />
     </nav>
   );

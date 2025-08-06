@@ -22,8 +22,10 @@
 */
 
 import React from "react";
+import Button from "./Button";
 
-export default function ProductCard({ name, price, image, stock, freeShipping }) {
+
+export default function ProductCard({ name, price, image, stock, freeShipping, phone = false }) {
   let stockMessage = "";
   let stockColor = "";
   if (stock === 0) {
@@ -41,25 +43,22 @@ export default function ProductCard({ name, price, image, stock, freeShipping })
   }
 
   return (
-    <div className="w-60 m-5 bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-      <div className="relative w-full">
-        {/* Imagen del producto */}
+    <div className={`cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center  ${phone ? "w-full mb-2 m-0 " : "h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow"}`}>
         <img
           src={image}
           alt={name}
-          className="w-full h-48 sm:h-56 md:h-64 object-cover"
+          className="w-44 h-full sm:h-full md:h-full object-cover"
         />
-      </div>
 
-      <div className="p-4 flex flex-col flex-grow">
-        <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">{name}</h2>
-        <p className="text-xl font-bold text-gray-900 mt-2">${price}</p>
+      <div className="p-4 flex flex-col w-full items-center justify-center">
+        <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">{name}</h2>
+        <p className="text-xl m-1 font-bold text-gray-900 mt-2">${price}</p>
 
         {freeShipping && (
-          <p className="text-green-500 text-sm font-medium mt-1">Envío gratis</p>
+          <p className="text-green-500 m-1 text-sm font-medium mt-1">Envío gratis</p>
         )}
-
-        <p className={`text-sm font-medium mt-1 ${stockColor}`}>{stockMessage}</p>
+        <p className={`text-sm font-medium m-1 ${stockColor}`}>{stockMessage}</p>
+        <Button color={"blue"} size={"md"} text={"Añadir al carrito"}/>
       </div>
     </div>
   );

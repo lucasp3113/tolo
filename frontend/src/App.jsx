@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import SellerDashboard from './pages/SellerDashboard';
+import EcommerceDashboard from './pages/EcommerceDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
 
@@ -48,6 +49,13 @@ function App() {
                 </Layout>
               }
             />
+            <Route path='/ecommerce_dashboard/' element={
+              <Layout>
+                  <ProtectedRoute>
+                    <EcommerceDashboard />
+                  </ProtectedRoute>
+                </Layout>
+            }/>
           </Routes>
         </AuthProvider>
       </BrowserRouter>
