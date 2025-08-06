@@ -3,6 +3,13 @@ mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
+require '../vendor/autoload.php';
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+$secret_key = "LA_CACHIMBA_AMA";
+$issued_at = time();
+$expiration_time = $issued_at + 3600;
+
 $data_base = new mysqli("localhost", "root", "", "tolo");
 
 if ($data_base) {
@@ -53,11 +60,20 @@ if ($data_base) {
             exit;
          }
       } else {
+         $payload = [
+            "iss" => "http://tu-dominio.com", // issuer: quién emite el token
+            "iat" => $issued_at,               // issued at: cuándo se emitió
+            "exp" => $expiration_time,        // expiration time: cuándo expira
+            "user" => $username                   // datos que quieras incluir
+         ];
+         // Generamos el token firmado con HS256 y la clave secreta
+         $jwt = JWT::encode($payload, $secret_key, 'HS256');
          http_response_code(200);
-            echo json_encode([
-               "success" => true,
-               "message" => 'Cuenta creada con éxito'
-            ]);
+         echo json_encode([
+            "success" => true,
+            "message" => 'Cuenta creada con éxito',
+            "token"=> $jwt
+         ]);
       }
       $query->close();
       $data_base->close();
