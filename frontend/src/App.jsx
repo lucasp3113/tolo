@@ -8,6 +8,7 @@ import SellerDashboard from './pages/SellerDashboard';
 import EcommerceDashboard from './pages/EcommerceDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
+import Product from './pages/Product';
 
 function App() {
   return (
@@ -50,11 +51,18 @@ function App() {
               }
             />
             <Route path='/ecommerce_dashboard/' element={
-              <Layout>
+                <Layout>
                   <ProtectedRoute>
                     <EcommerceDashboard />
                   </ProtectedRoute>
                 </Layout>
+            }/>
+            <Route path='/product/' element={
+              <Layout>
+                <ProtectedRoute>
+                  <Product/>
+                </ProtectedRoute>
+              </Layout>
             }/>
           </Routes>
         </AuthProvider>
