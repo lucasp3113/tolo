@@ -26,7 +26,7 @@ if ($data_base) {
 
     /*Arma una consulta sql, pero no completa, si no q crea marcadores de posicion(Los ?). Y luego hay q rellenar esos lugares. Esto se hace asi, para q no se puedan hacer inyecciones sql
      */
-    $query = $data_base->prepare("SELECT nombre_usuario, contraseña FROM usuarios WHERE nombre_usuario = ? ");
+    $query = $data_base->prepare("SELECT nombre_usuario, contraseña, tipo_usuario FROM usuarios WHERE nombre_usuario = ? ");
 
     //Completa los marcadores de posición(?) en orden de las varibles que se le pase como parametro  a bind_param. El primer parametro indica de que tipo de variable(String, int), son los datos q se pasas, en orden.
     $query->bind_param("s", $user);
@@ -58,8 +58,11 @@ if ($data_base) {
                 "input" => "user"
             ]);
         } else {
+            $array_result = $result->fetch_assoc();
+            //guarda el tipo de usuario
+            $user_type = $array_result["tipo_usuario"];
             //si no(si encontró un usuario), compara la contraseña de la base de datos con la contraseña que ingresó el usuario:
-            if (password_verify($password, $result->fetch_assoc()["contraseña"])) {
+            if (password_verify($password, $array_result["contraseña"])) {
                 $payload = [
                     "iss" => "http://tu-dominio.com", // issuer: quién emite el token
                     "iat" => $issued_at,               // issued at: cuándo se emitió
@@ -74,7 +77,9 @@ if ($data_base) {
                 echo json_encode([
                     "success" => true,
                     "message" => "Logeado con éxito",
-                    "token"=> $jwt
+                    "token" => $jwt,
+                    "expiration" => $expiration_time,
+                    "user_type" => $user_type
                 ]);
             } else {
                 http_response_code(400);

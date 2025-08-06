@@ -39,6 +39,7 @@ CREATE TABLE rangos (
     facturacion_minima INT NOT NULL DEFAULT 0,
     porcentaje_comision DECIMAL(4, 2) NOT NULL
 );
+SELECT * FROM rangos
 
 INSERT INTO
     rangos (
