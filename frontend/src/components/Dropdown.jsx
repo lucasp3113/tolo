@@ -64,8 +64,12 @@ const Dropdown = ({
         {options.map((item, index) => (
           <li
             key={index}
-            onClick={() => handleClick(item)}
-            className="hover:bg-gray-200 py-3 px-6 whitespace-nowrap cursor-pointer transition-all duration-200 ease-in-out transform hover:scale-105"
+            onClick={() => {
+              setIsOpen(false);
+              if (item.to) navigate(item.to); // redirección
+              if (item.onClick) item.onClick(); // otra acción
+            }}
+            className="hover:bg-gray-200 py-2 px-4 cursor-pointer transition-all duration-200 ease-in-out transform hover:scale-105"
           >
             {item.label}
           </li>
