@@ -48,7 +48,7 @@ export default function Button ({
    const sizes = {
      sm: "p-1 text-sm",
      md:"p-2 text-sm",
-     lg: "p-3 text-md"
+     lg: "p-2 text-md"
    };
 
   return (

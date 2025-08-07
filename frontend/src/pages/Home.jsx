@@ -3,7 +3,9 @@ import Form from "../components/Form";
 import Input from "../components/Input";
 import Dropdown from "../components/Dropdown";
 import { IoSearch } from "react-icons/io5";
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import ProductCard from '../components/ProductCard';
+import pelota from '../assets/pelota.png'
 
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -16,41 +18,24 @@ export default function Home() {
     };
   }, []);
   return (
-    <div className="flex items-center justify-center">
+    <section className='flex items-center flex-col justify-center'>
       {windowWidth < 500 ? (
-        <Form
-          className={"!bg-transparent !shadow-none !border-none !rounded-none"}
-          fields={[
-            <Input
-              type={"text"}
-              name={"search"}
-              className="pr-10"
-              icon={
-                <IoSearch className="-translate-y-1/2 text-2xl text-gray-600" />
-              }
-              placeholder={"Buscar"}
-            />,
-          ]}
-        />
-      ) : undefined}
-      <Dropdown
-        options={[
-          {
-            label: "Archivo",
-            children: [
-              { label: "Nuevo", onClick: () => alert("Nuevo") },
-              {
-                label: "Recientes",
-                children: [
-                  { label: "Proyecto 1", onClick: () => alert("P1") },
-                  { label: "Proyecto 2", onClick: () => alert("P2") },
-                ],
-              },
-            ],
-          },
-          { label: "Editar", path: "/editar" },
-        ]}
-      />
-    </div>
-  );
+        <>
+          <section className="flex flex-col w-full mb-20 items-center justify-center">
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={0} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={101} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={30} freeShipping={true} phone={true} />
+          </section>
+        </>
+      ) : <section className="flex mb-20 w-full items-center justify-center">
+        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+
+      </section>}
+
+
+    </section>
+  )
 }

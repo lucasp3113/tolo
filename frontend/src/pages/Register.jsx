@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext';
 import Input from '../components/Input'
 import Button from '../components/Button'
 import { useForm } from 'react-hook-form'
@@ -7,9 +9,14 @@ import logoToloBlue from '../assets/LogoToloBlue.png'
 import { FaUserCircle } from 'react-icons/fa'
 import { HiMail, HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+
 
 export default function Register() {
+    const { login } = useContext(AuthContext);
     const [message, setMessage] = useState(null);
+
+    const navigate = useNavigate()
 
     const { register, watch, handleSubmit, formState: { errors } } = useForm()
     const selected = watch("select")
@@ -29,9 +36,12 @@ export default function Register() {
     }, [selected]);
     function registrationRequest(data) {
         axios.post("/api/register.php", data)
-            .then((res) => (
-                setMessage([res.data.message, res.data.success])
-            ))
+            .then((res) => {
+                const token = res.data.token
+                const expiration = res.data.expiration
+                login(token, expiration);
+                navigate("/seller_dashboard")
+            })
             .catch((err) => setMessage([err.response.data.message, err.response.data.success]))
     }
         
