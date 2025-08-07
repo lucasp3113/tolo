@@ -8,8 +8,9 @@ const Dropdown = ({
   options = [],
   className = "",
   cnhamburger = "",
+   isSubmenu = false,
   cndiv = "",
-  direction = "d", // 👉 NUEVO: "d" = down, "r" = right, "l" = left
+  direction = "d", // "d" = down, "r" = right, "l" = left
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -35,30 +36,51 @@ const Dropdown = ({
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  // 👉 Direcciones dinámicas
-  let positionClasses = "";
+let positionClasses = "";
+let originClass = "";
 
-  if (direction === "d") {
-    positionClasses = text === "" ? "left-1/2 -translate-x-1/2 top-full" : "left-0 top-full";
-  } else if (direction === "r") {
-    positionClasses = "left-full top-0";
-  } else if (direction === "l") {
-    positionClasses = "right-full top-0";
-  } else {
-    positionClasses = "left-0 top-full"; // fallback
+if (!isSubmenu) {
+
+switch (direction) {
+  case "d":
+    positionClasses = text === "" 
+      ? "left-1/2 -translate-x-1/2 top-full mt-2" 
+      : "left-0 top-full mt-2";
+    originClass = "origin-top";
+    break;
+  case "r":
+    positionClasses = "left-full top-0 ml-2";
+    originClass = "origin-left";
+    break;
+  case "l":
+    positionClasses = "right-full top-0 mr-2";
+    originClass = "origin-right";
+    break;
+  default:
+    positionClasses = "left-0 top-full mt-2";
+    originClass = "origin-top";
+}
+}
+
+else {
+    // Submenu siempre va a la derecha, centrado verticalmente
+    positionClasses = "top-0 left-full ml-1";
+    transformClass = "";
+    originClass = "origin-left";
   }
+
 
   return (
     <div
       ref={dropdownRef}
-      className={`relative inline-block ${cndiv}`}
+      className={`relative inline-block ml-2 mr-2 ${cndiv}`}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
       <button
         className={`${
           text === ""
-            ? "flex items-center justify-center cursor-pointer"
+            ? "flex items-center justify-center cursor-pointer w-10 h-10"
             : "flex items-center px-4 py-2"
         } ${className}`}
       >
@@ -80,12 +102,10 @@ const Dropdown = ({
       </button>
 
       <ul
-        className={`absolute mt-1 z-20 ${positionClasses} w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen
-            ? "opacity-100 pointer-events-auto max-h-60"
-            : "opacity-0 pointer-events-none max-h-0"
-        }`}
-      >
+  className={`absolute z-20 ${positionClasses} ${originClass}
+    w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out
+    ${isOpen ? "opacity-100 pointer-events-auto max-h-60 scale-100" : "opacity-0 pointer-events-none max-h-0 scale-95"}`}
+>
         {options.map((item, index) => (
           <li
             key={index}
