@@ -5,6 +5,8 @@ import { IoSearch } from "react-icons/io5";
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import pelota from '../assets/pelota.png'
+import Dropdown from '../components/Dropdown';
+import Button from '../components/Button';
 
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
@@ -33,7 +35,6 @@ export default function Home() {
         <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
 
       </section>}
-
 
     </section>
   )
