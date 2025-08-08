@@ -6,6 +6,8 @@ import { IoSearch } from "react-icons/io5";
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import pelota from '../assets/pelota.png'
+import Dropdown from '../components/Dropdown';
+import Button from '../components/Button';
 
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -22,19 +24,18 @@ export default function Home() {
       {windowWidth < 500 ? (
         <>
           <section className="flex flex-col w-full mb-20 items-center justify-center">
-            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} phone={true} />
-            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={0} freeShipping={true} phone={true} />
-            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={101} freeShipping={true} phone={true} />
-            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={30} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={0} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={101} freeShipping={true} phone={true} />
+            <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={30} freeShipping={true} phone={true} />
           </section>
         </>
       ) : <section className="flex mb-20 w-full items-center justify-center">
-        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
-        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
-        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+        <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+        <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+        <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
 
       </section>}
-
 
     </section>
   )
