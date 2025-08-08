@@ -58,7 +58,6 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           <p className="text-green-500 m-1 text-sm font-medium mt-1">Envío gratis</p>
         )}
         <p className={`text-sm font-medium m-1 ${stockColor}`}>{stockMessage}</p>
-        <Button color={"blue"} size={"md"} text={"Añadir al carrito"}/>
       </div>
     </div>
   );

@@ -78,44 +78,96 @@
   - Se abre al pasar el mouse por encima.
   - Las opciones con `type: "custom"` permiten insertar cualquier componente de React.
   - El submenú también se despliega al pasar el mouse (ideal para menús multinivel).
+  - En móvil, los dropdowns anidados no se cierran automáticamente para mejor UX.
 */
 
-
-import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { IoClose } from "react-icons/io5";
+import { useState, useEffect } from "react";
+import {
+  IoIosArrowUp,
+  IoIosArrowDown,
+  IoIosArrowBack,
+  IoIosArrowForward,
+} from "react-icons/io";
 
 const Dropdown = ({
-  size = "30",
+  direction = "d",
   text = "",
   options = [],
-  className = "",
+  size = 40,
   cnhamburger = "",
   cndiv = "",
-  direction = "d",
+  className = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
-  const getDirectionStyles = () => {
+  // Detecta si es móvil al montar
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || "ontouchstart" in window);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const getDirectionConfig = () => {
     switch (direction) {
       case "l":
-        return "right-full top-1/2 -translate-y-1/2";
+        return {
+          styles: "right-full top-1/2 -translate-y-1/2",
+          ArrowClosed: IoIosArrowBack,
+        };
       case "r":
-        return "left-full top-1/2 -translate-y-1/2";
+        return {
+          styles: "left-full top-1/2 -translate-y-1/2",
+          ArrowClosed: IoIosArrowForward,
+        };
+      case "u":
+        return {
+          styles: "left-1/2 -translate-x-1/2 bottom-full",
+          ArrowClosed: IoIosArrowUp,
+        };
       case "d":
       default:
-        return "left-1/2 -translate-x-1/2 top-full";
+        return {
+          styles: "left-1/2 -translate-x-1/2 top-full",
+          ArrowClosed: IoIosArrowUp,
+        };
     }
+  };
+
+  const { styles, ArrowClosed } = getDirectionConfig();
+
+  // Handlers distintos para móvil y PC
+  const openMenu = () => !isMobile && setIsOpen(true);
+  const closeMenu = () => !isMobile && setIsOpen(false);
+  const toggleMenu = () => isMobile && setIsOpen(!isOpen);
+
+  // Función para verificar si un elemento tiene dropdown anidado
+  const hasNestedDropdown = (item) => {
+    if (item.type === "custom" && item.content) {
+      const contentString = item.content.toString();
+      return (
+        contentString.includes("Dropdown") ||
+        (item.content.type && item.content.type.name === "Dropdown")
+      );
+    }
+    return false;
   };
 
   return (
     <div
       className={`relative inline-block ${cndiv}`}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseEnter={openMenu}
+      onMouseLeave={closeMenu}
     >
       <button
+        onClick={toggleMenu}
         className={`${
           text === ""
             ? "flex items-center justify-center cursor-pointer"
@@ -123,25 +175,58 @@ const Dropdown = ({
         } ${className}`}
       >
         {text === "" ? (
-          <RxHamburgerMenu size={size} className={`${cnhamburger}`} />
+          <div className="relative">
+            {/* Hamburguesa */}
+            <RxHamburgerMenu
+              size={size}
+              className={`${cnhamburger} transition-all duration-300 ease-in-out ${
+                isOpen
+                  ? "opacity-0 rotate-180 scale-75"
+                  : "opacity-100 rotate-0 scale-100"
+              }`}
+              style={{ fontSize: size || "24px" }}
+            />
+            {/* X */}
+            <IoClose
+              size={size}
+              className={`${cnhamburger} absolute top-0 left-0 transition-all duration-300 ease-in-out ${
+                isOpen
+                  ? "opacity-100 rotate-0 scale-100"
+                  : "opacity-0 rotate-180 scale-75"
+              }`}
+              style={{ fontSize: size || "24px" }}
+            />
+          </div>
         ) : (
           <>
             <span>{text}</span>
-            <svg className="fill-current h-4 w-4 ml-2" viewBox="0 0 20 20">
-              <path
-                d="M5.25 7.75L10 12.5l4.75-4.75"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                fill="none"
+            <div className="relative ml-2 mt-1">
+              {/* Flecha cerrado (dirección específica) */}
+              <ArrowClosed
+                className={`transition-all duration-300 ease-in-out ${
+                  isOpen
+                    ? "opacity-0 rotate-180 scale-75"
+                    : "opacity-100 rotate-0 scale-100"
+                }`}
               />
-            </svg>
+              {/* Flecha abierto (siempre hacia abajo) */}
+              <IoIosArrowDown
+                className={`absolute top-0 left-0 transition-all duration-300 ease-in-out ${
+                  isOpen
+                    ? "opacity-100 rotate-0 scale-100"
+                    : "opacity-0 rotate-180 scale-75"
+                }`}
+              />
+            </div>
           </>
         )}
       </button>
 
       <ul
-        className={`absolute ${getDirectionStyles()} mt-1 z-50 w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out whitespace-nowrap ${
-          isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+        className={`minWidth: '100%' absolute ${styles} z-50 bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out ${
+          isOpen
+            ? "opacity-100 scale-100"
+            : "opacity-0 scale-95 pointer-events-none"
         }`}
       >
         {options.map((item, index) => (
@@ -151,9 +236,13 @@ const Dropdown = ({
               e.stopPropagation();
               if (item.onClick) item.onClick();
               if (item.to) navigate(item.to);
-              setIsOpen(false);
+
+              // En móvil, solo cerrar si NO es un dropdown anidado
+              if (isMobile && !hasNestedDropdown(item)) {
+                setIsOpen(false);
+              }
             }}
-            className={`py-2 px-4 transition-all duration-200 ease-in-out transform ${
+            className={`py-2 px-4 transition-all duration-200 ease-in-out transform select-none whitespace-nowrap ${
               item.type === "custom"
                 ? "cursor-default hover:bg-transparent"
                 : "cursor-pointer hover:bg-gray-200 hover:scale-105"
