@@ -68,7 +68,7 @@ export default function Input({
   options = [],
   className = '',
 }) {
-  const Component = type === "select" ? "select" : "input"
+  const Component = type === "select" ? "select" : type === "textarea" ? "textarea" : "input"
 
   const errorActual = errors?.[name];
 
@@ -82,7 +82,13 @@ export default function Input({
     <div className={type === "checkbox" ? "flex items-center gap-2 m-3" : "flex flex-col-reverse m-3 relative items-start"}>
       {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
 
-      {type === "checkbox" ? undefined : (
+      {type === "checkbox" ? undefined : type === "textarea" ? (
+        <span className={errors[name]
+          ? "absolute text-2xl -translate-1/3 right-1 bottom-[65px] text-gray-400"
+          : "absolute text-2xl right-3 bottom-[65px] text-gray-400"}>
+          {icon}
+        </span>
+      ) : (
         <span className={errors[name]
           ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400"
           : "absolute text-2xl right-3 top-1/2 text-gray-400"}>
@@ -116,11 +122,18 @@ export default function Input({
             message: pattern.message
           } : undefined
         })}
-        className={`w-full px-3 py-2 rounded-lg focus:outline-none
-          ${errors?.[name]
-            ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
-            : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'}
-          ${className}`}
+        className={`
+  ${type === "textarea" ? "h-24" : ""}
+  w-full px-3 py-2 rounded-lg
+  ${type === "checkbox"
+            ? "focus:outline-none focus:ring-0 focus:border-transparent"
+            : errors?.[name]
+              ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
+              : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          }
+  ${className}
+`}
+
       >
         {type === "select" ? options.map((option, index) => (
           <option key={index} value={option}>{option}</option>

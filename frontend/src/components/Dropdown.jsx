@@ -13,6 +13,11 @@
       • "d" (abajo) – por defecto
       • "l" (izquierda)
       • "r" (derecha)
+<<<<<<< HEAD
+=======
+      • "u" (arriba)
+      • "b" (abajo, alias de "d")
+>>>>>>> 2a960fce004c405db206cbdc51375ac9b57b8abd
   - options: (array) lista de opciones del menú. Cada opción puede ser:
       • { label: string, to: string } → Navega a una ruta usando react-router
       • { label: string, onClick: function } → Ejecuta una función al hacer clic
@@ -132,6 +137,7 @@ const Dropdown = ({
           styles: "left-1/2 -translate-x-1/2 bottom-full",
           ArrowClosed: IoIosArrowUp,
         };
+      case "b":
       case "d":
       default:
         return {
@@ -162,11 +168,12 @@ const Dropdown = ({
 
   return (
     <div
-      className={`relative inline-block ${cndiv}`}
+      className={`relative ${cndiv}`}
       onMouseEnter={openMenu}
       onMouseLeave={closeMenu}
     >
       <button
+        type="button"
         onClick={toggleMenu}
         className={`${
           text === ""
@@ -223,7 +230,7 @@ const Dropdown = ({
       </button>
 
       <ul
-        className={`minWidth: '100%' absolute ${styles} z-50 bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out ${
+        className={`absolute ${styles} z-50 w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out whitespace-nowrap ${
           isOpen
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"
@@ -239,7 +246,7 @@ const Dropdown = ({
 
               // En móvil, solo cerrar si NO es un dropdown anidado
               if (isMobile && !hasNestedDropdown(item)) {
-                setIsOpen(false);
+                setIsOpen(true);
               }
             }}
             className={`py-2 px-4 transition-all duration-200 ease-in-out transform select-none whitespace-nowrap ${
