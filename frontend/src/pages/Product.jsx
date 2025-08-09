@@ -7,10 +7,20 @@ import { FaBoxOpen } from "react-icons/fa";
 import { FaDollarSign } from "react-icons/fa";
 import { FaBoxes } from "react-icons/fa";
 import Dropdown from '../components/Dropdown';
+import axios from 'axios'
 
 
 export default function Product() {
     const [isMobile, setIsMobile] = useState(false);
+    // Remover el estado selectedFiles ya no se necesita
+    
+    let user = null;
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        user = payload.user
+    }
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -23,10 +33,55 @@ export default function Product() {
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
+    // Función modificada para manejar múltiples archivos
     function addProduct(data) {
-        console.log(data)
+        console.log(data);
+        const filteredArray = [];
+        const categoryList = [];
+        const valuesData = Object.entries(data);
+
+        valuesData.forEach((v) => {
+            if (v[1]) {
+                if (v[1] === true) {
+                    categoryList.push(v);
+                } else {
+                    filteredArray.push(v);
+                }
+            }
+        });
+
+        const cleanData = Object.fromEntries(filteredArray);
+        const formData = new FormData();
+        
+        for (const key in cleanData) {
+            formData.append(key, cleanData[key]);
+        }
+        
+        formData.append("username", user);
+        formData.append("categories", JSON.stringify(categoryList));
+        
+        // Manejar múltiples archivos usando watchedFiles
+        if (watchedFiles && watchedFiles.length > 0) {
+            Array.from(watchedFiles).forEach((file) => {
+                formData.append('images[]', file);
+            });
+            formData.append("imageCount", watchedFiles.length);
+        }
+
+        axios.post("/api/product_add.php", formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then(res => console.log(res))
+            .catch(err => console.log(err));
     }
-    const { register, handleSubmit, formState: { errors } } = useForm()
+
+    const { register, handleSubmit, watch, formState: { errors } } = useForm()
+
+    // Observar cambios en el input de archivos usando watch
+    const watchedFiles = watch("images");
+    
+    // Convertir FileList a Array para el preview
+    const selectedFiles = watchedFiles ? Array.from(watchedFiles) : [];
 
     // Componentes de dropdowns para reutilizar
     const VestimentaDropdown = () => (
@@ -38,12 +93,12 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="footwear" label="Calzado" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="menClothes" label="Ropa de hombre" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="womenClothes" label="Ropa de mujer" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="unisexClothes" label="Ropa unisex" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="boyClothes" label="Ropa de niño" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="girlClothes" label="Ropa de niña" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Calzado" label="Calzado" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ropa hombre" label="Ropa hombre" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ropa mujer" label="Ropa mujer" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Rop unisex" label="Rop unisex" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ropa niño" label="Ropa niño" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ropa niña" label="Ropa niña" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -59,10 +114,10 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="electronics" label="Electrónica" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="computing" label="Computación" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="phonesAccessories" label="Celulares y accesorios" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="videogames" label="Videojuegos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Electrónica" label="Electrónica" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Computación" label="Computación" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Celulares y accesorios" label="Celulares y accesorios" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Videojuegos" label="Videojuegos" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -78,10 +133,10 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="vehicles" label="Vehículos" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="spareParts" label="Repuestos y autopartes" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="motorcycles" label="Motocicletas" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="nautical" label="Náutica" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Vehículos" label="Vehículos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Repuestos y autopartes" label="Repuestos y autopartes" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Motocicletas" label="Motocicletas" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Náutica" label="Náutica" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -91,16 +146,16 @@ export default function Product() {
     const HogarDropdown = () => (
         <Dropdown
             text="Hogar y Herramientas"
-            cndiv="ml-10"
+            cndiv="ml-10 md:ml-3"
             direction='b'
             options={[{
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="electrodomesticos" label="Electrodomésticos" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="homeKitchen" label="Hogar y Cocina" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="toolsHardware" label="Herramientas y Ferretería" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="gardenOutdoor" label="Jardín y exteriores" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Electrodomésticos" label="Electrodomésticos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Hogar y Cocina" label="Hogar y Cocina" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Herramientas y Ferretería" label="Herramientas y Ferretería" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Jardín y exteriores" label="Jardín y exteriores" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -116,9 +171,9 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="fieldRentals" label="Alquiler de campos" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="houseRentals" label="Alquiler de casas" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="toolRentals" label="Alquiler de herramientas" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Alquiler de campos" label="Alquiler de campos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Alquiler de casas" label="Alquiler de casas" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Alquiler de herramientas" label="Alquiler de herramientas" register={register} errors={errors} className='!flex-row' />
 
                     </fieldset>
                 )
@@ -135,8 +190,8 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="babiesKids" label="Bebés y niños" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="toys" label="Juguetes" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Bebés y niños" label="Bebés y niños" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Juguetes" label="Juguetes" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -152,8 +207,8 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="officeSupplies" label="Oficina y papelería" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="books" label="Libros" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Oficina y papelería" label="Oficina y papelería" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Libros" label="Libros" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -169,10 +224,10 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="cattle" label="Ganado bovino" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="sheep" label="Ganado ovino" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="horses" label="Ganado equino" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="goats" label="Ganado caprino" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ganado bovino" label="Ganado bovino" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ganado ovino" label="Ganado ovino" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ganado equino" label="Ganado equino" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ganado caprino" label="Ganado caprino" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -188,8 +243,9 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="dogs" label="Perros" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="cats" label="Gatos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Perros" label="Perros" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Gatos" label="Gatos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Mascotas" label="Mascotas" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -205,12 +261,11 @@ export default function Product() {
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="agroSupplies" label="Agro e insumos rurales" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="fieldTools" label="Herramientas de campo" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="farmMachinery" label="Maquinaria agrícola" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="farmAnimals" label="Animales y ganado" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="agroFood" label="Alimentos agroindustriales" register={register} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="organicProducts" label="Productos orgánicos" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Agro e insumos rurales" label="Agro e insumos rurales" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Herramientas de campo" label="Herramientas de campo" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Maquinaria agrícola" label="Maquinaria agrícola" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Alimentos agroindustriales" label="Alimentos agroindustriales" register={register} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Productos orgánicos" label="Productos orgánicos" register={register} errors={errors} className='!flex-row' />
                     </fieldset>
                 )
             }]}
@@ -245,26 +300,26 @@ export default function Product() {
                 <MascotasDropdown />
             </section>
 
-            {/* Fila 5: Agro solo (centrado) */}
+            {/* Fila 5 */}
             <section className='grid grid-cols-2 w-full mt-4 justify-items-center'>
                 <HogarDropdown />
                 <Rentals />
             </section>
 
             {/* Checkboxes individuales - 2 columnas */}
-            <section className='grid grid-cols-2 gap-6 mt-4 w-full justify-items-start'>
+            <section className='grid grid-cols-2 gap-10 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
-                    name="instrumentosMusicales"
+                    name="Instrumentos Musicales"
                     label="Instrumentos Musicales"
                     register={register}
                     errors={errors}
 
-                    className='!flex-row w-full'
+                    className='!flex-row w-full ml-4.5'
                 />
                 <Input
                     type="checkbox"
-                    name="accessories"
+                    name="Accesorios"
                     label="Accesorios"
                     register={register}
                     errors={errors}
@@ -273,19 +328,19 @@ export default function Product() {
                 />
             </section>
 
-            <section className='grid grid-cols-2 gap-6 mt-4 w-full justify-items-start'>
+            <section className='grid grid-cols-2 gap-10 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
-                    name="healthBeauty"
+                    name="Salud y Belleza"
                     label="Salud y Belleza"
                     register={register}
                     errors={errors}
 
-                    className='!flex-row w-full'
+                    className='!flex-row w-full ml-4.5'
                 />
                 <Input
                     type="checkbox"
-                    name="sportsOutdoors"
+                    name="Deportes y Aire libre"
                     label="Deportes y Aire libre"
                     register={register}
                     errors={errors}
@@ -294,40 +349,39 @@ export default function Product() {
                 />
             </section>
 
-            <section className='grid grid-cols-2 gap-6 mt-4 w-full justify-items-start'>
+            <section className='grid grid-cols-2 gap-10 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
-                    name="musicMovies"
+                    name="Música y Películas"
                     label="Música y Películas"
                     register={register}
                     errors={errors}
-
-                    className='!flex-row w-full'
+                    className='!flex-row w-full ml-4.5'
                 />
                 <Input
                     type="checkbox"
-                    name="foodDrinks"
+                    name="Alimentos y Bebidas"
                     label="Alimentos y Bebidas"
                     register={register}
                     errors={errors}
 
-                    className='!flex-row w-full'
+                    className='!flex-row w-full '
                 />
             </section>
 
-            <section className='grid grid-cols-2 mb-6 gap-6 mt-4 w-full justify-items-start'>
+            <section className='grid grid-cols-2 mb-6 gap-10 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
-                    name="poultry"
+                    name="Aves de corral"
                     label="Aves de corral"
                     register={register}
                     errors={errors}
 
-                    className='!flex-row w-full'
+                    className='!flex-row w-full ml-4.5'
                 />
                 <Input
                     type="checkbox"
-                    name="realEstate"
+                    name="Inmuebles"
                     label="Inmuebles"
                     register={register}
                     errors={errors}
@@ -362,7 +416,7 @@ export default function Product() {
             <section className='grid grid-cols-4 gap-6 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
-                    name="instrumentosMusicales"
+                    name="Instrumentos Musicales"
                     label="Instrumentos Musicales"
                     register={register}
                     errors={errors}
@@ -371,7 +425,7 @@ export default function Product() {
                 />
                 <Input
                     type="checkbox"
-                    name="accessories"
+                    name="Accesorios"
                     label="Accesorios"
                     register={register}
                     errors={errors}
@@ -380,7 +434,7 @@ export default function Product() {
                 />
                 <Input
                     type="checkbox"
-                    name="healthBeauty"
+                    name="Salud y Belleza"
                     label="Salud y Belleza"
                     register={register}
                     errors={errors}
@@ -389,7 +443,7 @@ export default function Product() {
                 />
                 <Input
                     type="checkbox"
-                    name="sportsOutdoors"
+                    name="Deportes y Aire libre"
                     label="Deportes y Aire libre"
                     register={register}
                     errors={errors}
@@ -401,7 +455,7 @@ export default function Product() {
             <section className='grid grid-cols-4 gap-6 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
-                    name="musicMovies"
+                    name="Música y Películas"
                     label="Música y Películas"
                     register={register}
                     errors={errors}
@@ -410,7 +464,7 @@ export default function Product() {
                 />
                 <Input
                     type="checkbox"
-                    name="foodDrinks"
+                    name="Alimentos y Bebidas"
                     label="Alimentos y Bebidas"
                     register={register}
                     errors={errors}
@@ -419,7 +473,7 @@ export default function Product() {
                 />
                 <Input
                     type="checkbox"
-                    name="poultry"
+                    name="Aves de corral"
                     label="Aves de corral"
                     register={register}
                     errors={errors}
@@ -428,11 +482,10 @@ export default function Product() {
                 />
                 <Input
                     type="checkbox"
-                    name="realEstate"
+                    name="Inmuebles"
                     label="Inmuebles"
                     register={register}
                     errors={errors}
-
                     className='!flex-row w-full'
                 />
             </section>
@@ -440,7 +493,7 @@ export default function Product() {
     );
 
     return (
-        <form onSubmit={handleSubmit(addProduct)} className='w-85 mb-52 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+        <form onSubmit={handleSubmit(addProduct)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
             <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
             <div className="flex flex-col mt-3 ml-3 items-start ">
                 <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>Crear publicación</h2>
@@ -491,6 +544,49 @@ export default function Product() {
                     }
                 ]}
             />
+            <Input
+                type="file"
+                name="images"
+                label="Imágenes del producto"
+                register={register}
+                errors={errors}
+                multiple={true}
+                required={true}
+            />
+
+            {selectedFiles.length > 0 && (
+                <div className="m-3">
+                    <p className="text-sm text-gray-600 mb-2">
+                        {selectedFiles.length} imagen(es) seleccionada(s):
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {selectedFiles.map((file, index) => {
+                            
+                            const imageUrl = URL.createObjectURL(file);
+                            
+                            return (
+                                <div key={index} className="relative">
+                                    <img 
+                                        src={imageUrl} 
+                                        alt={`Preview ${index + 1}`}
+                                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                        onLoad={() => URL.revokeObjectURL(imageUrl)}
+                                    />
+                                    <div className="mt-1">
+                                        <span className="text-xs text-gray-500 block truncate">
+                                            {file.name}
+                                        </span>
+                                        <span className="text-xs text-gray-400">
+                                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             <Input
                 type={"textarea"}
                 name={"productDescription"}

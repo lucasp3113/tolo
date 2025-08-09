@@ -24,7 +24,7 @@ export default function MovileNav() {
     axios.post('/api/type_user.php', { usuario: user })
       .then((res) => {
         setUserType(res.data.user_type);
-        console.log(res);
+
       })
       .catch((err) => {
         console.error('Error al obtener datos del ecommerce:', err);

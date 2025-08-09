@@ -36,7 +36,6 @@ export default function HeaderNav() {
     })
       .then((res) => {
         setUserType(res.data.user_type);
-        console.log(res.data.user_type)
       })
       .catch((err) => {
         console.error("Error al obtener datos del ecommerce:", err);
