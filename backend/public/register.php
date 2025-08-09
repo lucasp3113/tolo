@@ -8,7 +8,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 $secret_key = "LA_CACHIMBA_AMA";
 $issued_at = time();
-$expiration_time = $issued_at + 3600;
+$expiration_time = $issued_at + 8000;
 
 $data_base = new mysqli("localhost", "root", "", "tolo");
 

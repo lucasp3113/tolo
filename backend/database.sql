@@ -22,7 +22,7 @@ DELETE FROM categorias;
 
 SELECT nombre_usuario, contraseña FROM usuarios WHERE nombre_usuario = "Lucas";
 
-ALTER TABLE categorias AUTO_INCREMENT = 1;
+ALTER TABLE imagenes_productos AUTO_INCREMENT = 1;
 
 SELECT * FROM usuarios;
 SELECT * FROM ecommerces;
@@ -120,6 +120,17 @@ VALUES
 ('Inmuebles', 'Bienes raíces y propiedades');
 
 
+INSERT INTO categorias (nombre_categoria, descripcion) 
+VALUES ('Electrodomésticos', 'Aparatos y equipos eléctricos para el hogar');
+
+INSERT INTO categorias (nombre_categoria, descripcion) 
+VALUES ('Instrumentos Musicales', 'Guitarras, pianos, baterías y otros instrumentos para músicos y aficionados');
+
+INSERT INTO categorias (nombre_categoria, descripcion) VALUES
+('Alquiler de campos', 'Campos disponibles para alquiler'),
+('Alquiler de casas', 'Casas para alquilar'),
+('Alquiler de herramientas', 'Herramientas disponibles para alquiler');
+
 
 SELECT * FROM categorias
 
@@ -139,6 +150,12 @@ CREATE TABLE productos (
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
 
+SELECT * FROM productos_categorias;
+DELETE FROM productos;
+
+
+SELECT * FROM productos;
+
 CREATE TABLE productos_categorias (
     id_producto INT UNSIGNED NOT NULL,
     id_categoria INT UNSIGNED NOT NULL,
@@ -154,6 +171,8 @@ CREATE TABLE imagenes_productos (
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
+SELECT * FROM imagenes_productos
 
 
 CREATE TABLE compras (
