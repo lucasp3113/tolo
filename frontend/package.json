@@ -19,6 +19,7 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.60.0",
     "react-icons": "^5.5.0",
+    "react-progressbar": "^15.4.1",
     "react-router-dom": "^7.6.3",
     "tailwindcss": "^4.1.11",
     "three": "^0.178.0"
@@ -28,11 +29,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
-<<<<<<< HEAD
-    "@vitejs/plugin-react-swc": "^3.11.0",
-=======
     "@vitejs/plugin-react-swc": "^4.0.0",
->>>>>>> 6af3560d6106d03a5d49e9b6afacaff128d1c23d
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

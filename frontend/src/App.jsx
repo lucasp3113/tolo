@@ -44,9 +44,9 @@ function App() {
               path="/seller_dashboard/"
               element={
                 <Layout>
-                  <ProtectedRoute>
+                  {/* <ProtectedRoute> */}
                     <SellerDashboard />
-                  </ProtectedRoute>
+                  {/* </ProtectedRoute> */}
                 </Layout>
               }
             />

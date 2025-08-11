@@ -43,7 +43,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   }
 
   return (
-    <div className={`cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center  ${phone ? "w-full mb-2 m-0 " : "h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow"}`}>
+    <div className={`rounded-lg cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center  ${phone ? "w-full mb-2 m-0 " : "h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow"}`}>
         <img
           src={image}
           alt={name}

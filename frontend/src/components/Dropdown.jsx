@@ -240,7 +240,7 @@ const Dropdown = ({
 
               // En móvil, solo cerrar si NO es un dropdown anidado
               if (isMobile && !hasNestedDropdown(item)) {
-                setIsOpen(false);
+                setIsOpen(true);
               }
             }}
             className={`py-2 px-4 transition-all duration-200 ease-in-out transform select-none whitespace-nowrap ${
