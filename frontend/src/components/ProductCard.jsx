@@ -45,52 +45,8 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
     stockColor = "text-green-600";
   }
 
-  useEffect(() => {
-    if (phone && image) {
-      const img = new Image();
-      img.onload = () => {
-        const aspectRatio = img.width / img.height;
-        setUseOverlayLayout(aspectRatio > 1.3);
-        setImageLoaded(true);
-      };
-      img.src = image;
-    }
-  }, [image, phone]);
-
-  // celu cuando la iamgen es grande
-  if (phone && useOverlayLayout && imageLoaded) {
-    return (
-      <div className="cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0">
-        <div className="w-44 aspect-square flex-shrink-0 bg-gray-100"> 
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-full object-cover" 
-          />
-        </div>
-
-        <div className="p-4 flex flex-col w-full items-center justify-center">
-          <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">{name}</h2>
-          <p className="text-xl m-1 font-bold text-gray-900 mt-2">${price}</p>
-          {freeShipping && (
-            <p className="text-green-500 m-1 text-sm font-medium mt-1">Envío gratis</p>
-          )}
-          <p className={`text-sm font-medium m-1 ${stockColor}`}>{stockMessage}</p>
-          {client ? <Button color={"blue"} size={"md"} text={"Añadir al carrito"} /> :
-            <section className="flex">
-              <Button color={"blue"} size={"md"} className={"w-23 !rounded-lg"} text={"Editar"} onClick={onUpdate} />
-              <Button color={"red"} size={"md"} className={"w-23 !rounded-lg"} text={"Borrar"} onClick={onDelete} />
-            </section>
-          }
-        </div>
-      </div>
-    );
-  }
-
-  // celu cuando la imagen es chica
-  if (phone) {
-    return (
-      <div className="cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0">
+  return (
+    <div className={`rounded-lg cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center  ${phone ? "w-full mb-2 m-0 " : "h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow"}`}>
         <img
           src={image}
           alt={name}
@@ -142,4 +98,3 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
       </div>
     </div>
   );
-}

@@ -45,7 +45,13 @@ function App() {
               path="/seller_dashboard/"
               element={
                 <Layout>
+<<<<<<< HEAD
                     <SellerDashboard />
+=======
+                  {/* <ProtectedRoute> */}
+                    <SellerDashboard />
+                  {/* </ProtectedRoute> */}
+>>>>>>> 0eaa37719ea4e77a5528be2515a97cf6ff36710c
                 </Layout>
               }
             />

@@ -66,7 +66,7 @@ export default function SellerDashboard() {
             alt="Logo Comercio" 
             className="w-32 mb-4 border-4 border-sky-800 rounded-full" 
           />
-          <h1 className="text-2xl font-bold mb-2">Arctec</h1>
+          <h1 className="text-2xl font-bold mb-2">Artec</h1>
           <p className="text-center text-gray-600">
             Vendemos electrónicos, componentes de PC, gadgets y más.
           </p>
@@ -81,7 +81,6 @@ export default function SellerDashboard() {
 
         {/* Panel derecho Desktop */}
         <div className="col-span-3 grid grid-rows-2 gap-4 p-4">
-
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
               <h1 className="text-3xl font-bold">221</h1>
@@ -131,7 +130,6 @@ export default function SellerDashboard() {
 
           {/* Parte inferior Desktop */}
           <div className="grid grid-cols-2 gap-4">
-
             <div className="bg-white shadow rounded p-4">
               <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>
               <ul className="space-y-2">
@@ -180,9 +178,9 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/*Teléfono/Tablet*/}
+      {/* Layout Mobile/Tablet */}
       <div className="md:hidden flex flex-col min-h-screen">
-
+        {/* Header móvil */}
         <div className="bg-white shadow-sm p-4 flex items-center space-x-4">
           <img 
             src={logo} 
@@ -198,8 +196,9 @@ export default function SellerDashboard() {
           </div>
         </div>
 
+        {/* Contenido móvil */}
         <div className="flex-1 p-4 space-y-4 pb-6">
-
+          {/* Métricas móvil - Grid 2x2 */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
               <h1 className="text-2xl font-bold">221</h1>
@@ -249,13 +248,11 @@ export default function SellerDashboard() {
             </div>
           </div>
 
-
           <div className="bg-white shadow rounded-lg p-4">
             <p className="text-gray-600 text-sm">
               Vendemos electrónicos, componentes de PC, gadgets y más.
             </p>
           </div>
-
 
           <div className="bg-white shadow rounded-lg p-4">
             <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>

@@ -1,15 +1,15 @@
-import React from 'react'
-import Form from '../components/Form';
-import Input from '../components/Input'
+import React from "react";
+import Form from "../components/Form";
+import Input from "../components/Input";
+import Dropdown from "../components/Dropdown";
 import { IoSearch } from "react-icons/io5";
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import pelota from '../assets/pelota.png'
-import Dropdown from '../components/Dropdown';
 import Button from '../components/Button';
 
 export default function Home() {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -20,6 +20,35 @@ export default function Home() {
   }, []);
   return (
     <section className='flex items-center flex-col justify-center'>
+      <Dropdown
+  text=""
+  direction="d"
+  options={[
+    {
+      type: "custom",
+      content: (
+        <Dropdown
+          text="Categoría"
+          direction="r"
+          options={[
+            { label: "Zapatos", to: "./SellerDashboard" },
+            { label: "Remeras", to: "/remeras" },
+          ]}
+        />
+      )
+    },
+    {
+      type: "custom",
+      content: (
+        <input
+          type="text"
+          placeholder="Buscar..."
+          className="w-full px-2 py-1 border border-gray-300 rounded"
+        />
+      )
+    }
+  ]}
+/>
       {windowWidth < 500 ? (
         <>
           <section className="flex flex-col w-full mb-20 items-center justify-center">

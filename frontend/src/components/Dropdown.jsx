@@ -98,6 +98,7 @@ const Dropdown = ({
   options = [],
   size = 40,
   cnhamburger = "",
+   isSubmenu = false,
   cndiv = "",
   className = "",
 }) => {
@@ -172,7 +173,7 @@ const Dropdown = ({
         onClick={toggleMenu}
         className={`${
           text === ""
-            ? "flex items-center justify-center cursor-pointer"
+            ? "flex items-center justify-center cursor-pointer w-10 h-10"
             : "flex items-center px-4 py-2"
         } ${className}`}
       >
