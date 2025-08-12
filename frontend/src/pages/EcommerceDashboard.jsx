@@ -39,8 +39,8 @@ export default function EcommerceDashboard() {
         })
             .then((res) => {
                 setEcommerceName(res.data.ecommerce_name);
-                // setCumulativeBilling(res.data.cumulative_billing);
-                setCumulativeBilling(3000);
+                setCumulativeBilling(res.data.cumulative_billing);
+                // setCumulativeBilling(3000);
                 setCurrentRange(res.data.name_range);
                 setMinimumBilling(res.data.minimum_billing);
                 setCommissionPercentage(res.data.commission_percentage);
@@ -102,13 +102,14 @@ export default function EcommerceDashboard() {
                 <h4 className='mb-3 tracking-tight text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[nextRange]}`}> {nextPercentage}%</span></h4>
             </Card>
             <section className='w-full'>
-                <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/product/")}/>
+                <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
+                <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
                 <Card className={"w-full mb-28"}>
                     <h2 className='text-3xl font-bold font-mono tracking-tight mb-2'>Ganancias totales</h2>
                     <p className='font-semibold text-2xl'>{cumulativeBilling}$</p>
                 </Card>
 
-                
+
             </section>
         </div>
     );

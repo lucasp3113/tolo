@@ -9,11 +9,10 @@ import { FaBoxes } from "react-icons/fa";
 import Dropdown from '../components/Dropdown';
 import axios from 'axios'
 
+export default function CreateProduct({ edit = false, onCancel, id }) {
 
-export default function Product() {
     const [isMobile, setIsMobile] = useState(false);
-    // Remover el estado selectedFiles ya no se necesita
-    
+
     let user = null;
     const token = localStorage.getItem("token");
 
@@ -24,7 +23,7 @@ export default function Product() {
 
     useEffect(() => {
         const checkScreenSize = () => {
-            setIsMobile(window.innerWidth < 768); // md breakpoint
+            setIsMobile(window.innerWidth < 768);
         };
 
         checkScreenSize();
@@ -33,9 +32,7 @@ export default function Product() {
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
-    // Función modificada para manejar múltiples archivos
     function addProduct(data) {
-        console.log(data);
         const filteredArray = [];
         const categoryList = [];
         const valuesData = Object.entries(data);
@@ -52,15 +49,14 @@ export default function Product() {
 
         const cleanData = Object.fromEntries(filteredArray);
         const formData = new FormData();
-        
+
         for (const key in cleanData) {
             formData.append(key, cleanData[key]);
         }
-        
+
         formData.append("username", user);
         formData.append("categories", JSON.stringify(categoryList));
-        
-        // Manejar múltiples archivos usando watchedFiles
+
         if (watchedFiles && watchedFiles.length > 0) {
             Array.from(watchedFiles).forEach((file) => {
                 formData.append('images[]', file);
@@ -68,7 +64,47 @@ export default function Product() {
             formData.append("imageCount", watchedFiles.length);
         }
 
-        axios.post("/api/product_add.php", formData, {
+        axios.post("/api/create_product.php", formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then(res => console.log(res))
+            .catch(err => console.log(err));
+    }
+
+    function updateProduct(data, productId) {
+        const filteredArray = [];
+        const categoryList = [];
+        const valuesData = Object.entries(data);
+
+        valuesData.forEach((v) => {
+            if (v[1]) {
+                if (v[1] === true) {
+                    categoryList.push(v);
+                } else {
+                    filteredArray.push(v);
+                }
+            }
+        });
+
+        const cleanData = Object.fromEntries(filteredArray);
+        const formData = new FormData();
+
+        for (const key in cleanData) {
+            formData.append(key, cleanData[key]);
+        }
+
+        formData.append("username", user);
+        formData.append("categories", JSON.stringify(categoryList));
+        formData.append("id_publicacion", productId); // Agregado el id_publicacion
+
+        if (watchedFiles && watchedFiles.length > 0) {
+            Array.from(watchedFiles).forEach((file) => {
+                formData.append('images[]', file);
+            });
+            formData.append("imageCount", watchedFiles.length);
+        }
+
+        axios.post("/api/update_product.php", formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
             .then(res => console.log(res))
@@ -79,7 +115,7 @@ export default function Product() {
 
     // Observar cambios en el input de archivos usando watch
     const watchedFiles = watch("images");
-    
+
     // Convertir FileList a Array para el preview
     const selectedFiles = watchedFiles ? Array.from(watchedFiles) : [];
 
@@ -493,11 +529,11 @@ export default function Product() {
     );
 
     return (
-        <form onSubmit={handleSubmit(addProduct)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+        <form onSubmit={handleSubmit(!edit ? addProduct : (data) => updateProduct(data, id))} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
             <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
             <div className="flex flex-col mt-3 ml-3 items-start ">
-                <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>Crear publicación</h2>
-                <p className="text-sm whitespace-nowrap text-gray-600">Completá el formulario para crear una publicación.</p>
+                <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>{edit ? "Editar publicación" : "Crear publicación"}</h2>
+                <p className="text-sm whitespace-nowrap text-gray-600">{edit ? "Completá el formulario para editar la publicación." : "Completá el formulario para crear una publicación."}</p>
             </div>
             <Input
                 name={"nameProduct"}
@@ -561,13 +597,13 @@ export default function Product() {
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {selectedFiles.map((file, index) => {
-                            
+
                             const imageUrl = URL.createObjectURL(file);
-                            
+
                             return (
                                 <div key={index} className="relative">
-                                    <img 
-                                        src={imageUrl} 
+                                    <img
+                                        src={imageUrl}
                                         alt={`Preview ${index + 1}`}
                                         className="w-full h-24 object-cover rounded-lg border border-gray-200"
                                         onLoad={() => URL.revokeObjectURL(imageUrl)}
@@ -596,7 +632,12 @@ export default function Product() {
                 errors={errors}
                 maxLength={2000}
             />
-            <Button className={"w-50"} color={"blue"} size={"md"} text={"Añadir producto"} />
+            {edit ? (
+                <section className='flex items-center justify-center'>
+                    <Button className={"w-50"} color={"green"} size={"md"} text={"Editar producto"} />
+                    <Button className={"w-50"} color={"blue"} size={"md"} type='button' text={"Cancelar"} onClick={() => onCancel()} />
+                </section>
+            ) : (<Button className={"w-50"} color={"blue"} size={"md"} text={"Añadir producto"} />)}
 
         </form>
     )

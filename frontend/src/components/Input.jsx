@@ -1,52 +1,3 @@
-/*
-📝 Input — Campo de entrada de texto con validaciones integradas y estilos para mostrar errores
-
-🧩 Uso:
-   Componente para capturar datos en formularios que funcionan con React Hook Form. 
-   Las funciones y estados de validación (`register`, `errors`, `watch`) se reciben 
-   indirectamente desde el componente Form que envuelve este Input. Permite validar:
-   campo obligatorio, longitud mínima y máxima, expresiones regulares y validaciones personalizadas.
-   Muestra mensajes de error debajo del campo y cambia el estilo del borde si hay error.
-
-🔧 Props:
-  - type: tipo de input (text, email, password, etc).
-  - name: identificador único del campo, usado para registro y errores.
-  - value: valor actual del input.
-  - required: booleano para indicar si es obligatorio.
-  - minLength: longitud mínima requerida.
-  - maxLength: longitud máxima permitida.
-  - validate: función para validaciones personalizadas (recibe valor y watch).
-  - pattern: objeto con `regex` (expresión regular) y `message` para validar formato.
-  - onChange: función manejadora para el evento onChange.
-  - placeholder: texto de ayuda que aparece dentro del input.
-  - label: texto descriptivo que aparece arriba del input.
-  - className: clases CSS adicionales para personalización de estilos.
-
-📌 Ejemplo de uso dentro de un componente Form:
-
-<Form
-  fields={[
-    <Input
-      type="password"
-      name="password"
-      label="Contraseña"
-      required={true}
-      minLength={8}
-      maxLength={20}
-      placeholder="Ingresa tu contraseña"
-      pattern={{
-        regex: /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/,
-        message: "La contraseña debe tener al menos 8 caracteres, una mayúscula y un número"
-      }}
-      validate={(value, watch) =>
-        watch("repeatPassword") === value || "Las contraseñas no coinciden"
-      }
-    />
-  ]}
-  onSubmit={(data) => console.log(data)}
-/>
-*/
-
 import React, { useEffect } from 'react';
 
 export default function Input({
@@ -79,6 +30,29 @@ export default function Input({
     }
   }, [errorActual]);
 
+  // Función para validar archivos de imagen
+  const validateImageFiles = (files) => {
+    if (!files || files.length === 0) return true; // Si no hay archivos, pasa la validación
+    
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      if (!allowedTypes.includes(file.type)) {
+        return `El archivo "${file.name}" no es una imagen válida. Solo se permiten: JPG y PNG`;
+      }
+      
+      // Validar tamaño
+      if (file.size > maxSize) {
+        return `El archivo "${file.name}" es demasiado grande. Máximo 5MB`;
+      }
+    }
+    
+    return true;
+  };
+
   return (
     <div className={type === "checkbox" ? "flex items-center gap-2 m-3" : "flex flex-col-reverse m-3 relative items-start"}>
       {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
@@ -98,19 +72,22 @@ export default function Input({
       )}
 
       {type === "file" ? (
-        // Input file personalizado
         <div className="relative w-full">
           <input
             type="file"
             name={name}
             id={name}
             multiple={multiple}
+            accept="image/jpeg,image/jpg,image/png" 
             {...register(`${name}`, {
               required: {
                 value: required,
                 message: "Campo requerido"
               },
-              validate: validate ? (value) => validate(value, watch) : undefined,
+              validate: {
+                imageFiles: validateImageFiles,
+                ...(validate ? { custom: (value) => validate(value, watch) } : {})
+              },
             })}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
           />
@@ -130,6 +107,15 @@ export default function Input({
               {multiple ? 'Seleccionar imágenes' : 'Seleccionar imagen'}
             </span>
           </div>
+          {/* Mostrar archivos seleccionados */}
+          {watch && watch(name) && watch(name).length > 0 && (
+            <div className="mt-2 text-xs text-gray-600">
+              <p className="font-medium">Archivos seleccionados:</p>
+              {Array.from(watch(name)).map((file, index) => (
+                <p key={index} className="truncate">• {file.name}</p>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <Component
