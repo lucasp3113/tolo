@@ -150,8 +150,8 @@ CREATE TABLE productos (
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
 
-SELECT * FROM productos_categorias;
-DELETE FROM productos;
+SELECT * FROM imagenes_productos;
+DELETE FROM imagenes_productos;
 
 
 SELECT * FROM productos;
@@ -172,7 +172,7 @@ CREATE TABLE imagenes_productos (
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
-SELECT * FROM imagenes_productos
+SELECT * FROM productos
 
 
 CREATE TABLE compras (
