@@ -13,11 +13,6 @@
       • "d" (abajo) – por defecto
       • "l" (izquierda)
       • "r" (derecha)
-<<<<<<< HEAD
-=======
-      • "u" (arriba)
-      • "b" (abajo, alias de "d")
->>>>>>> 2a960fce004c405db206cbdc51375ac9b57b8abd
   - options: (array) lista de opciones del menú. Cada opción puede ser:
       • { label: string, to: string } → Navega a una ruta usando react-router
       • { label: string, onClick: function } → Ejecuta una función al hacer clic

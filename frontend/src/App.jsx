@@ -44,9 +44,7 @@ function App() {
               path="/seller_dashboard/"
               element={
                 <Layout>
-                  <ProtectedRoute>
                     <SellerDashboard />
-                  </ProtectedRoute>
                 </Layout>
               }
             />

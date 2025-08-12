@@ -33,7 +33,6 @@ export default function Home() {
         <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
         <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
         <ProductCard name={"Pelota Nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
-
       </section>}
 
     </section>
