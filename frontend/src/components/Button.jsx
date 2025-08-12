@@ -32,7 +32,8 @@ export default function Button ({
   color, 
   size, 
   text,
-  className
+  className,
+  type = "submit"
   }) {
 
   const colors = {
@@ -54,6 +55,7 @@ export default function Button ({
   return (
     <button
       onClick={onClick}
+      type={type}
       className={`
         ${colors[color] || "bg-gray-800"}
         ${sizes[size] || "sm"}

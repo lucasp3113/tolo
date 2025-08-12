@@ -7,7 +7,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 $secret_key = "LA_CACHIMBA_AMA";
 $issued_at = time();
-$expiration_time = $issued_at + 3600;
+$expiration_time = $issued_at + 8000;
 
 //Esto indica q este archivo no es una pagina normal, si no q debe tratarse como un json
 header('Content-Type: application/json');
