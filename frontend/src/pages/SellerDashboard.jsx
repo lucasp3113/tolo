@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import Dropdown from "../components/Dropdown";
 import Input from "../components/Input";
 import logo from "../assets/arctec.jpg";
-import { FaLocationDot } from "react-icons/fa6";  
+import { FaLocationDot } from "react-icons/fa6";
+import { FaRegClock } from "react-icons/fa6";
 
 export default function SellerDashboard() {
   const [isMobile, setIsMobile] = useState(false);
@@ -15,8 +16,8 @@ export default function SellerDashboard() {
       setIsMobile(window.innerWidth < 768);
     };
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   // Animar barra de calificación
@@ -48,23 +49,24 @@ export default function SellerDashboard() {
   // Cálculo para el trazo del semicirculo Desktop
   const radiusDesktop = 40;
   const circumferenceDesktop = Math.PI * radiusDesktop;
-  const offsetDesktop = circumferenceDesktop - (progress / 5) * circumferenceDesktop;
+  const offsetDesktop =
+    circumferenceDesktop - (progress / 5) * circumferenceDesktop;
 
   // Cálculo para el trazo del semicirculo Mobile
   const radiusMobile = 32;
   const circumferenceMobile = Math.PI * radiusMobile;
-  const offsetMobile = circumferenceMobile - (progress / 5) * circumferenceMobile;
+  const offsetMobile =
+    circumferenceMobile - (progress / 5) * circumferenceMobile;
 
   return (
     <div className="min-h-screen w-full bg-gray-100">
-
       <div className="hidden md:grid md:grid-cols-4 h-screen w-screen overflow-x-hidden">
         {/* Panel izquierdo Desktop */}
         <div className="col-span-1 bg-white shadow-lg flex flex-col items-center p-6">
-          <img 
-            src={logo} 
-            alt="Logo Comercio" 
-            className="w-32 mb-4 border-4 border-sky-800 rounded-full" 
+          <img
+            src={logo}
+            alt="Logo Comercio"
+            className="w-32 mb-4 border-4 border-sky-800 rounded-full"
           />
           <h1 className="text-2xl font-bold mb-2">Artec</h1>
           <p className="text-center text-gray-600">
@@ -72,11 +74,34 @@ export default function SellerDashboard() {
           </p>
           <div className="mt-6 w-full pt-4">
             <div className="flex justify-center">
-              <FaLocationDot title="Localidad" className="text-gray-500 mb-2 mr-2"/>
+              <FaLocationDot
+                title="Localidad"
+                className="text-gray-500 mb-2 mr-2"
+              />
               <h2>San José, Uruguay</h2>
             </div>
+            <div className="flex justify-center items-center">
+              <FaRegClock title="Horario" className="text-gray-500 mr-2" />
+              <h2>
+                Lunes a Viernes: 9:00-18:00 <br /> Sábado: 9:00 13:00
+              </h2>
+            </div>
           </div>
-          <div className="mt-6 w-full border-t border-gray-300 pt-4"></div>
+          <div className="flex justify-center mt-6 w-full border-t border-gray-300 pt-4">
+            <Dropdown
+              text="Mes"
+              showSelectedAsTitle={true}
+              defaultSelectedIndex={0}
+              options={[
+                { label: "Enero"},
+                { label: "Febrero"},
+                { label: "Marzo"} ,
+              ]}
+              onSelectionChange={(selectedOption) =>
+                console.log("Seleccionado:", selectedOption)
+              }
+            />
+          </div>
         </div>
 
         {/* Panel derecho Desktop */}
@@ -182,15 +207,15 @@ export default function SellerDashboard() {
       <div className="md:hidden flex flex-col min-h-screen">
         {/* Header móvil */}
         <div className="bg-white shadow-sm p-4 flex items-center space-x-4">
-          <img 
-            src={logo} 
-            alt="Logo Comercio" 
-            className="w-12 h-12 border-2 border-sky-800 rounded-full flex-shrink-0" 
+          <img
+            src={logo}
+            alt="Logo Comercio"
+            className="w-12 h-12 border-2 border-sky-800 rounded-full flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold truncate">Arctec</h1>
             <div className="flex justify-center items-center text-sm text-gray-600">
-              <FaLocationDot className="mr-1 flex-shrink-0" size={12}/>
+              <FaLocationDot className="mr-1 flex-shrink-0" size={12} />
               <span className="truncate">San José, Uruguay</span>
             </div>
           </div>
@@ -202,13 +227,16 @@ export default function SellerDashboard() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
               <h1 className="text-2xl font-bold">221</h1>
-              <p className="text-gray-600 text-sm text-center">Ventas totales</p>
+              <p className="text-gray-600 text-sm text-center">
+                Ventas totales
+              </p>
             </div>
             <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
               <h1 className="text-2xl font-bold">$3000</h1>
-              <p className="text-gray-600 text-sm text-center">Ingresos del mes</p>
+              <p className="text-gray-600 text-sm text-center">
+                Ingresos del mes
+              </p>
             </div>
-            
 
             {/* Barra semicircular de calificación con animación */}
             <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
@@ -241,10 +269,12 @@ export default function SellerDashboard() {
               </svg>
               <p className="text-gray-600 mt-1">Calificación</p>
             </div>
-            
+
             <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
               <h1 className="text-2xl font-bold">15</h1>
-              <p className="text-gray-600 text-sm text-center">Pedidos activos</p>
+              <p className="text-gray-600 text-sm text-center">
+                Pedidos activos
+              </p>
             </div>
           </div>
 
@@ -258,43 +288,74 @@ export default function SellerDashboard() {
             <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>
             <div className="space-y-3">
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">Teclado mecánico</span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">$2000</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Teclado mecánico
+                </span>
+                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
+                  $2000
+                </span>
               </div>
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">Mouse gamer</span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">$1200</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Mouse gamer
+                </span>
+                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
+                  $1200
+                </span>
               </div>
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">Placa de video RTX 3060</span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">$16000</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Placa de video RTX 3060
+                </span>
+                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
+                  $16000
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800 truncate pr-2">Monitor 27" 144Hz</span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">$10000</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Monitor 27" 144Hz
+                </span>
+                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
+                  $10000
+                </span>
               </div>
             </div>
           </div>
-
 
           <div className="bg-white shadow rounded-lg p-4">
             <h2 className="text-lg font-bold mb-3">Productos más vendidos</h2>
             <div className="space-y-3 mb-18">
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">Mouse gamer</span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">80 u.</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Mouse gamer
+                </span>
+                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
+                  80 u.
+                </span>
               </div>
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">Teclado mecánico</span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">65 u.</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Teclado mecánico
+                </span>
+                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
+                  65 u.
+                </span>
               </div>
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">Auriculares inalámbricos</span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">50 u.</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  Auriculares inalámbricos
+                </span>
+                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
+                  50 u.
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800 truncate pr-2">SSD 1TB</span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">40 u.</span>
+                <span className="text-sm text-gray-800 truncate pr-2">
+                  SSD 1TB
+                </span>
+                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
+                  40 u.
+                </span>
               </div>
             </div>
           </div>

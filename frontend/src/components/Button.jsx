@@ -42,7 +42,7 @@ export default function Button ({
     yellow: "bg-amber-600",
     blue: "bg-sky-800",
     purple: "bg-purple-800",
-    sky: "bg-sky-500",
+    sky: "bg-blue-500",
     black: "bg-gray-900"
   };
 
@@ -60,9 +60,7 @@ export default function Button ({
         ${colors[color] || "bg-gray-800"}
         ${sizes[size] || "sm"}
         text-lg
-        text-white
         rounded-xl
-        hover:scale-110
         transition
         duration-300
         cursor-pointer

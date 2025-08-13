@@ -68,7 +68,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
         </div>
       </div>
     );
-  }
+  
 
   // compu
   return (
@@ -98,3 +98,4 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
       </div>
     </div>
   );
+}

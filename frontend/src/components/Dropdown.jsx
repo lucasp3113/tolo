@@ -17,6 +17,9 @@
       • { label: string, to: string } → Navega a una ruta usando react-router
       • { label: string, onClick: function } → Ejecuta una función al hacer clic
       • { type: "custom", content: JSX.Element } → Inserta contenido personalizado (otro Dropdown, input, etc.)
+  - showSelectedAsTitle: (boolean) si es true, muestra la opción seleccionada como título del dropdown
+  - defaultSelectedIndex: (number) índice de la opción que se selecciona por defecto (opcional)
+  - onSelectionChange: (function) callback que se ejecuta cuando cambia la selección (opcional)
   - className: (string) clases adicionales para estilizar el botón.
   - cnhamburger: (string) clases adicionales para el ícono hamburguesa.
   - cndiv: (string) clases adicionales para el contenedor principal.
@@ -42,7 +45,34 @@
   ]}
 />
 
-3️⃣ Con input o sub-dropdown:
+3️⃣ Con selección que cambia el título:
+
+<Dropdown
+  text="Selecciona una opción"
+  showSelectedAsTitle={true}
+  options={[
+    { label: "Opción 1", onClick: () => console.log("Opción 1") },
+    { label: "Opción 2", onClick: () => console.log("Opción 2") },
+    { label: "Opción 3", onClick: () => console.log("Opción 3") },
+  ]}
+  onSelectionChange={(selectedOption) => console.log("Seleccionado:", selectedOption)}
+/>
+
+3️⃣ Con opción por defecto preseleccionada:
+
+<Dropdown
+  text="Selecciona una opción"
+  showSelectedAsTitle={true}
+  defaultSelectedIndex={1} // Preselecciona "Opción 2"
+  options={[
+    { label: "Opción 1", onClick: () => console.log("Opción 1") },
+    { label: "Opción 2", onClick: () => console.log("Opción 2") },
+    { label: "Opción 3", onClick: () => console.log("Opción 3") },
+  ]}
+  onSelectionChange={(selectedOption) => console.log("Seleccionado:", selectedOption)}
+/>
+
+4️⃣ Con input o sub-dropdown:
 
 <Dropdown
   text="Filtros"
@@ -79,6 +109,8 @@
   - Las opciones con `type: "custom"` permiten insertar cualquier componente de React.
   - El submenú también se despliega al pasar el mouse (ideal para menús multinivel).
   - En móvil, los dropdowns anidados no se cierran automáticamente para mejor UX.
+  - Cuando `showSelectedAsTitle` es true, el título cambia al seleccionar una opción.
+  - `defaultSelectedIndex` permite preseleccionar una opción al montar el componente.
 */
 
 import { useNavigate } from "react-router-dom";
@@ -98,12 +130,17 @@ const Dropdown = ({
   options = [],
   size = 40,
   cnhamburger = "",
-   isSubmenu = false,
+  isSubmenu = false,
   cndiv = "",
   className = "",
+  showSelectedAsTitle = false,
+  defaultSelectedIndex = null,
+  onSelectionChange = null,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [displayText, setDisplayText] = useState(text);
   const navigate = useNavigate();
 
   // Detecta si es móvil al montar
@@ -115,6 +152,29 @@ const Dropdown = ({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Establecer opción por defecto si está especificada
+  useEffect(() => {
+    if (showSelectedAsTitle && defaultSelectedIndex !== null && options[defaultSelectedIndex]) {
+      const defaultOption = options[defaultSelectedIndex];
+      if (defaultOption.type !== "custom" && defaultOption.label) {
+        setSelectedOption(defaultOption);
+        setDisplayText(defaultOption.label);
+        
+        // Ejecutar callback si existe
+        if (onSelectionChange) {
+          onSelectionChange(defaultOption);
+        }
+      }
+    }
+  }, [showSelectedAsTitle, defaultSelectedIndex, options, onSelectionChange]);
+
+  // Actualiza el texto mostrado cuando cambia el texto inicial
+  useEffect(() => {
+    if (!showSelectedAsTitle || !selectedOption) {
+      setDisplayText(text);
+    }
+  }, [text, showSelectedAsTitle, selectedOption]);
 
   const getDirectionConfig = () => {
     switch (direction) {
@@ -162,6 +222,29 @@ const Dropdown = ({
     return false;
   };
 
+  // Función para manejar la selección de opciones
+  const handleOptionSelect = (item, index) => {
+    // Solo actualizar el título si showSelectedAsTitle está activo y la opción tiene label
+    if (showSelectedAsTitle && item.label && item.type !== "custom") {
+      setSelectedOption(item);
+      setDisplayText(item.label);
+      
+      // Ejecutar callback si existe
+      if (onSelectionChange) {
+        onSelectionChange(item);
+      }
+    }
+
+    // Ejecutar la acción de la opción
+    if (item.onClick) item.onClick();
+    if (item.to) navigate(item.to);
+
+    // En móvil, solo cerrar si NO es un dropdown anidado
+    if (isMobile && !hasNestedDropdown(item)) {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <div
       className={`relative ${cndiv}`}
@@ -172,12 +255,12 @@ const Dropdown = ({
         type="button"
         onClick={toggleMenu}
         className={`${
-          text === ""
+          displayText === ""
             ? "flex items-center justify-center cursor-pointer w-10 h-10"
             : "flex items-center px-4 py-2"
         } ${className}`}
       >
-        {text === "" ? (
+        {displayText === "" ? (
           <div className="relative">
             {/* Hamburguesa */}
             <RxHamburgerMenu
@@ -202,7 +285,7 @@ const Dropdown = ({
           </div>
         ) : (
           <>
-            <span>{text}</span>
+            <span>{displayText}</span>
             <div className="relative ml-2 mt-1">
               {/* Flecha cerrado (dirección específica) */}
               <ArrowClosed
@@ -237,18 +320,16 @@ const Dropdown = ({
             key={index}
             onClick={(e) => {
               e.stopPropagation();
-              if (item.onClick) item.onClick();
-              if (item.to) navigate(item.to);
-
-              // En móvil, solo cerrar si NO es un dropdown anidado
-              if (isMobile && !hasNestedDropdown(item)) {
-                setIsOpen(true);
-              }
+              handleOptionSelect(item, index);
             }}
             className={`py-2 px-4 transition-all duration-200 ease-in-out transform select-none whitespace-nowrap ${
               item.type === "custom"
                 ? "cursor-default hover:bg-transparent"
                 : "cursor-pointer hover:bg-gray-200 hover:scale-105"
+            } ${
+              showSelectedAsTitle && selectedOption?.label === item.label
+                ? "bg-blue-100 text-blue-700"
+                : ""
             }`}
           >
             {item.type === "custom" ? item.content : item.label}
