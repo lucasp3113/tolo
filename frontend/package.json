@@ -13,6 +13,7 @@
     "@google/model-viewer": "^4.1.0",
     "@react-three/drei": "^10.5.1",
     "@react-three/fiber": "^9.2.0",
+    "@swc/core": "^1.13.3",
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "react": "^19.1.0",

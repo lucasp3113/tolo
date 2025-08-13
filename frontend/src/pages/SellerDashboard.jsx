@@ -1,7 +1,8 @@
-import { FaLocationDot } from "react-icons/fa6";
-import { useState, useEffect } from "react";
-import logo from '../assets/artec.jpg';
-import Dropdown from '../components/Dropdown'
+import React, { useState, useEffect } from "react";
+import Dropdown from "../components/Dropdown";
+import Input from "../components/Input";
+import logo from "../assets/arctec.jpg";
+import { FaLocationDot } from "react-icons/fa6";  
 
 export default function SellerDashboard() {
   const [isMobile, setIsMobile] = useState(false);
@@ -52,11 +53,11 @@ export default function SellerDashboard() {
   // Cálculo para el trazo del semicirculo Mobile
   const radiusMobile = 32;
   const circumferenceMobile = Math.PI * radiusMobile;
-  const offsetMobile = circumferenceMobile - (progress / 5) * circumferenceMobile;  
+  const offsetMobile = circumferenceMobile - (progress / 5) * circumferenceMobile;
 
   return (
     <div className="min-h-screen w-full bg-gray-100">
-      {/* Layout Desktop */}
+
       <div className="hidden md:grid md:grid-cols-4 h-screen w-screen overflow-x-hidden">
         {/* Panel izquierdo Desktop */}
         <div className="col-span-1 bg-white shadow-lg flex flex-col items-center p-6">
@@ -70,21 +71,16 @@ export default function SellerDashboard() {
             Vendemos electrónicos, componentes de PC, gadgets y más.
           </p>
           <div className="mt-6 w-full pt-4">
-            <div className="inline-block">
-              <FaLocationDot title="Localidad" className="text-gray-500 mb-2 inline-block mr-2"/>
-              <h2 className="inline-block">San José, Uruguay</h2>
+            <div className="flex justify-center">
+              <FaLocationDot title="Localidad" className="text-gray-500 mb-2 mr-2"/>
+              <h2>San José, Uruguay</h2>
             </div>
           </div>
-          <div className="mt-6 w-full border-t border-gray-300 pt-4">
-            <h2 className="font-semibold mb-2"></h2>
-            <p></p>
-            <p></p>
-          </div>
+          <div className="mt-6 w-full border-t border-gray-300 pt-4"></div>
         </div>
 
         {/* Panel derecho Desktop */}
         <div className="col-span-3 grid grid-rows-2 gap-4 p-4">
-          {/* Métricas rápidas Desktop */}
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
               <h1 className="text-3xl font-bold">221</h1>
@@ -94,8 +90,8 @@ export default function SellerDashboard() {
               <h1 className="text-3xl font-bold">$3000</h1>
               <p className="text-gray-600">Ingresos de este mes</p>
             </div>
-            {/* Barra semicircular de calificación */}
-             <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
+            {/* Barra semicircular de calificación con animación */}
+            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
               <svg width="100" height="60" viewBox="0 0 100 50">
                 <path
                   d="M 10 50 A 40 40 0 0 1 90 50"
@@ -134,7 +130,6 @@ export default function SellerDashboard() {
 
           {/* Parte inferior Desktop */}
           <div className="grid grid-cols-2 gap-4">
-            {/* Ventas recientes */}
             <div className="bg-white shadow rounded p-4">
               <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>
               <ul className="space-y-2">
@@ -194,7 +189,7 @@ export default function SellerDashboard() {
           />
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold truncate">Arctec</h1>
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="flex justify-center items-center text-sm text-gray-600">
               <FaLocationDot className="mr-1 flex-shrink-0" size={12}/>
               <span className="truncate">San José, Uruguay</span>
             </div>
@@ -214,38 +209,37 @@ export default function SellerDashboard() {
               <p className="text-gray-600 text-sm text-center">Ingresos del mes</p>
             </div>
             
-            {/* Calificación móvil */}
-            <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
-              <svg width="80" height="48" viewBox="0 0 80 40" className="mb-1">
-                {/* Fondo gris */}
+
+            {/* Barra semicircular de calificación con animación */}
+            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
+              <svg width="100" height="60" viewBox="0 0 100 50">
                 <path
-                  d="M 8 40 A 32 32 0 0 1 72 40"
+                  d="M 10 50 A 40 40 0 0 1 90 50"
                   fill="transparent"
                   stroke="#e5e7eb"
-                  strokeWidth="8"
+                  strokeWidth="10"
                 />
-                {/* Progreso */}
                 <path
-                  d="M 8 40 A 32 32 0 0 1 72 40"
+                  d="M 10 50 A 40 40 0 0 1 90 50"
                   fill="transparent"
-                  stroke={getColor(rating)}
-                  strokeWidth="8"
-                  strokeDasharray={Math.PI * 32}
-                  strokeDashoffset={Math.PI * 32 - (rating / 5) * Math.PI * 32}
+                  stroke={getColor(progress)}
+                  strokeWidth="10"
+                  strokeDasharray={circumferenceDesktop}
+                  strokeDashoffset={offsetDesktop}
                   strokeLinecap="round"
+                  style={{ transition: "stroke-dashoffset 0.1s linear" }}
                 />
-                {/* Texto de calificación */}
                 <text
-                  x="40"
-                  y="36"
+                  x="50"
+                  y="45"
                   textAnchor="middle"
-                  fontSize="12"
+                  fontSize="14"
                   fontWeight="bold"
                 >
-                  {rating.toFixed(1)}
+                  {progress.toFixed(1)}
                 </text>
               </svg>
-              <p className="text-gray-600 text-sm text-center">Calificación</p>
+              <p className="text-gray-600 mt-1">Calificación</p>
             </div>
             
             <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
@@ -254,14 +248,12 @@ export default function SellerDashboard() {
             </div>
           </div>
 
-          {/* Descripción móvil */}
           <div className="bg-white shadow rounded-lg p-4">
             <p className="text-gray-600 text-sm">
               Vendemos electrónicos, componentes de PC, gadgets y más.
             </p>
           </div>
 
-          {/* Ventas recientes móvil */}
           <div className="bg-white shadow rounded-lg p-4">
             <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>
             <div className="space-y-3">
@@ -284,10 +276,10 @@ export default function SellerDashboard() {
             </div>
           </div>
 
-          {/* Productos más vendidos móvil */}
-          <div className="bg-white shadow mb-18 rounded-lg p-4">
+
+          <div className="bg-white shadow rounded-lg p-4">
             <h2 className="text-lg font-bold mb-3">Productos más vendidos</h2>
-            <div className="space-y-3">
+            <div className="space-y-3 mb-18">
               <div className="flex justify-between items-center border-b border-gray-200 pb-2">
                 <span className="text-sm text-gray-800 truncate pr-2">Mouse gamer</span>
                 <span className="text-sm font-semibold text-blue-600 flex-shrink-0">80 u.</span>

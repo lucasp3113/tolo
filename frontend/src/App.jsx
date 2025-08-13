@@ -8,7 +8,8 @@ import SellerDashboard from './pages/SellerDashboard';
 import EcommerceDashboard from './pages/EcommerceDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
-import Product from './pages/Product';
+import CreateProduct from './pages/CreateProduct';
+import ProductCRUD from './pages/ProductCRUD';
 
 function App() {
   return (
@@ -44,9 +45,13 @@ function App() {
               path="/seller_dashboard/"
               element={
                 <Layout>
+<<<<<<< HEAD
+                    <SellerDashboard />
+=======
                   {/* <ProtectedRoute> */}
                     <SellerDashboard />
                   {/* </ProtectedRoute> */}
+>>>>>>> 0eaa37719ea4e77a5528be2515a97cf6ff36710c
                 </Layout>
               }
             />
@@ -57,10 +62,17 @@ function App() {
                   </ProtectedRoute>
                 </Layout>
             }/>
-            <Route path='/product/' element={
+            <Route path='/create_product/' element={
               <Layout>
                 <ProtectedRoute>
-                  <Product/>
+                  <CreateProduct/>
+                </ProtectedRoute>
+              </Layout>
+            }/>
+            <Route path='/product_crud/' element={
+              <Layout>
+                <ProtectedRoute>
+                  <ProductCRUD/>
                 </ProtectedRoute>
               </Layout>
             }/>

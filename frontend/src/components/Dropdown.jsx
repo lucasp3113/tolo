@@ -133,6 +133,7 @@ const Dropdown = ({
           styles: "left-1/2 -translate-x-1/2 bottom-full",
           ArrowClosed: IoIosArrowUp,
         };
+      case "b":
       case "d":
       default:
         return {
@@ -163,11 +164,12 @@ const Dropdown = ({
 
   return (
     <div
-      className={`relative inline-block ${cndiv}`}
+      className={`relative ${cndiv}`}
       onMouseEnter={openMenu}
       onMouseLeave={closeMenu}
     >
       <button
+        type="button"
         onClick={toggleMenu}
         className={`${
           text === ""
@@ -224,7 +226,7 @@ const Dropdown = ({
       </button>
 
       <ul
-        className={`minWidth: '100%' absolute ${styles} z-50 bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out ${
+        className={`absolute ${styles} z-50 w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out whitespace-nowrap ${
           isOpen
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"

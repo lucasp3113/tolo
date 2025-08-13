@@ -18,11 +18,11 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
-DELETE FROM usuarios;
+DELETE FROM categorias;
 
 SELECT nombre_usuario, contraseña FROM usuarios WHERE nombre_usuario = "Lucas";
 
-ALTER TABLE usuarios AUTO_INCREMENT = 1;
+ALTER TABLE imagenes_productos AUTO_INCREMENT = 1;
 
 SELECT * FROM usuarios;
 SELECT * FROM ecommerces;
@@ -74,11 +74,72 @@ CREATE TABLE categorias (
     descripcion TEXT DEFAULT NULL
 );
 
+INSERT INTO categorias (nombre_categoria, descripcion)
+VALUES
+('Electrónica', 'Dispositivos y gadgets electrónicos'),
+('Ropa hombre', 'Prendas de vestir para hombres'),
+('Ropa mujer', 'Prendas de vestir para mujeres'),
+('Ropa niño', 'Prendas de vestir para niños'),
+('Ropa niña', 'Prendas de vestir para niñas'),
+('Rop unisex', 'Prendas de vestir para cualquier género'),
+('Calzado', 'Zapatos, zapatillas y sandalias'),
+('Accesorios', 'Complementos de moda y uso diario'),
+('Libros', 'Material de lectura y estudio'),
+('Juguetes', 'Productos para la diversión de niños'),
+('Hogar y Cocina', 'Artículos para el hogar y utensilios de cocina'),
+('Salud y Belleza', 'Productos para cuidado personal y estética'),
+('Deportes y Aire libre', 'Equipamiento deportivo y actividades al aire libre'),
+('Herramientas y Ferretería', 'Herramientas manuales y eléctricas'),
+('Mascotas', 'Productos para el cuidado de mascotas'),
+('Bebés y niños', 'Artículos para bebés y niños pequeños'),
+('Videojuegos', 'Juegos y consolas para entretenimiento digital'),
+('Computación', 'Hardware y software para computadoras'),
+('Celulares y accesorios', 'Teléfonos móviles y complementos'),
+('Oficina y papelería', 'Suministros para oficina y escritura'),
+('Automotriz', 'Repuestos y accesorios para vehículos'),
+('Música y Películas', 'Material audiovisual y equipos de sonido'),
+('Jardín y exteriores', 'Productos para jardín y espacios exteriores'),
+('Alimentos y Bebidas', 'Comestibles y bebidas para consumo'),
+('Vehículos', 'Automóviles, motos y otros vehículos'),
+('Agro e insumos rurales', 'Productos agrícolas y suministros rurales'),
+('Maquinaria agrícola', 'Equipos y maquinaria para agricultura'),
+('Animales y ganado', 'Productos para animales de granja'),
+('Herramientas de campo', 'Herramientas específicas para campo y agro'),
+('Alimentos agroindustriales', 'Productos alimenticios industriales'),
+('Productos orgánicos', 'Productos naturales y ecológicos'),
+('Repuestos y autopartes', 'Piezas para reparación de vehículos'),
+('Motocicletas', 'Motos y accesorios'),
+('Náutica', 'Equipamiento para actividades náuticas'),
+('Ganado bovino', 'Productos para ganado vacuno'),
+('Ganado ovino', 'Productos para ganado ovino'),
+('Ganado equino', 'Productos para ganado equino'),
+('Ganado caprino', 'Productos para ganado caprino'),
+('Aves de corral', 'Productos para aves domésticas'),
+('Perros', 'Productos específicos para perros'),
+('Gatos', 'Productos específicos para gatos'),
+('Inmuebles', 'Bienes raíces y propiedades');
+
+
+INSERT INTO categorias (nombre_categoria, descripcion) 
+VALUES ('Electrodomésticos', 'Aparatos y equipos eléctricos para el hogar');
+
+INSERT INTO categorias (nombre_categoria, descripcion) 
+VALUES ('Instrumentos Musicales', 'Guitarras, pianos, baterías y otros instrumentos para músicos y aficionados');
+
+INSERT INTO categorias (nombre_categoria, descripcion) VALUES
+('Alquiler de campos', 'Campos disponibles para alquiler'),
+('Alquiler de casas', 'Casas para alquilar'),
+('Alquiler de herramientas', 'Herramientas disponibles para alquiler');
+
+
+SELECT * FROM categorias
+
+
+
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_vendedor INT UNSIGNED NOT NULL,
     id_ecommerce INT UNSIGNED,
-    id_categoria INT UNSIGNED NOT NULL,
     nombre_producto VARCHAR(100) NOT NULL,
     descripcion TEXT DEFAULT NULL,
     precio DECIMAL(10, 2) NOT NULL,
@@ -86,9 +147,23 @@ CREATE TABLE productos (
     fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id_vendedor) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL,
-    FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria) ON DELETE RESTRICT
+    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
+
+SELECT * FROM imagenes_productos;
+DELETE FROM imagenes_productos;
+
+
+SELECT * FROM productos;
+
+CREATE TABLE productos_categorias (
+    id_producto INT UNSIGNED NOT NULL,
+    id_categoria INT UNSIGNED NOT NULL,
+    PRIMARY KEY (id_producto, id_categoria),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE CASCADE
+);
+
 
 CREATE TABLE imagenes_productos (
     id_imagen INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -96,6 +171,8 @@ CREATE TABLE imagenes_productos (
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
+SELECT * FROM productos
 
 
 CREATE TABLE compras (
