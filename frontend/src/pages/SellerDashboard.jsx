@@ -1,6 +1,7 @@
 import { FaLocationDot } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import logo from '../assets/artec.jpg';
+import Dropdown from '../components/Dropdown'
 
 export default function SellerDashboard() {
   const [isMobile, setIsMobile] = useState(false);
