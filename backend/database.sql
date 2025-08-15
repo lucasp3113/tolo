@@ -18,6 +18,9 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
+
+SELECT * FROM usuarios
+
 DELETE FROM categorias;
 
 SELECT nombre_usuario, contraseña FROM usuarios WHERE nombre_usuario = "Lucas";
@@ -25,6 +28,9 @@ SELECT nombre_usuario, contraseña FROM usuarios WHERE nombre_usuario = "Lucas";
 ALTER TABLE imagenes_productos AUTO_INCREMENT = 1;
 
 SELECT * FROM usuarios;
+
+DELETE FROM usuarios WHERE nombre_usuario = "lucas";
+
 SELECT * FROM ecommerces;
 
 CREATE TABLE rangos (
@@ -240,7 +246,7 @@ CREATE TABLE notificaciones (
     id_usuario INT UNSIGNED NOT NULL,
     tipo ENUM('email', 'interna') NOT NULL DEFAULT 'interna',
     mensaje TEXT,
-    estado ENUM('enviado', 'leído', 'error') NOT NULL DEFAULT 'enviado',
-    fecha_envio DATETIME,
+    fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
+
