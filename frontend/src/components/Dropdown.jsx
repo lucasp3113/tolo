@@ -102,6 +102,7 @@ const Dropdown = ({
   cnhamburger = "",
   cndiv = "",
   className = "",
+  classUl = ""
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -227,7 +228,7 @@ const Dropdown = ({
       </button>
 
       <ul
-        className={`absolute ${styles} z-50 w-auto min-w-max bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out whitespace-nowrap ${
+        className={`absolute ${styles} z-50 w-auto bg-white min-w-max ${classUl} text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out whitespace-nowrap ${
           isOpen
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"

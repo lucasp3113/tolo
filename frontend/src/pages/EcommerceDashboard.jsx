@@ -39,8 +39,8 @@ export default function EcommerceDashboard() {
         })
             .then((res) => {
                 setEcommerceName(res.data.ecommerce_name);
-                setCumulativeBilling(res.data.cumulative_billing);
-                // setCumulativeBilling(3000);
+                // setCumulativeBilling(res.data.cumulative_billing);
+                setCumulativeBilling(3000);
                 setCurrentRange(res.data.name_range);
                 setMinimumBilling(res.data.minimum_billing);
                 setCommissionPercentage(res.data.commission_percentage);
