@@ -71,6 +71,7 @@ export default function Button({
         transition
         duration-300
         cursor-pointer
+        text-white
         transform
         m-2
         shadow

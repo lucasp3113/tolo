@@ -17,18 +17,20 @@ export default function Product() {
             Negro
           </h1>
         </div>
-        <div className="max-w-[30%]">
+
+        <div className="flex-col justify-center">
+          <div className="" className="max-w-[30%]">
           <div className="">
-            <div className="mb-[1rem]">
-              <p className="text-green-600">Envío gratis a todo el país </p>
-              <p>Conoce los tiempos y las formas de envío.</p>
-              <p className="text-sky-600">Calcular cuándo llega</p>
-            </div>
-            <div>
-              <p className="text-green-600">Devolución gratis</p>
-              <p>Tienes 30 días desde que lo recibes.</p>
-              <p className="text-sky-600">Conocer más</p>
-            </div>
+              <div className="mb-[1rem]">
+                <p className="text-green-600">Envío gratis a todo el país </p>
+                <p>Conoce los tiempos y las formas de envío.</p>
+                <p className="text-sky-600">Calcular cuándo llega</p>
+              </div>
+              <div>
+                <p className="text-green-600">Devolución gratis</p>
+                <p>Tienes 30 días desde que lo recibes.</p>
+                <p className="text-sky-600">Conocer más</p>
+              </div>
           </div>
           <div>
           </div>
@@ -53,18 +55,45 @@ export default function Product() {
               }
             />
           </div>
-          <div className="justify-start flex items-center">
-            <Button
-              color="sky"
-              text="Comprar ahora"
-              className="transform-[1] hover:bg-[#306ccc] text-white rounded transition-colors duration-300 font-semibold w-[15rem] h-[3rem]"
-            />
-            <Button
-              color="sky"
-              theme="blue"
+          </div>
+
+          <div>
+            <div className="flex justify-center mt-[1rem]">
+              <p className="mr-[1rem]">Cantidad:</p>
+              <Dropdown
+                text="Número"
+                border={true}
+                hoverActivation={false}
+                defaultSelectedIndex={0}
+                showSelectedAsTitle={true}
+                options={[
+                  { label: "1", onClick: () => console.log("1") },
+                  { label: "2", onClick: () => console.log("2") },
+                  { label: "3", onClick: () => console.log("3") },
+                  { label: "4", onClick: () => console.log("4") },
+                  { label: "5", onClick: () => console.log("5") },
+                  { label: "6", onClick: () => console.log("6") },
+                ]}
+              />
+            </div>
+            <div>
+              <div className="flex justify-center">
+                <Button
+                  color="sky"
+                  text="Comprar ahora"
+                  className="transform-[1] bg-[#3884fc] hover:bg-[#306ccc] text-white rounded transition-colors duration-300 font-semibold w-[15rem] h-[3rem]"
+                />
+              </div>
+              <div className="flex justify-center">
+                <Button
+                  color="sky"
+                  theme="blue"
               text="Añadir al carrito"
-              className=" bg-sky-50 hover:bg-sky-100 transition-colors duration-300 font-semibold w-[15rem] h-[3rem]"
-            />
+                  className="! bg-[#e8ecfc]! hover:bg-[#e0e4fc]! transition-colors duration-300 font-semibold w-[15rem] h-[3rem]"
+                />
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
