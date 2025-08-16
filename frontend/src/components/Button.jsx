@@ -27,14 +27,21 @@
  
  import React from "react";
 
-export default function Button ({
+export default function Button({
   onClick,
-  color, 
-  size, 
+  color,
+  size,
   text,
   className,
-  type = "submit"
-  }) {
+  type = "submit",
+  theme = "light" // agregamos theme por defecto
+}) {
+
+  const themes = {
+    light: "text-white",
+    dark: "text-black",
+    blue: "text-blue-500"
+  }
 
   const colors = {
     green: "bg-green-600",
@@ -42,15 +49,15 @@ export default function Button ({
     yellow: "bg-amber-600",
     blue: "bg-sky-800",
     purple: "bg-purple-800",
-    sky: "bg-sky-500",
+    sky: "bg-blue-500",
     black: "bg-gray-900"
   };
 
-   const sizes = {
-     sm: "p-1 text-sm",
-     md:"p-2 text-sm",
-     lg: "p-2 text-md"
-   };
+  const sizes = {
+    sm: "p-1 text-sm",
+    md: "p-2 text-sm",
+    lg: "p-2 text-md"
+  };
 
   return (
     <button
@@ -58,19 +65,18 @@ export default function Button ({
       type={type}
       className={`
         ${colors[color] || "bg-gray-800"}
-        ${sizes[size] || "sm"}
-        text-lg
-        text-white
+        ${sizes[size] || "p-1 text-sm"}
         rounded-xl
-        hover:scale-110
+        ${themes[theme] || "text-white"}
         transition
         duration-300
         cursor-pointer
         transform
         m-2
         shadow
-        ${className}
-      `}>
+        ${className || ""}
+      `}
+    >
       {text}
     </button>
   );

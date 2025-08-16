@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import pelota from '../assets/pelota.png'
 import Button from '../components/Button';
+import Rating from '../components/Rating'
+
 
 export default function Home() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -20,35 +22,18 @@ export default function Home() {
   }, []);
   return (
     <section className='flex items-center flex-col justify-center'>
+      
       <Dropdown
-  text=""
-  direction="d"
+  text="Selecciona una opción"
+  showSelectedAsTitle={true}
   options={[
-    {
-      type: "custom",
-      content: (
-        <Dropdown
-          text="Categoría"
-          direction="r"
-          options={[
-            { label: "Zapatos", to: "./SellerDashboard" },
-            { label: "Remeras", to: "/remeras" },
-          ]}
-        />
-      )
-    },
-    {
-      type: "custom",
-      content: (
-        <input
-          type="text"
-          placeholder="Buscar..."
-          className="w-full px-2 py-1 border border-gray-300 rounded"
-        />
-      )
-    }
+    { label: "Opción 1", onClick: () => console.log("Opción 1") },
+    { label: "Opción 2", onClick: () => console.log("Opción 2") },
+    { label: "Opción 3", onClick: () => console.log("Opción 3") },
   ]}
+  onSelectionChange={(selectedOption) => console.log("Seleccionado:", selectedOption)}
 />
+      <Rating/>
       {windowWidth < 500 ? (
         <>
           <section className="flex flex-col w-full mb-20 items-center justify-center">
