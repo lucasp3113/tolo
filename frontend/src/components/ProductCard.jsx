@@ -24,10 +24,12 @@
 
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate }) {
+export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick }) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const navigate = useNavigate();
 
   let stockMessage = "";
   let stockColor = "";
@@ -46,7 +48,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   }
 
   return (
-    <div className={`rounded-lg cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center  ${phone ? "w-full mb-2 m-0 " : "h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow"}`}>
+    <div onClick={onClick} className={`rounded-lg cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center  ${phone ? "w-full mb-2 m-0 " : "h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow"}`}>
         <img
           src={image}
           alt={name}
