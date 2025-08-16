@@ -20,18 +20,6 @@ export default function Home() {
   }, []);
   return (
     <section className='flex items-center flex-col justify-center'>
-      
-      <Dropdown
-  text="Selecciona una opción"
-  showSelectedAsTitle={true}
-  options={[
-    { label: "Opción 1", onClick: () => console.log("Opción 1") },
-    { label: "Opción 2", onClick: () => console.log("Opción 2") },
-    { label: "Opción 3", onClick: () => console.log("Opción 3") },
-  ]}
-  onSelectionChange={(selectedOption) => console.log("Seleccionado:", selectedOption)}
-/>
-
       {windowWidth < 500 ? (
         <>
           <section className="flex flex-col w-full mb-20 items-center justify-center">
