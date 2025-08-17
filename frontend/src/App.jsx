@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './components/AuthProvider';
 import CreateProduct from './pages/CreateProduct';
 import ProductCRUD from './pages/ProductCRUD';
+import Notifications from './pages/Notifications';
 
 function App() {
   return (
@@ -51,27 +52,44 @@ function App() {
                 </Layout>
               }
             />
-            <Route path='/ecommerce_dashboard/' element={
+            <Route
+              path="/ecommerce_dashboard/"
+              element={
                 <Layout>
                   <ProtectedRoute>
                     <EcommerceDashboard />
                   </ProtectedRoute>
                 </Layout>
-            }/>
-            <Route path='/create_product/' element={
-              <Layout>
-                <ProtectedRoute>
-                  <CreateProduct/>
-                </ProtectedRoute>
-              </Layout>
-            }/>
-            <Route path='/product_crud/' element={
-              <Layout>
-                <ProtectedRoute>
-                  <ProductCRUD/>
-                </ProtectedRoute>
-              </Layout>
-            }/>
+              }
+            />
+            <Route
+              path="/create_product/"
+              element={
+                <Layout>
+                  <ProtectedRoute>
+                    <CreateProduct />
+                  </ProtectedRoute>
+                </Layout>
+              }
+            />
+            <Route
+              path="/product_crud/"
+              element={
+                <Layout>
+                  <ProtectedRoute>
+                    <ProductCRUD />
+                  </ProtectedRoute>
+                </Layout>
+              }
+            />
+            <Route
+              path="/notifications/"
+              element={
+                <Layout>
+                    <Notifications />
+                </Layout>
+              }
+            />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
