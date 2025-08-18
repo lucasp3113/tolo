@@ -1,12 +1,112 @@
-import React from 'react';
-import carruseluno from '../assets/carrusel1'
+import React from "react";
+import carruseluno from "../assets/carrusel1.png";
+import auris from "../assets/auris.jpg";
+import pelota from "../assets/pelota.png";
 
 export default function Carrusel() {
-
   return (
-    <div className="w-80 mx-auto text-center">
-      <div className="relative">
-        <img
+    <div className="w-80 max-w-12 mx-auto text-center">
+      {/* <div className="relative"> */}
+      <ul
+        className="flex flex-col gap-y-2 h-115 overflow-y-auto"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <li onClick={() => alert("Opción 1")}>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={carruseluno}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={auris}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+        <li>
+          <img
+            className="cursor-pointer w-[3rem] h-[3rem]"
+            src={pelota}
+            alt=""
+          />
+        </li>
+      </ul>
+      {/* <img
           src={carruseluno}
           alt="slide"
           className="w-full rounded-lg"
@@ -23,7 +123,7 @@ export default function Carrusel() {
         >
           ›
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

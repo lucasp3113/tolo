@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import pelota from "../assets/pelota.png";
 import auris from "../assets/auris.jpg";
+import Button from "../components/Button"
 import Rating from "../components/Rating";
 import ProtectedComponent from "../components/ProtectedComponent";
 
@@ -22,9 +23,7 @@ export default function Home() {
   }, []);
   return (
     <section className="flex items-center flex-col justify-center">
-        <ProtectedComponent>
-        <Rating/>
-        </ProtectedComponent>
+      
       {windowWidth < 500 ? (
         <>
           <section className="flex flex-col w-full mb-20 items-center justify-center">

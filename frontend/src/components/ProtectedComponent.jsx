@@ -19,13 +19,32 @@ const ProtectedComponent = ({
   // Si requiere auth y no está logueado
   if (requireAuth && !isLoggedIn) {
     
-    // Interceptamos los clicks en el Rating y redirigimos
+    // Interceptamos solo clicks, permitiendo hovers y otros eventos
     const interceptedChildren = React.Children.map(children, child => {
       if (React.isValidElement(child)) {
-        return React.cloneElement(child, {
-          ...child.props,
-          onRatingChange: handleLoginRedirect // Interceptamos el onRatingChange del Rating
-        });
+        const interceptedProps = { ...child.props };
+        
+        // Solo interceptamos eventos de "acción" no eventos visuales
+        if (child.props.onClick) interceptedProps.onClick = handleLoginRedirect;
+        if (child.props.onChange) interceptedProps.onChange = handleLoginRedirect;
+        if (child.props.onRatingChange) interceptedProps.onRatingChange = handleLoginRedirect;
+        if (child.props.onSubmit) interceptedProps.onSubmit = handleLoginRedirect;
+        if (child.props.onSelect) interceptedProps.onSelect = handleLoginRedirect;
+        if (child.props.onToggle) interceptedProps.onToggle = handleLoginRedirect;
+        
+        // Para interceptar clicks internos (como en Rating) sin bloquear hovers
+        return (
+          <div 
+            onClickCapture={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleLoginRedirect();
+            }}
+            style={{ display: 'contents' }} // No afecta el layout
+          >
+            {React.cloneElement(child, interceptedProps)}
+          </div>
+        );
       }
       return child;
     });

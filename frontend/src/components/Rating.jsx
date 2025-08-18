@@ -6,7 +6,8 @@ export default function Rating({
   onRatingChange = () => {}, 
   size = 'md',
   readonly = false,
-  showValue = false 
+  showValue = false,
+  className
 }) {
   const [rating, setRating] = useState(initialRating);
   const [hoverRating, setHoverRating] = useState(0);
@@ -50,7 +51,7 @@ export default function Rating({
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className={`flex items-center gap-1 ${className}`}>
       <div 
         className="flex gap-1"
         onMouseLeave={handleMouseLeave}
