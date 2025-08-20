@@ -10,6 +10,8 @@ import lauta from "../assets/lautaro.jpeg";
 import silvano from "../assets/silvano.jpg";
 import matias from "../assets/matias.jpg";
 import Input from "../components/Input";
+import { FaComment } from "react-icons/fa";
+import Form from "../components/Form";
 
 export default function Product() {
   const navigate = useNavigate();
@@ -89,34 +91,37 @@ export default function Product() {
           <h1 className="text-3xl mb-5 border-b border-gray-200">
             Calificación
           </h1>
-          <div className="border border-gray-300 p-3 rounded-md">
-            <section>
-              <Rating
-                id="user-rating"
-                initialRating={ratings.userRating}
-                onRatingChange={handleRatingChange}
-                showValue={true}
+          <div className="border border-gray-300 p-3 rounded-md ml-1">
+              <Form
+                fields={[
+                  <Rating
+                    id="user-rating"
+                    name="rating"
+                    initialRating={ratings.userRating}
+                    onRatingChange={handleRatingChange}
+                    showValue={true}
+                  />,
+                  <Input
+                    name="comentarios"
+                    type="text"
+                    placeholder="Haz una opinión..."
+                    required={true}
+                    minLength={5}
+                    maxLength={300}
+                    icon={<FaComment className="-translate-y-3" />}
+                    className=""
+                  />,
+                ]}
+                onSubmit={(data) => console.log(data)}
+                button={
+                  <Button
+                    color="sky"
+                    text="Publicar"
+                    size="md"
+                    className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold"
+                  />
+                }
               />
-            </section>
-            <section className="ml-1">
-              <input
-                type="text"
-                className="w-full"
-                placeholder="Haz una opinión"
-              />
-              {/* 
-            <ProtectedComponent>
-              <Input
-                name="title"
-                label="Título"
-                type="text"
-                register={register}
-                errors={errors}
-                watch={watch}
-                required
-              /> 
-            <ProtectedComponent/>*/}
-            </section>
           </div>
           <div className="flex justify-end">
             <Button
