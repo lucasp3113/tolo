@@ -22,12 +22,10 @@ const Carousel = ({
 
   // Imágenes por defecto si no se pasan ninguna
   const defaultImages = [
-    "https://asset-cdn.schoology.com/system/files/imagecache/profile_reg/pictures/picture-c3e6ab399fffacdff996c87aeceb685f_68240bb2aeaff.jpg?1747192754",
-    "https://asset-cdn.schoology.com/system/files/imagecache/profile_reg/pictures/picture-584a760c2c72381cafd3b187532d1b52_5b10b2291708e.png?1527820841",
-    "https://asset-cdn.schoology.com/system/files/imagecache/profile_reg/pictures/picture-7a0bd7c76f352c1de526ca4e2908d2cb_664753a528393.jpeg?1715950532",
-    "https://asset-cdn.schoology.com/system/files/imagecache/profile_reg/pictures/picture-621f71033d4070fb7087fa836f1b4e6f_5f91c6393dda2.jpg?1603388985",
-    "https://asset-cdn.schoology.com/system/files/imagecache/profile_reg/pictures/picture-2e02580acaf44ad5e88475f9217fd3d2_6838c8938d67b.jpg?1748551827",
-    "https://asset-cdn.schoology.com/system/files/imagecache/profile_reg/pictures/picture-e8cb653f617b28f06e6d8f86dd22ae3f_66e8dbe8d46f9.jpg?1726536680",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=400&fit=crop",
+    "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop"
   ];
 
   const slideImages = images.length > 0 ? images : defaultImages;
@@ -59,12 +57,12 @@ const Carousel = ({
   }
 
   return (
-    <div className={`relative bg-white rounded-xl overflow-hidden shadow-lg ${className}`}>
+    <div className={`relative bg-white overflow-hidden ${className}`}>
       {/* Contenedor principal del carrusel */}
-      <div className="relative h-96 overflow-hidden group">
+      <div className="relative rounded-md h-96 overflow-hidden group">
         {/* Slides */}
         <div 
-          className="flex transition-transform duration-500 ease-in-out h-full"
+          className="flex transition-transform duration-300 ease-in-out h-full"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {slideImages.map((image, index) => (
