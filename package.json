@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@vitejs/plugin-react-swc": "^3.11.0"
+  },
+  "dependencies": {
+    "@fontsource/roboto": "^5.2.6",
+    "axios": "^1.11.0",
+    "react-circular-progressbar": "^2.2.0"
+  }
+}
