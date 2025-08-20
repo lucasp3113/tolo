@@ -3,6 +3,7 @@ export default {
   content: [
     "./src/**/*.{js,jsx,ts,tsx,html}",
   ],
+  darkMode: 'media',
   theme: {
     extend: {
       keyframes: {
@@ -15,6 +16,19 @@ export default {
       animation: {
         shake: 'shake 0.5s ease-in-out infinite',
       },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        nunito: ['Nunito', 'sans-serif'],
+        quicksand: ['Quicksand', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+        lato: ['Lato', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        raleway: ['Raleway', 'sans-serif'],
+        oswald: ['Oswald', 'sans-serif'],
+        sourcesans: ['Source Sans Pro', 'sans-serif'],
+      },
     },
   },
+  plugins: [],
 };

@@ -5,6 +5,7 @@ import { BiLogOut } from "react-icons/bi";
 import { IoSearch } from 'react-icons/io5';
 import { MdSpaceDashboard } from 'react-icons/md';
 import axios from 'axios';
+import { IoSettings } from "react-icons/io5";
 
 import logoTolo from "../assets/logoTolo.png";
 import Menu from './Menu';
@@ -110,9 +111,9 @@ export default function HeaderNav() {
                 onClick: () => navigate(userType === "ecommerce" ? "/ecommerce_dashboard/" : "/seller_dashboard/"),
               },
               isLoggedIn && {
-                title: 'Cerrar sesión',
+                title: '',
                 icon: {
-                  name: <BiLogOut className="text-red-400 text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px]" />,
+                  name: <BiLogOut className="text-red-400 text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125" />,
                   expand: true,
                 },
                 animation: false,
@@ -122,7 +123,16 @@ export default function HeaderNav() {
                   logout();
                   navigate('/');
                 },
-              }
+              },
+            isLoggedIn && {
+                title: "",
+                icon: {
+                  name: <IoSettings className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300" />,
+                  expand: false,
+                },
+                animation: false,
+                onClick: () => navigate('/settings/'),
+              },
             ].filter(Boolean)}
           />
         </nav>
