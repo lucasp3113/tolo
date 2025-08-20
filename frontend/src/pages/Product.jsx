@@ -70,7 +70,7 @@ export default function Product() {
         </div>
         <section className="text-gray-700 p-3 border-b border-gray-200">
           <h1 className="text-3xl mb-5">Descripción</h1>
-          <p>
+          <p className="font-semibold text-gray-500 text-2xl">
             Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
             Electrónico Inteligente con Pedal de Sostenido, Cable de Carga USB,
             Soporte de Música y Estuche de Transporte - Negro/Blanco
@@ -137,7 +137,7 @@ export default function Product() {
 
       {/* Columna derecha (info + botones) */}
       <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
-        <h1 className="text-4xl font-semibold">Teclado Electrónico Portátil</h1>
+        <h1 className="text-4xl font-semibold ">Teclado Electrónico Portátil</h1>
         <h2 className="text-4xl mt-6">$ 5.093</h2>
         <div className="flex items-center gap-2">
           <Rating

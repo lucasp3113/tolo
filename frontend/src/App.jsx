@@ -13,6 +13,7 @@ import ProductCRUD from './pages/ProductCRUD';
 import Settings from './pages/Settings';
 import { DarkModeProvider } from './components/DarkModeProvider';
 import ChangePassword from './pages/ChangePassword';
+import Product from "./pages/Product";
 
 function App() {
   return (
@@ -88,6 +89,12 @@ function App() {
                   <ProtectedRoute>
                     <ChangePassword />
                   </ProtectedRoute>
+                </Layout>
+              }>
+              </Route>
+              <Route path='/product' element={
+                <Layout>
+                    <Product />
                 </Layout>
               }>
               </Route>
