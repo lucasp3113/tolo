@@ -59,21 +59,22 @@ const Carousel = ({
   return (
     <div className={`relative bg-white overflow-hidden ${className}`}>
       {/* Contenedor principal del carrusel */}
-      <div className="relative rounded-md h-96 overflow-hidden group">
+      <div className="relative rounded-md h-96 overflow-hidden group bg-gray-50">
         {/* Slides */}
         <div 
           className="flex transition-transform duration-300 ease-in-out h-full"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {slideImages.map((image, index) => (
-            <div key={index} className="w-full flex-shrink-0 relative">
+            <div key={index} className="w-full flex-shrink-0 relative flex items-center justify-center">
               {/* Imagen */}
               {!imageError[index] ? (
                 <img
                   src={image}
                   alt={`Slide ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full object-contain"
                   onError={() => handleImageError(index)}
+                  style={{ backgroundColor: 'transparent' }}
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -92,14 +93,14 @@ const Carousel = ({
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg z-10"
             >
               <ChevronLeft className="w-5 h-5 text-gray-800" />
             </button>
 
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg z-10"
             >
               <ChevronRight className="w-5 h-5 text-gray-800" />
             </button>
@@ -107,7 +108,7 @@ const Carousel = ({
         )}
 
         {/* Contador de imágenes */}
-        <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1 text-white text-sm">
+        <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1 text-white text-sm z-10">
           {currentSlide + 1} / {slideImages.length}
         </div>
       </div>

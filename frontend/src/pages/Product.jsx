@@ -10,10 +10,56 @@ import lauta from "../assets/lautaro.jpeg";
 import silvano from "../assets/silvano.jpg";
 import matias from "../assets/matias.jpg";
 import Input from "../components/Input";
-import { FaComment } from "react-icons/fa";
 import Form from "../components/Form";
 
 export default function Product() {
+  const caract = "Marca";
+  const valor = "Yamaha";
+
+  const items = [
+    `${caract}: ${valor}`,
+    "Modelo: PSR-EW310",
+    "Teclas: 88",
+    "Consumo: 8W",
+    "Entrada de cable: USB",
+    "Estuche: Sí",
+  ];
+  const availableColors = ["Blanco", "Negro"];
+  const [selectedColor, setSelectedColor] = useState(null);
+
+  // Diccionario: cada color tiene sus imágenes
+  const colorImages = {
+    Blanco: [
+      "https://http2.mlstatic.com/D_NQ_NP_763537-MLU73335304666_122023-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_808568-MLU72748503475_112023-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_765812-MLU72748589977_112023-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_658411-MLU72748570563_112023-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_813811-MLU72748503491_112023-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_983973-MLU72748618455_112023-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_662338-MLU74959621979_032024-O.webp",
+    ],
+    Negro: [
+      "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
+    ],
+  };
+
+  // Imágenes default si no hay color elegido
+  const defaultImages = [
+      "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
+      "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
+  ];
+
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   let rating = 3;
@@ -59,18 +105,12 @@ export default function Product() {
             productData={false}
             showProductInfo={false}
             className="w-2xl"
-            images={[
-              "https://img.kwcdn.com/product/fancy/8eb6d5e4-fcb1-4ea6-adc3-7a7d6e814c73.jpg?imageView2/2/w/800/q/70/format/webp",
-              "https://img.kwcdn.com/product/fancy/ef691fed-8d80-42ec-87d9-bea38c625706.jpg?imageView2/2/w/800/q/70/format/webp",
-              "https://img.kwcdn.com/product/fancy/5856bdf4-40bd-4e8f-a811-b97d68bf212a.jpg?imageView2/2/w/800/q/70/format/webp",
-              "https://img.kwcdn.com/product/fancy/5856bdf4-40bd-4e8f-a811-b97d68bf212a.jpg?imageView2/2/w/800/q/70/format/webp",
-              "https://img.kwcdn.com/product/fancy/110ad3c1-7415-4124-92e6-91fdc7c8f8b8.jpg?imageView2/2/w/800/q/70/format/webp",
-            ]}
+            images={selectedColor ? colorImages[selectedColor] : defaultImages}
           />
         </div>
         <section className="text-gray-700 p-3 border-b border-gray-200">
           <h1 className="text-3xl mb-5">Descripción</h1>
-          <p className="font-semibold text-gray-500 text-2xl">
+          <p className="font-semibold text-gray-500 text-xl">
             Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
             Electrónico Inteligente con Pedal de Sostenido, Cable de Carga USB,
             Soporte de Música y Estuche de Transporte - Negro/Blanco
@@ -78,66 +118,68 @@ export default function Product() {
         </section>
         <section className="p-3 border-b border-gray-200 flex flex-col">
           <h1 className="text-3xl mb-5 text-gray-700">Detalles del Producto</h1>
-          <span>Marca: Yamaha</span>
-          <span>Modelo: PSR-EW310</span>
-          <span></span>
-          <span></span>
-          <span>Teclas: 88</span>
-          <span>Consumo: 8W</span>
-          <span>Entrada de cable: USB</span>
-          <span>Estuche: Sí</span>
+          <ul className="[column-count:2] [column-gap:2rem] list-none p-0 m-0">
+            {items.map((item, index) => (
+              <div
+                className={`${index % 2 === 0 ? "bg-white" : "bg-[#f0ecec]"}`}
+                key={index}
+              >
+                <li
+                  className={`mb-0 h-12 break-inside-avoid-column flex items-center ml-5`}
+                >
+                  {item}
+                </li>
+              </div>
+            ))}
+          </ul>
         </section>
-        <section className="text-gray-700 p-3 border border-gray-200">
-          <h1 className="text-3xl mb-5 border-b border-gray-200">
-            Calificación
-          </h1>
-          <div className="border border-gray-300 p-3 rounded-md ml-1">
-              <Form
-                fields={[
-                  <Rating
-                    id="user-rating"
-                    name="rating"
-                    initialRating={ratings.userRating}
-                    onRatingChange={handleRatingChange}
-                    showValue={true}
-                  />,
-                  <Input
-                    name="comentarios"
-                    type="text"
-                    placeholder="Haz una opinión..."
-                    required={true}
-                    minLength={5}
-                    maxLength={300}
-                    icon={<FaComment className="-translate-y-3" />}
-                    className=""
-                  />,
-                ]}
-                onSubmit={(data) => console.log(data)}
-                button={
+        <section className="text-gray-700 p-3">
+          <h1 className="text-3xl mb-5">Comentarios</h1>
+          <div className="p-3 rounded-md">
+            <Form
+              fields={[
+                <Rating
+                  id="user-rating"
+                  name="rating"
+                  initialRating={ratings.userRating}
+                  onRatingChange={handleRatingChange}
+                  showValue={true}
+                  className="ml-4"
+                />,
+                <Input
+                  name="comentarios"
+                  type="textarea"
+                  placeholder="Haz una opinión..."
+                  required={true}
+                  minLength={5}
+                  maxLength={300}
+                  className="h-30 w-150!"
+                />,
+              ]}
+              onSubmit={(data) => console.log(data)}
+              button={
+                <ProtectedComponent>
                   <Button
                     color="sky"
                     text="Publicar"
                     size="md"
-                    className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold"
+                    className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold ml-4!"
                   />
-                }
-              />
-          </div>
-          <div className="flex justify-end">
-            <Button
-              color="sky"
-              text="Publicar"
-              size="md"
-              className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold"
+                </ProtectedComponent>
+              }
             />
           </div>
         </section>
         <section className="p-3"></section>
       </div>
 
+      {/*}============================================================================================================================================*/}
+
       {/* Columna derecha (info + botones) */}
       <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
-        <h1 className="text-4xl font-semibold ">Teclado Electrónico Portátil</h1>
+        <h1 className="text-4xl font-semibold ">
+          Teclado Electrónico Portátil
+        </h1>
         <h2 className="text-4xl mt-6">$ 5.093</h2>
         <div className="flex items-center gap-2">
           <Rating
@@ -151,7 +193,28 @@ export default function Product() {
           <p className="text-sm font-semibold">+50 ventas</p>
         </div>
 
-        <div className="flex justify-between items-center w-full my-7">
+        <div className="flex items-center gap-2 my-6 w-full ml-3">
+          {availableColors.map((color) => (
+            <button
+              key={color}
+              className={`relative rounded-md overflow-hidden shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                selectedColor === color ? "ring-2 ring-blue-500" : ""
+              }`}
+              onClick={() => setSelectedColor(color)} // solo cambia el color seleccionado
+            >
+              <img
+                src={colorImages[color][0]} // muestra la primera imagen del color
+                alt={color}
+                className="w-10 h-10 object-cover"
+              />
+              {selectedColor === color && (
+                <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center w-full my-2">
           <div className="flex w-full">
             <p className="mt-[0.46rem] mr-2">Cantidad:</p>
             <Dropdown
