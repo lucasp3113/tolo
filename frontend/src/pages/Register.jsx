@@ -74,7 +74,7 @@ export default function Register() {
             isOpen: true,
             type: "toast",
             variant: "danger",
-            title: "Error en el formulario",
+            title: "Error maestro",
             message: firstErrorMsg,
         })
     }
