@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
 import { IoNotifications } from "react-icons/io5";
 import { IoNotificationsOffSharp } from "react-icons/io5";
-
+import axios from "axios";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
 
-  // Ejemplo de estilos según tipo de notificación
+  // Estilos según tipo de notificación
   const typeStyles = {
     success: "border-green-300 bg-green-50 text-green-800",
     info: "border-blue-300 bg-blue-50 text-blue-800",
@@ -15,10 +15,20 @@ export default function Notifications() {
     default: "border-gray-300 bg-gray-50 text-gray-800"
   };
 
+  // Traer notificaciones desde PHP
+  useEffect(() => {
+    axios
+      .get("http://localhost/tolo/notifications.php?id_usuario=1") 
+      .then((res) => {
+        setNotifications(res.data);
+      })
+      .catch((err) => {
+        console.error("Error al traer notificaciones:", err);
+      });
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
-      
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-center">
         <IoNotifications className="text-blue-600 text-3xl" />
         Notificaciones
@@ -28,7 +38,7 @@ export default function Notifications() {
         <div className="w-full max-w-2xl space-y-4">
           {notifications.map((n, i) => (
             <Card
-              key={i}
+              key={n.id || i}
               className={`flex items-start gap-3 border ${
                 typeStyles[n.type] || typeStyles.default
               } transform transition-transform duration-200 hover:scale-105 hover:shadow-lg`}
@@ -53,4 +63,3 @@ export default function Notifications() {
     </div>
   );
 }
-
