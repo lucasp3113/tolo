@@ -13,8 +13,14 @@ import ProductCRUD from './pages/ProductCRUD';
 import Settings from './pages/Settings';
 import { DarkModeProvider } from './components/DarkModeProvider';
 import ChangePassword from './pages/ChangePassword';
+import { useState } from 'react';
 
 function App() {
+  /*esto es para conectar la peticion q hace el formualrio de busqueda en el
+    componente HeaderNav con la page Home, para renderizar los productos
+  */
+  const [searchData, setSearchData] = useState(null)
+
   return (
     <div className="Tolo">
       <DarkModeProvider>
@@ -24,8 +30,8 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <Layout>
-                    <Home />
+                  <Layout search={true} setSearchData={setSearchData}>
+                    <Home searchData={searchData} />
                   </Layout>
                 }
               />

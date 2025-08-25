@@ -90,7 +90,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // celu cuando la imagen es chica
   if (phone) {
     return (
-      <div className="cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0">
+      <div className="cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0">
         <img
           src={image}
           alt={name}

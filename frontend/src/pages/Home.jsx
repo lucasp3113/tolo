@@ -1,12 +1,7 @@
-import React from 'react'
-import Form from '../components/Form';
-import Input from '../components/Input'
-import { IoSearch } from "react-icons/io5";
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
-import pelota from '../assets/pelota.png'
 
-export default function Home() {
+export default function Home({ searchData }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -16,23 +11,50 @@ export default function Home() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const [animation, setAnimation] = useState(null)
+
+  useEffect(() => {
+    setAnimation(false)
+    if (searchData) {
+      setTimeout(() => setAnimation(true), 300)
+    }
+  }, [searchData])
+
   return (
     <section className='flex items-center flex-col justify-center'>
       {windowWidth < 500 ? (
+        //celu
         <>
-          <section className="flex flex-col w-full mb-20 items-center justify-center">
-            <ProductCard name={"Vaca holando"} price={3000} image={"/api/uploads/products/6898014a29918_1754792266.jpg"} stock={0} freeShipping={true} phone={true} />
-            <ProductCard name={"Auto audi a5"} price={3000} image={"/api/uploads/products/6897e4d6dbab3_1754784982.jpg"} stock={10} freeShipping={true} phone={true} />
-            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={101} freeShipping={true} phone={true} />
-            <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={30} freeShipping={true} phone={true} />
+          <section key={JSON.stringify(searchData)} className={`flex flex-col w-full mb-20 items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}>
+            {searchData ? searchData.map(i => (
+              <ProductCard
+                key={i.id || i.nombre_producto}
+                name={i["nombre_producto"]}
+                price={i["precio"]}
+                image={`/api/${i["ruta_imagen"]}`}
+                stock={i["stock"]}
+                freeShipping={true}
+                phone={true}
+              />
+            )) : null}
           </section>
         </>
-      ) : <section className="flex mb-20 w-full items-center justify-center">
-        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
-        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
-        <ProductCard name={"Pelota nike"} price={3000} image={pelota} stock={10} freeShipping={true} />
+      ) : //compu 
+        <section className={`flex mb-20 w-full items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}>
+          {searchData ? searchData.map(i => (
+            <ProductCard
+              key={i.id || i.nombre_producto}
+              name={i["nombre_producto"]}
+              price={i["precio"]}
+              image={`/api/${i["ruta_imagen"]}`}
+              stock={i["stock"]}
+              freeShipping={true}
+              phone={false}
+            />
+          )) : null}
 
-      </section>}
+        </section>}
 
 
     </section>
