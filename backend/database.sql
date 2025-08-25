@@ -180,6 +180,14 @@ CREATE TABLE imagenes_productos (
 
 SELECT * FROM productos
 
+SELECT p.nombre_producto, p.id_producto, p.precio, p.stock, i.ruta_imagen FROM productos p JOIN imagenes_productos i ON p.id_producto = i.id_producto
+
+SELECT p.nombre_producto, p.precio, p.stock, (
+    SELECT i.ruta_imagen FROM imagenes_productos i
+    WHERE p.id_producto = i.id_producto
+    ORDER BY i.id_imagen ASC LIMIT 1
+) AS ruta_imagen
+FROM productos p WHERE id_producto = 91
 
 CREATE TABLE compras (
     id_compra INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -224,6 +232,10 @@ CREATE TABLE pagos (
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     FOREIGN KEY (id_metodo_pago) REFERENCES metodos_pagos (id_metodo_pago) ON DELETE RESTRICT
 );
+
+SELECT * FROM productos;
+
+
 
 CREATE TABLE envios (
     id_envio INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

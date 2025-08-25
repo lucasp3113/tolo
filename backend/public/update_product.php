@@ -3,6 +3,9 @@ mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
+require __DIR__ . '/../vendor/autoload.php';
+use MeiliSearch\Client;
+
 $data_base = new mysqli("localhost", "root", "", "tolo");
 
 if ($data_base) {
@@ -13,7 +16,6 @@ if ($data_base) {
         $product_price = $_POST["productPrice"];
         $product_stock = $_POST["productStock"];
         $product_description = $_POST["productDescription"];
-
         $categories_json = $_POST["categories"] ?? "[]";
         $categories_array = json_decode($categories_json, true);
         $category_list = [];
@@ -21,11 +23,12 @@ if ($data_base) {
             $category_list[] = $item[0];
         }
 
-        function updateImages($product_id, $data_base) {
+        function updateImages($product_id, $data_base)
+        {
             $saved_images = [];
 
             if (!isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
-                return true; 
+                return true;
             }
 
             $query = $data_base->prepare("SELECT ruta_imagen FROM imagenes_productos WHERE id_producto = ?");
@@ -47,25 +50,25 @@ if ($data_base) {
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
-            
+
             $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
             $max_size = 5 * 1024 * 1024;
-            
+
             for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
                 $file_name = $_FILES['images']['name'][$i];
                 $file_tmp = $_FILES['images']['tmp_name'][$i];
                 $file_size = $_FILES['images']['size'][$i];
                 $file_type = $_FILES['images']['type'][$i];
                 $file_error = $_FILES['images']['error'][$i];
-                
+
                 if ($file_error !== UPLOAD_ERR_OK) {
                     continue;
                 }
-                
+
                 if (!in_array($file_type, $allowed_types)) {
                     continue;
                 }
-                
+
                 if ($file_size > $max_size) {
                     continue;
                 }
@@ -76,15 +79,15 @@ if ($data_base) {
                     $relative_path = "uploads/products/" . $unique_name;
                     $query = $data_base->prepare("INSERT INTO imagenes_productos (id_producto, ruta_imagen) VALUES (?, ?)");
                     $query->bind_param("is", $product_id, $relative_path);
-                    
+
                     if ($query->execute()) {
                         $saved_images[] = $relative_path;
                     } else {
                         unlink($file_path);
                     }
                 }
-            }     
-            return count($saved_images) > 0; 
+            }
+            return count($saved_images) > 0;
         }
 
         $query = $data_base->prepare("SELECT id_usuario, tipo_usuario FROM usuarios WHERE nombre_usuario = ?");
@@ -98,19 +101,19 @@ if ($data_base) {
                 $query->bind_param("i", $id);
                 if ($query->execute()) {
                     $id_ecommerce = $query->get_result()->fetch_assoc()["id_ecommerce"];
-                    
+
                     $verify_query = $data_base->prepare("SELECT id_producto FROM productos WHERE id_producto = ? AND id_vendedor = ? AND id_ecommerce = ?");
                     $verify_query->bind_param("iii", $product_id, $id, $id_ecommerce);
                     if ($verify_query->execute() && $verify_query->get_result()->num_rows > 0) {
-                        
+
                         $query = $data_base->prepare("UPDATE productos SET nombre_producto = ?, descripcion = ?, precio = ?, stock = ? WHERE id_producto = ?");
                         $query->bind_param("ssdii", $name_product, $product_description, $product_price, $product_stock, $product_id);
                         if ($query->execute()) {
-                            
+
                             $delete_categories = $data_base->prepare("DELETE FROM productos_categorias WHERE id_producto = ?");
                             $delete_categories->bind_param("i", $product_id);
                             $delete_categories->execute();
-                            
+
                             if (!empty($category_list)) {
                                 $number_of_question_marks = implode(',', array_fill(0, count($category_list), "?"));
                                 $number_of_s = str_repeat("s", count($category_list));
@@ -137,7 +140,15 @@ if ($data_base) {
                                 }
                             }
                             $images_updated = updateImages($product_id, $data_base);
-                            
+
+                            $client = new Client('http://127.0.0.1:7700');
+                            $index = $client->getIndex('productos');
+                            $producto_index = [
+                                'id' => $name_product,
+                                'name'=> $name_product
+                            ];
+                            $index->addDocuments([$producto_index]);
+
                             http_response_code(200);
                             echo json_encode([
                                 "success" => true,
@@ -146,7 +157,7 @@ if ($data_base) {
                                 "images_updated" => $images_updated
                             ]);
                             exit;
-                            
+
                         } else {
                             http_response_code(400);
                             echo json_encode([
