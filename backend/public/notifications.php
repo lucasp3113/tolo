@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";
-$user = "root";        // Usuario MySQL
-$password = "";        // Contraseña MySQL
-$dbname = "tolo";      // Base de datos
+$user = "root";        
+$password = "";        
+$dbname = "tolo";      
 
 // Crear conexión
 $conn = new mysqli($host, $user, $password, $dbname);
@@ -32,7 +32,13 @@ $notificaciones = [];
 
 if ($result && $result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $notificaciones[] = $row;
+        $notificaciones[] = [
+            "id" => $row["id_notificacion"],
+            "title" => ucfirst($row["estado"]),      // ejemplo: "Leído" o "Pendiente"
+            "message" => $row["mensaje"],
+            "type" => $row["tipo"],                  // success, warning, info, etc.
+            "time" => $row["fecha_envio"]
+        ];
     }
 }
 
