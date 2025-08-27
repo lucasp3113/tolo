@@ -19,7 +19,7 @@ CREATE TABLE usuarios (
 );
 
 
-SELECT * FROM usuarios
+SELECT * FROM productos;
 
 DELETE FROM categorias;
 

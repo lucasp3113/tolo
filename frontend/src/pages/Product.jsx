@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
@@ -12,7 +13,37 @@ import matias from "../assets/matias.jpg";
 import Input from "../components/Input";
 import Form from "../components/Form";
 
-export default function Product() {
+export default function Product(stock) {  
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // FIX 1: Mover axios dentro de useEffect
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.post("/api/product.php", {
+          idProducto: 1
+        });
+        
+        if (response.data.success) {
+          setData(response.data.data);
+          console.log("Datos del producto:", response.data.data);
+        } else {
+          setError(response.data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("Error al cargar el producto");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, []); // Solo ejecuta una vez al montar el componente
+
   const caract = "Marca";
   const valor = "Yamaha";
 
@@ -23,46 +54,46 @@ export default function Product() {
     "Consumo: 8W",
     "Entrada de cable: USB",
     "Estuche: Sí",
+    "Inalámbrico: Sí",
   ];
-  const availableColors = ["Blanco", "Negro"];
-  const [selectedColor, setSelectedColor] = useState(null);
 
-  // Diccionario: cada color tiene sus imágenes
-  const colorImages = {
-    Blanco: [
-      "https://http2.mlstatic.com/D_NQ_NP_763537-MLU73335304666_122023-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_808568-MLU72748503475_112023-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_765812-MLU72748589977_112023-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_658411-MLU72748570563_112023-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_813811-MLU72748503491_112023-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_983973-MLU72748618455_112023-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_662338-MLU74959621979_032024-O.webp",
-    ],
-    Negro: [
-      "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
-    ],
+  const availableColors = ["Blanco"];
+  const [selectedColor, setSelectedColor] = useState("Negro"); // Default value
+  const availableSizes = ["XL", "M", "S"];
+  const [selectedSize, setSelectedSize] = useState(null);
+
+  // FIX 2: Crear colorImages de forma segura
+  const getColorImages = () => {
+    if (!data) return {};
+    
+    return {
+      // FIX 3: Manejar imagen de BD correctamente
+      Blanco: data.imagen?.ruta_imagen ? [`/api/${data.imagen.ruta_imagen}`] : [image],
+      Negro: [
+        "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
+      ],
+      Rojo: [
+        "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
+        "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
+      ],
+    };
   };
 
-  // Imágenes default si no hay color elegido
-  const defaultImages = [
-      "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
-      "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
-  ];
+  const colorImages = getColorImages();
 
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
-  let rating = 3;
 
   const [ratings, setRatings] = useState({
     userRating: 0,
@@ -85,15 +116,30 @@ export default function Product() {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // // Detectar tamaño de pantalla
-  //   useEffect(() => {
-  //     const checkScreenSize = () => {
-  //       setIsMobile(window.innerWidth < 768);
-  //     };
-  //     checkScreenSize();
-  //     window.addEventListener("resize", checkScreenSize);
-  //     return () => window.removeEventListener("resize", checkScreenSize);
-  //   }, []);
+  // FIX 4: Mostrar loading/error states
+  if (loading) {
+    return (
+      <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
+        <p>Cargando producto...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
+        <p>No se encontraron datos del producto</p>
+      </div>
+    );
+  }
 
   return (
     <article className="w-[90%] lg:w-[70%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-5 mx-auto text-left">
@@ -105,7 +151,7 @@ export default function Product() {
             productData={false}
             showProductInfo={false}
             className="w-2xl"
-            images={selectedColor ? colorImages[selectedColor] : defaultImages}
+            images={colorImages[selectedColor] || [image]}
           />
         </div>
         <section className="text-gray-700 p-3 border-b border-gray-200">
@@ -137,8 +183,10 @@ export default function Product() {
           <h1 className="text-3xl mb-5">Comentarios</h1>
           <div className="p-3 rounded-md">
             <Form
+              className="w-160!"
               fields={[
                 <Rating
+                  key="rating"
                   id="user-rating"
                   name="rating"
                   initialRating={ratings.userRating}
@@ -147,6 +195,7 @@ export default function Product() {
                   className="ml-4"
                 />,
                 <Input
+                  key="input"
                   name="comentarios"
                   type="textarea"
                   placeholder="Haz una opinión..."
@@ -170,17 +219,16 @@ export default function Product() {
             />
           </div>
         </section>
-        <section className="p-3"></section>
       </div>
-
-      {/*}============================================================================================================================================*/}
 
       {/* Columna derecha (info + botones) */}
       <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
-        <h1 className="text-4xl font-semibold ">
-          Teclado Electrónico Portátil
+        <h1 className="text-4xl font-semibold">
+          {data.producto?.nombre_producto || "Teclado Electrónico Portátil"}
         </h1>
-        <h2 className="text-4xl mt-6">$ 5.093</h2>
+        <h2 className="text-4xl mt-6">
+          $ {data.producto?.precio || "5.093"}
+        </h2>
         <div className="flex items-center gap-2">
           <Rating
             id="product-average"
@@ -195,21 +243,38 @@ export default function Product() {
 
         <div className="flex items-center gap-2 my-6 w-full ml-3">
           {availableColors.map((color) => (
+            console.log(color),
             <button
               key={color}
               className={`relative rounded-md overflow-hidden shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 selectedColor === color ? "ring-2 ring-blue-500" : ""
               }`}
-              onClick={() => setSelectedColor(color)} // solo cambia el color seleccionado
+              onClick={() => setSelectedColor(color)}
             >
               <img
-                src={colorImages[color][0]} // muestra la primera imagen del color
+                src={colorImages[color]?.[0] || image}
                 alt={color}
                 className="w-10 h-10 object-cover"
               />
               {selectedColor === color && (
                 <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
               )}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2 my-6 w-full ml-3">
+          {availableSizes.map((size) => (
+            <button
+              key={size}
+              className={`px-4 py-2 border rounded-md ${
+                selectedSize === size 
+                  ? "border-blue-500 bg-blue-50 text-blue-600" 
+                  : "border-gray-300 bg-white"
+              }`}
+              onClick={() => setSelectedSize(size)}
+            >
+              {size}
             </button>
           ))}
         </div>
@@ -222,6 +287,7 @@ export default function Product() {
               hoverActivation={false}
               border={true}
               defaultSelectedIndex={0}
+              stock={data.producto?.stock || 55}
               options={[
                 { label: "1", onClick: () => console.log("Opción 1") },
                 { label: "2", onClick: () => console.log("Opción 2") },
@@ -235,9 +301,10 @@ export default function Product() {
               }
             />
           </div>
-          {/* STOCK */}
           <div>
-            <p className="text-sm text-gray-500">+100 disponibles</p>
+            <p className="text-sm text-gray-500">
+              +{data.producto?.stock || 100} disponibles
+            </p>
           </div>
         </div>
 
@@ -258,6 +325,7 @@ export default function Product() {
             className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-[15rem] h-[3rem] mt-2"
           />
         </ProtectedComponent>
+        
         <section className="flex justify-center mt-5">
           <div>
             <img src={matias} alt="" className="mr-6 w-10 rounded-full" />

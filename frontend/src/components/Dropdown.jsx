@@ -167,6 +167,7 @@ const Dropdown = ({
   showSelectedAsTitle = false,
   defaultSelectedIndex = null,
   onSelectionChange = null,
+  stock = 0,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -316,8 +317,8 @@ const Dropdown = ({
     
     // Convertir a número y validar rango
     const num = parseInt(value);
-    if (value !== "" && (!isNaN(num) && num > 999)) {
-      value = "999";
+    if (value !== "" && (!isNaN(num) && num > stock)) {
+      value = stock;
     }
     
     setInputValue(value);
