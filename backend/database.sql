@@ -1,4 +1,3 @@
--- Active: 1753920206856@@localhost@3306@tolo
 CREATE DATABASE tolo;
 
 
@@ -150,6 +149,8 @@ CREATE TABLE productos (
     descripcion TEXT DEFAULT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL,
+    caracteristicas STRING NOT NULL,
+    colores STRING NOT NULL,
     fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id_vendedor) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
@@ -177,6 +178,7 @@ CREATE TABLE imagenes_productos (
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
 
 SELECT * FROM productos
 

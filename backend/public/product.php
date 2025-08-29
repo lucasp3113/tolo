@@ -13,7 +13,7 @@ if ($data_base) {
     if ($query->execute()) {
         $result = $query->get_result()->fetch_assoc();
 
-        $query2 = $data_base->prepare("SELECT ruta_imagen FROM imagenes_productos WHERE id_producto = ?");
+        $query2 = $data_base->prepare("SELECT ruta_imagen FROM imagenes_productos WHERE i_producto = ?");
         $query2->bind_param("i", $id_producto);
         http_response_code(200);
         if ($query2->execute()) {

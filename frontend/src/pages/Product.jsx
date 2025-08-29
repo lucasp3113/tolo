@@ -13,7 +13,7 @@ import matias from "../assets/matias.jpg";
 import Input from "../components/Input";
 import Form from "../components/Form";
 
-export default function Product(stock) {  
+export default function Product(stock) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,9 +24,9 @@ export default function Product(stock) {
       try {
         setLoading(true);
         const response = await axios.post("/api/product.php", {
-          idProducto: 1
+          idProducto: 1,
         });
-        
+
         if (response.data.success) {
           setData(response.data.data);
           console.log("Datos del producto:", response.data.data);
@@ -58,17 +58,20 @@ export default function Product(stock) {
   ];
 
   const availableColors = ["Blanco"];
-  const [selectedColor, setSelectedColor] = useState("Negro"); // Default value
+  const [selectedColor, setSelectedColor] = useState(availableColors[0]); // Default value
   const availableSizes = ["XL", "M", "S"];
   const [selectedSize, setSelectedSize] = useState(null);
+  const showSizes = false;
 
   // FIX 2: Crear colorImages de forma segura
   const getColorImages = () => {
     if (!data) return {};
-    
+
     return {
       // FIX 3: Manejar imagen de BD correctamente
-      Blanco: data.imagen?.ruta_imagen ? [`/api/${data.imagen.ruta_imagen}`] : [image],
+      Blanco: data.imagen?.ruta_imagen
+        ? [`/api/${data.imagen.ruta_imagen}`]
+        : [image],
       Negro: [
         "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
         "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
@@ -226,9 +229,7 @@ export default function Product(stock) {
         <h1 className="text-4xl font-semibold">
           {data.producto?.nombre_producto || "Teclado Electrónico Portátil"}
         </h1>
-        <h2 className="text-4xl mt-6">
-          $ {data.producto?.precio || "5.093"}
-        </h2>
+        <h2 className="text-4xl mt-6">$ {data.producto?.precio || "5.093"}</h2>
         <div className="flex items-center gap-2">
           <Rating
             id="product-average"
@@ -241,43 +242,46 @@ export default function Product(stock) {
           <p className="text-sm font-semibold">+50 ventas</p>
         </div>
 
-        <div className="flex items-center gap-2 my-6 w-full ml-3">
-          {availableColors.map((color) => (
-            console.log(color),
-            <button
-              key={color}
-              className={`relative rounded-md overflow-hidden shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                selectedColor === color ? "ring-2 ring-blue-500" : ""
-              }`}
-              onClick={() => setSelectedColor(color)}
-            >
-              <img
-                src={colorImages[color]?.[0] || image}
-                alt={color}
-                className="w-10 h-10 object-cover"
-              />
-              {selectedColor === color && (
-                <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
-              )}
-            </button>
-          ))}
-        </div>
+        {availableColors.length > 1 && (
+          <div className="flex items-center gap-2 my-6 w-full ml-3">
+            {availableColors.map((color) => (
+              <button
+                key={color}
+                className={`relative rounded-md overflow-hidden shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  selectedColor === color ? "ring-2 ring-blue-500" : ""
+                }`}
+                onClick={() => setSelectedColor(color)}
+              >
+                <img
+                  src={colorImages[color]?.[0] || image}
+                  alt={color}
+                  className="w-10 h-10 object-cover"
+                />
+                {selectedColor === color && (
+                  <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
-        <div className="flex items-center gap-2 my-6 w-full ml-3">
-          {availableSizes.map((size) => (
-            <button
-              key={size}
-              className={`px-4 py-2 border rounded-md ${
-                selectedSize === size 
-                  ? "border-blue-500 bg-blue-50 text-blue-600" 
-                  : "border-gray-300 bg-white"
-              }`}
-              onClick={() => setSelectedSize(size)}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
+        {showSizes === true && (
+          <div className="flex items-center gap-2 my-6 w-full ml-3">
+            {availableSizes.map((size) => (
+              <button
+                key={size}
+                className={`px-4 py-2 border rounded-md ${
+                  selectedSize === size
+                    ? "border-blue-500 bg-blue-50 text-blue-600"
+                    : "border-gray-300 bg-white"
+                }`}
+                onClick={() => setSelectedSize(size)}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex justify-between items-center w-full my-2">
           <div className="flex w-full">
@@ -325,7 +329,7 @@ export default function Product(stock) {
             className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-[15rem] h-[3rem] mt-2"
           />
         </ProtectedComponent>
-        
+
         <section className="flex justify-center mt-5">
           <div>
             <img src={matias} alt="" className="mr-6 w-10 rounded-full" />

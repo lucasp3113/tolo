@@ -12,6 +12,8 @@ if ($data_base) {
         $product_price = $_POST["productPrice"];
         $product_stock = $_POST["productStock"];
         $product_description = $_POST["productDescription"];
+        $product_characteristics = $_POST["productCharacteristics"];
+        $product_colors = $_POST["productColors"];
 
         $categories_json = $_POST["categories"] ?? "[]";
         $categories_array = json_decode($categories_json, true);
@@ -83,7 +85,7 @@ if ($data_base) {
                 if ($query->execute()) {
                     $id_ecommerce = $query->get_result()->fetch_assoc()["id_ecommerce"];
                     $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock) VALUES (?, ?, ?, ?, ?, ?)");
-                    $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock);
+                    $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock, $product_characteristics, $product_colors);
                     if ($query->execute()) {
                         $product_id = $data_base->insert_id;
                         if (!empty($category_list)) {
