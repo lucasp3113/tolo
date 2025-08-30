@@ -4,8 +4,7 @@ import Footer from '../components/Footer'
 import { useState, useEffect } from 'react'
 import MobileNav from './MobileNav'
 
-
-export default function Layout({children}) {
+export default function Layout({children, search = false, setSearchData}) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -17,7 +16,7 @@ export default function Layout({children}) {
   }, [windowWidth])
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr_auto]">
-    <HeaderNav/>
+    <HeaderNav search={search} setSearchData={setSearchData}/>
     <main className=''>{children}</main>
     {windowWidth < 500 ? <MobileNav/> : undefined}
     {windowWidth > 500 ? <Footer/> : undefined}

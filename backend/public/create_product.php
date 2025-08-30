@@ -3,6 +3,9 @@ mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
+require __DIR__ . '/../vendor/autoload.php';
+use MeiliSearch\Client;
+
 $data_base = new mysqli("localhost", "root", "", "tolo");
 
 if ($data_base) {
@@ -11,7 +14,7 @@ if ($data_base) {
         $name_product = $_POST["nameProduct"];
         $product_price = $_POST["productPrice"];
         $product_stock = $_POST["productStock"];
-        $product_description = $_POST["productDescription"];
+        $product_description = $_POST["productDescription"] ?? null;
         $product_characteristics = $_POST["productCharacteristics"];
         $product_colors = $_POST["productColors"];
 
@@ -21,78 +24,82 @@ if ($data_base) {
         foreach ($categories_array as $item) {
             $category_list[] = $item[0];
         }
-        function saveImages($product_id, $data_base) {
+
+        function saveImages($product_id, $data_base)
+        {
             $saved_images = [];
 
             if (!isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
-                return true; 
+                return true;
             }
 
             $upload_dir = "uploads/products/";
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
-            
+
             $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
             $max_size = 5 * 1024 * 1024;
-            
+
             for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
                 $file_name = $_FILES['images']['name'][$i];
                 $file_tmp = $_FILES['images']['tmp_name'][$i];
                 $file_size = $_FILES['images']['size'][$i];
                 $file_type = $_FILES['images']['type'][$i];
                 $file_error = $_FILES['images']['error'][$i];
-                
-                // Validaciones
-                if ($file_error !== UPLOAD_ERR_OK) {
+
+                if ($file_error !== UPLOAD_ERR_OK)
                     continue;
-                }
-                
-                if (!in_array($file_type, $allowed_types)) {
+                if (!in_array($file_type, $allowed_types))
                     continue;
-                }
-                
-                if ($file_size > $max_size) {
+                if ($file_size > $max_size)
                     continue;
-                }
+
                 $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
                 $unique_name = uniqid() . '_' . time() . '.' . $file_extension;
                 $file_path = $upload_dir . $unique_name;
+
                 if (move_uploaded_file($file_tmp, $file_path)) {
                     $relative_path = "uploads/products/" . $unique_name;
                     $query = $data_base->prepare("INSERT INTO imagenes_productos (id_producto, ruta_imagen) VALUES (?, ?)");
                     $query->bind_param("is", $product_id, $relative_path);
-                    
+
                     if ($query->execute()) {
                         $saved_images[] = $relative_path;
                     } else {
                         unlink($file_path);
                     }
                 }
-            }     
-            return count($saved_images) > 0; 
+            }
+            return count($saved_images) > 0;
         }
 
         $query = $data_base->prepare("SELECT id_usuario, tipo_usuario FROM usuarios WHERE nombre_usuario = ?");
         $query->bind_param("s", $username);
+
         if ($query->execute()) {
             $result = $query->get_result()->fetch_assoc();
             $id = $result["id_usuario"];
             $user_type = $result["tipo_usuario"];
+
             if ($user_type === "ecommerce") {
-                $query = $data_base->prepare("SELECT id_ecommerce FROM ecommerces WHERE id_usuario = ? ");
+                $query = $data_base->prepare("SELECT id_ecommerce FROM ecommerces WHERE id_usuario = ?");
                 $query->bind_param("i", $id);
+
                 if ($query->execute()) {
                     $id_ecommerce = $query->get_result()->fetch_assoc()["id_ecommerce"];
                     $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock) VALUES (?, ?, ?, ?, ?, ?)");
-                    $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock, $product_characteristics, $product_colors);
+                    $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock);
+
                     if ($query->execute()) {
                         $product_id = $data_base->insert_id;
+
                         if (!empty($category_list)) {
                             $number_of_question_marks = implode(',', array_fill(0, count($category_list), "?"));
                             $number_of_s = str_repeat("s", count($category_list));
                             $query = $data_base->prepare("SELECT id_categoria FROM categorias WHERE nombre_categoria IN ($number_of_question_marks)");
                             $query->bind_param($number_of_s, ...$category_list);
+
                             if ($query->execute()) {
                                 $id_categories_ugly = $query->get_result()->fetch_all(MYSQLI_NUM);
                                 $id_categories_cute = array_column($id_categories_ugly, 0);
@@ -114,16 +121,24 @@ if ($data_base) {
                             }
                         }
                         $images_saved = saveImages($product_id, $data_base);
-                        
+
+                        // 🔹 Agregar producto a MeiliSearch
+                        $client = new Client('http://127.0.0.1:7700');
+                        $index = $client->getIndex('productos');
+                        $name_product_clean = str_replace(" ", "", $name_product);
+                        $producto_index = [
+                            'id' => trim($name_product_clean),
+                            'name'=> $name_product
+                        ];
+                        $index->addDocuments([$producto_index]);
                         http_response_code(200);
                         echo json_encode([
                             "success" => true,
-                            "message" => "Producto creado exitosamente",
+                            "message" => "Producto creado e indexado exitosamente",
                             "product_id" => $product_id,
                             "images_uploaded" => $images_saved
                         ]);
                         exit;
-                        
                     } else {
                         http_response_code(400);
                         echo json_encode([
@@ -132,6 +147,7 @@ if ($data_base) {
                         ]);
                         exit;
                     }
+
                 } else {
                     http_response_code(400);
                     echo json_encode([
@@ -148,6 +164,7 @@ if ($data_base) {
                 ]);
                 exit;
             }
+
         } else {
             http_response_code(400);
             echo json_encode([
@@ -156,6 +173,7 @@ if ($data_base) {
             ]);
             exit;
         }
+
     } else {
         http_response_code(400);
         echo json_encode([
@@ -164,6 +182,7 @@ if ($data_base) {
         ]);
         exit;
     }
+
 } else {
     http_response_code(500);
     echo json_encode([

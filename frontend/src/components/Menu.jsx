@@ -60,7 +60,7 @@ export default function Menu({ elements, model3d, className = "" }) {
         <ul className={`m-3 flex items-center justify-between ${className}`}>
             {elements.map((element, index) => (
                 <li onClick={element.onClick}
-                    className={` group text-white cursor-pointer flex items-center ${elements.length === 3 ? "m-8" : "m-4"} 
+                    className={` group text-white cursor-pointer flex items-center ${elements.length === 3 ? windowWidth < 500 ? "m-8" : "m-2" : windowWidth < 500 ? "m-4" : "m-2"} 
                         ${element.animation
                             ? "relative leading-none transition-transform duration-300 hover:scale-110 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-[3px] after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-700 hover:after:w-full"
                             : ""

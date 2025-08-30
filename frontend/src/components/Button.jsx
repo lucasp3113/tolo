@@ -45,7 +45,7 @@ export default function Button({
 
   const colors = {
     green: "bg-green-600",
-    red: "bg-red-600",
+    red: "bg-red-400",
     yellow: "bg-amber-600",
     blue: "bg-sky-800",
     purple: "bg-purple-800",
