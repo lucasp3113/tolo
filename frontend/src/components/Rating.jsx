@@ -10,7 +10,8 @@ export default function Rating({
   showValue = true,
   className = '',
   onClick,
-  id // ID único para cada rating
+  id, // ID único para cada rating
+  text = "", // classname para el texto que indica el puntaje
 }) {
   const [rating, setRating] = useState(initialRating);
   const [hoverRating, setHoverRating] = useState(0);
@@ -107,7 +108,7 @@ export default function Rating({
         })}
       </div>
       {showValue && (
-        <span className="ml-2 text-xl font-medium text-[#3884fc]">
+        <span className={`${text} ml-2 text-xl font-medium text-[#3884fc]`}>
           {displayRating}
         </span>
       )}

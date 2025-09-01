@@ -59,7 +59,7 @@ const Carousel = ({
   return (
     <div className={`relative bg-white overflow-hidden ${className}`}>
       {/* Contenedor principal del carrusel */}
-      <div className="relative rounded-md h-96 overflow-hidden group bg-gray-50">
+      <div className="relative rounded-md h-96 overflow-hidden group">
         {/* Slides */}
         <div 
           className="flex transition-transform duration-300 ease-in-out h-full"
