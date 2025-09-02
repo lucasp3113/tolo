@@ -152,7 +152,7 @@ export default function Product() {
         <article
           className={`${
             width < 500 ? "w-full" : "w-100 m-auto"
-          } w-[90%] lg:w-[70%] rounded-md flex justify-between bg-white lg:bg-green-800 lg:bg-red-800 shadow-xl mt-10 p-5 mx-auto text-left`}
+          } w-[90%] lg:w-[70%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-5 mx-auto text-left`}
         >
           {/* Columna izquierda (Carrusel + descripción) */}
           <div className="flex flex-col mr-7 w-full md:w-[60%] lg:w-[65%]">
