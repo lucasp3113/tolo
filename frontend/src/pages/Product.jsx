@@ -57,7 +57,7 @@ export default function Product() {
     "Inalámbrico: Sí",
   ];
 
-  const availableColors = ["Blanco"];
+  const availableColors = ["Blanco", "Negro", "Rojo"];
   const [selectedColor, setSelectedColor] = useState(availableColors[0]); // Default value
   const availableSizes = ["XL", "M", "S"];
   const [selectedSize, setSelectedSize] = useState(null);
@@ -70,6 +70,12 @@ export default function Product() {
     return {
       // FIX 3: Manejar imagen de BD correctamente
       // Blanco: data.imagen?.ruta_imagen ? [`/api/${data.imagen.ruta_imagen}`] : [image],
+      Blanco: [
+        "https://m.media-amazon.com/images/I/31bCPm6G7EL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/21AfSg2p9mL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/31WDLQ34cfL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/71FbHNM-JbL._AC_SL1500_.jpg",
+      ],
       Negro: [
         "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
         "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
@@ -156,7 +162,7 @@ export default function Product() {
                 productData={false}
                 showProductInfo={false}
                 className="w-2xl"
-                images={colorImages[selectedColor] || [image]}
+                images={colorImages[selectedColor] || ["Blanco", "Negro"]}
               />
             </div>
             <section className="text-gray-700 p-3 border-b border-gray-200">
@@ -231,7 +237,7 @@ export default function Product() {
           </div>
 
           {/* Columna derecha (info + botones) */}
-          <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
+          <div className="flex flex-col items-start w-full md:w-[400px] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
             <h1 className="text-4xl font-semibold">
               {/* {data.producto?.nombre_producto ||  */}"Teclado Electrónico
               Portátil"{/*}}*/}
@@ -373,7 +379,7 @@ export default function Product() {
           </div>
         </article>
       ) : (
-        <article className="rounded-md flex flex-col justify-between bg-white shadow-xl p-5 mx-auto text-left w-full max-w-full overflow-hiddensm:p-5">
+        <article className="rounded-md flex flex-col justify-between bg-white shadow-xl p-5 mx-auto text-left w-full max-w-full overflow-hidden sm:p-5">
           {/* Columna izquierda (Carrusel + descripción) */}
           <div className="flex flex-col mr-7 w-[50%]">
             <div className="flex items-center gap-2 w-full justify-between mb-2">
@@ -396,6 +402,8 @@ export default function Product() {
                 autoPlay={false}
                 productData={false}
                 showProductInfo={false}
+                draggable={true}
+                showArrows={true}
                 className="w-2xl"
                 images={colorImages[selectedColor] || [image]}
               />
@@ -525,7 +533,7 @@ export default function Product() {
                 </div>
               </section>
             </div>
-            <section className="text-gray-700 p-3 border-y border-gray-200">
+            <section className="text-gray-700 p-3 border-b border-gray-200">
               <h1 className="text-2xl mb-5">Descripción</h1>
               <p className="font-semibold text-gray-500 text-md">
                 Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
@@ -554,11 +562,11 @@ export default function Product() {
                 ))}
               </ul>
             </section>
-            <section className="text-gray-700 p-3">
+            <section className="text-gray-700 p-3 w-full">
               <h1 className="text-2xl mb-5">Comentarios</h1>
               <div className="p-3 rounded-md mb-15 w-full">
                 <Form
-                  className="w-full p-0 shadow-none! max-w-none!"
+                  className="w-[400px] -translate-x-10 p-0 shadow-none!"
                   fields={[
                     <Rating
                       key="rating"
@@ -577,7 +585,7 @@ export default function Product() {
                       required={true}
                       minLength={5}
                       maxLength={300}
-                      className="h-15 w-full min-w-full max-w-full!"
+                      className="h-15 w-full!"
                     />,
                   ]}
                   button={
