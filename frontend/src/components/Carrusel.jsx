@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
 // Iconos SVG personalizados
 const ChevronLeft = ({ className }) => (
@@ -13,14 +13,19 @@ const ChevronRight = ({ className }) => (
   </svg>
 );
 
-const Carousel = ({ 
-  images = [], 
-  className = ""
+const Carousel = ({
+  images = [],
+  className = "",
+  draggable = false,      // ✅ Nuevo prop: permite arrastrar con mouse
+  showArrows = false      // ✅ Nuevo prop: muestra siempre las flechas si es true
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [imageError, setImageError] = useState({});
+  const [dragStartX, setDragStartX] = useState(null);
+  const [dragging, setDragging] = useState(false);
 
-  // Imágenes por defecto si no se pasan ninguna
+  const slideRef = useRef();
+
   const defaultImages = [
     "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop",
     "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&h=400&fit=crop",
@@ -46,6 +51,36 @@ const Carousel = ({
     setImageError(prev => ({ ...prev, [index]: true }));
   };
 
+  // 🔁 Drag handlers
+  const handleMouseDown = (e) => {
+    if (!draggable) return;
+    setDragStartX(e.clientX);
+    setDragging(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!draggable || !dragging) return;
+    const dragDistance = e.clientX - dragStartX;
+    if (Math.abs(dragDistance) > 50) {
+      if (dragDistance > 0) {
+        prevSlide();
+      } else {
+        nextSlide();
+      }
+      setDragging(false);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!draggable) return;
+    setDragging(false);
+  };
+
+  const handleMouseLeave = () => {
+    if (!draggable) return;
+    setDragging(false);
+  };
+
   if (slideImages.length === 0) {
     return (
       <div className={`relative bg-gray-200 rounded-xl overflow-hidden ${className}`}>
@@ -60,14 +95,19 @@ const Carousel = ({
     <div className={`relative bg-white overflow-hidden ${className}`}>
       {/* Contenedor principal del carrusel */}
       <div className="relative rounded-md h-96 overflow-hidden group">
+
         {/* Slides */}
-        <div 
+        <div
+          ref={slideRef}
           className="flex transition-transform duration-300 ease-in-out h-full"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
         >
           {slideImages.map((image, index) => (
             <div key={index} className="w-full flex-shrink-0 relative flex items-center justify-center">
-              {/* Imagen */}
               {!imageError[index] ? (
                 <img
                   src={image}
@@ -93,14 +133,16 @@ const Carousel = ({
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg z-10"
+              className={`absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 shadow-lg z-10
+              ${showArrows ? '' : 'opacity-0 group-hover:opacity-100'}`}
             >
               <ChevronLeft className="w-5 h-5 text-gray-800" />
             </button>
 
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg z-10"
+              className={`absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2 transition-all duration-300 shadow-lg z-10
+              ${showArrows ? '' : 'opacity-0 group-hover:opacity-100'}`}
             >
               <ChevronRight className="w-5 h-5 text-gray-800" />
             </button>
@@ -121,8 +163,8 @@ const Carousel = ({
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-2 h-2 rounded-full transition-all duration-300 hover:scale-125 ${
-                index === currentSlide 
-                  ? 'bg-blue-500 w-8' 
+                index === currentSlide
+                  ? 'bg-blue-500 w-8'
                   : 'bg-gray-300 hover:bg-gray-400'
               }`}
             />

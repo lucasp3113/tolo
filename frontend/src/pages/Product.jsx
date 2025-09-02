@@ -57,7 +57,7 @@ export default function Product() {
     "Inalámbrico: Sí",
   ];
 
-  const availableColors = ["Blanco"];
+  const availableColors = ["Blanco", "Negro", "Rojo"];
   const [selectedColor, setSelectedColor] = useState(availableColors[0]); // Default value
   const availableSizes = ["XL", "M", "S"];
   const [selectedSize, setSelectedSize] = useState(null);
@@ -70,6 +70,12 @@ export default function Product() {
     return {
       // FIX 3: Manejar imagen de BD correctamente
       // Blanco: data.imagen?.ruta_imagen ? [`/api/${data.imagen.ruta_imagen}`] : [image],
+      Blanco: [
+        "https://m.media-amazon.com/images/I/31bCPm6G7EL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/21AfSg2p9mL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/31WDLQ34cfL._AC_.jpg",
+        "https://m.media-amazon.com/images/I/71FbHNM-JbL._AC_SL1500_.jpg",
+      ],
       Negro: [
         "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
         "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
@@ -142,11 +148,11 @@ export default function Product() {
 
   return (
     <section>
-      {width >= 500 && (
+      {width >= 500 ? (
         <article
           className={`${
             width < 500 ? "w-full" : "w-100 m-auto"
-          } w-[90%] lg:w-[70%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-5 mx-auto text-left`}
+          } w-[90%] lg:w-[70%] rounded-md flex justify-between bg-white lg:bg-green-800 lg:bg-red-800 shadow-xl mt-10 p-5 mx-auto text-left`}
         >
           {/* Columna izquierda (Carrusel + descripción) */}
           <div className="flex flex-col mr-7 w-full md:w-[60%] lg:w-[65%]">
@@ -156,7 +162,7 @@ export default function Product() {
                 productData={false}
                 showProductInfo={false}
                 className="w-2xl"
-                images={colorImages[selectedColor] || [image]}
+                images={colorImages[selectedColor] || ["Blanco", "Negro"]}
               />
             </div>
             <section className="text-gray-700 p-3 border-b border-gray-200">
@@ -192,7 +198,7 @@ export default function Product() {
               <h1 className="text-3xl mb-5">Comentarios</h1>
               <div className="p-3 rounded-md">
                 <Form
-                  className="w-160!"
+                  className="w-160! shadow-none!  "
                   fields={[
                     <Rating
                       key="rating"
@@ -231,7 +237,7 @@ export default function Product() {
           </div>
 
           {/* Columna derecha (info + botones) */}
-          <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
+          <div className="flex flex-col items-start w-full md:w-[400px] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
             <h1 className="text-4xl font-semibold">
               {/* {data.producto?.nombre_producto ||  */}"Teclado Electrónico
               Portátil"{/*}}*/}
@@ -372,63 +378,82 @@ export default function Product() {
             </section>
           </div>
         </article>
-      )}
-      <article className="rounded-md flex flex-col justify-between bg-white shadow-xl p-5 mx-auto text-left w-full max-w-full overflow-hidden p-2 sm:p-5">
-        {/* Columna izquierda (Carrusel + descripción) */}
-        <div className="flex flex-col mr-7 w-[50%]">
-          <div className="flex items-center gap-2 w-full justify-between mb-2">
-            <Rating
-              id="product-average"
-              value={4.5}
-              readonly={true}
-              showValue={true}
-              size="sm"
-              text="text-sm!"
-            />
-            <p className="text-sm font-semibold text-gray-400">+50 ventas</p>
-          </div>
-          <h1 className="text-lg font-semibold self-center">
-            {/* {data.producto?.nombre_producto ||  */}Teclado Electrónico
-            Portátil CON TODA LA MANDOLE DEL MUHNDO AYHI CON TUCO{/*}}*/}
-          </h1>
-          <div className="flex justify-center">
-            <Carrusel
-              autoPlay={false}
-              productData={false}
-              showProductInfo={false}
-              className="w-2xl"
-              images={colorImages[selectedColor] || [image]}
-            />
-          </div>
-          <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto rounded-md p-3">
-            <h2 className="text-2xl mt-6">
-              {/* $ {data.producto?.precio || */}"5.093"{/*}}*/}
-            </h2>
+      ) : (
+        <article className="rounded-md flex flex-col justify-between bg-white shadow-xl p-5 mx-auto text-left w-full max-w-full overflow-hidden sm:p-5">
+          {/* Columna izquierda (Carrusel + descripción) */}
+          <div className="flex flex-col mr-7 w-[50%]">
+            <div className="flex items-center gap-2 w-full justify-between mb-2">
+              <Rating
+                id="product-average"
+                value={4.5}
+                readonly={true}
+                showValue={true}
+                size="sm"
+                text="text-sm!"
+              />
+              <p className="text-sm font-semibold text-gray-400">+50 ventas</p>
+            </div>
+            <h1 className="text-lg font-semibold self-center">
+              {/* {data.producto?.nombre_producto ||  */}Teclado Electrónico
+              Portátil CON TODA LA MANDOLE DEL MUHNDO AYHI CON TUCO{/*}}*/}
+            </h1>
+            <div className="flex justify-center">
+              <Carrusel
+                autoPlay={false}
+                productData={false}
+                showProductInfo={false}
+                draggable={true}
+                showArrows={true}
+                className="w-2xl"
+                images={colorImages[selectedColor] || [image]}
+              />
+            </div>
+            <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto rounded-md p-3">
+              <h2 className="text-2xl mt-6">
+                {/* $ {data.producto?.precio || */}"5.093"{/*}}*/}
+              </h2>
 
-            {availableColors.length > 1 && (
-              <div className="flex items-center gap-2 my-6 w-full ml-3">
-                {availableColors.map((color) => (
-                  <button
-                    key={color}
-                    className={`relative rounded-md overflow-hidden shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      selectedColor === color ? "ring-2 ring-blue-500" : ""
-                    }`}
-                    onClick={() => setSelectedColor(color)}
-                  >
-                    <img
-                      src={colorImages[color]?.[0] || image}
-                      alt={color}
-                      className="w-10 h-10 object-cover"
-                    />
-                    {selectedColor === color && (
-                      <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
+              {availableColors.length > 1 && (
+                <div className="flex items-center gap-2 my-6 w-full ml-3">
+                  {availableColors.map((color) => (
+                    <button
+                      key={color}
+                      className={`relative rounded-md overflow-hidden shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        selectedColor === color ? "ring-2 ring-blue-500" : ""
+                      }`}
+                      onClick={() => setSelectedColor(color)}
+                    >
+                      <img
+                        src={colorImages[color]?.[0] || image}
+                        alt={color}
+                        className="w-10 h-10 object-cover"
+                      />
+                      {selectedColor === color && (
+                        <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-            {showSizes === true && (
+              {showSizes === true && (
+                <div className="flex items-center gap-2 my-6 w-full ml-3">
+                  {availableSizes.map((size) => (
+                    <button
+                      key={size}
+                      className={`px-4 py-2 border rounded-md ${
+                        selectedSize === size
+                          ? "border-blue-500 bg-blue-50 text-blue-600"
+                          : "border-gray-300 bg-white"
+                      }`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="flex items-center gap-2 my-6 w-full ml-3">
                 {availableSizes.map((size) => (
                   <button
@@ -444,155 +469,141 @@ export default function Product() {
                   </button>
                 ))}
               </div>
-            )}
 
-            <div className="flex items-center gap-2 my-6 w-full ml-3">
-              {availableSizes.map((size) => (
-                <button
-                  key={size}
-                  className={`px-4 py-2 border rounded-md ${
-                    selectedSize === size
-                      ? "border-blue-500 bg-blue-50 text-blue-600"
-                      : "border-gray-300 bg-white"
-                  }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
+              <div className="flex justify-between items-center w-full my-2">
+                <div className="flex w-full">
+                  <p className="mt-[0.46rem] mr-2 ml-4">Cantidad:</p>
+                  <Dropdown
+                    showSelectedAsTitle={true}
+                    hoverActivation={false}
+                    border={true}
+                    defaultSelectedIndex={0}
+                    max={stock}
+                    options={[
+                      { label: "1", onClick: () => console.log("Opción 1") },
+                      { label: "2", onClick: () => console.log("Opción 2") },
+                      { label: "3", onClick: () => console.log("Opción 3") },
+                      { label: "4", onClick: () => console.log("Opción 4") },
+                      { label: "5", onClick: () => console.log("Opción 5") },
+                      { label: "6", onClick: () => console.log("Opción 6") },
+                    ]}
+                    onSelectionChange={(selectedOption) =>
+                      console.log("Seleccionado:", selectedOption)
+                    }
+                  />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {/*data.producto?.stock ||*/} {stock} disponibles
+                  </p>
+                </div>
+              </div>
+
+              <ProtectedComponent>
+                <Button
+                  color="sky"
+                  text="Comprar ahora"
+                  className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem]"
+                />
+              </ProtectedComponent>
+
+              <ProtectedComponent>
+                <Button
+                  color="sky"
+                  onClick={() => navigate("/")}
+                  theme="blue"
+                  text="Añadir al carrito"
+                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] mt-2"
+                />
+              </ProtectedComponent>
+              <section className="flex justify-center mt-5">
+                <div>
+                  <img src={matias} alt="" className="mr-6 w-10 rounded-full" />
+                </div>
+                <div className="flex flex-col">
+                  <span>
+                    Vendido por:{" "}
+                    <button
+                      className="cursor-pointer text-sky-600"
+                      onClick={() => navigate("/seller_dashboard/")}
+                    >
+                      El Letra
+                    </button>{" "}
+                  </span>
+                </div>
+              </section>
             </div>
-
-            <div className="flex justify-between items-center w-full my-2">
-              <div className="flex w-full">
-                <p className="mt-[0.46rem] mr-2 ml-4">Cantidad:</p>
-                <Dropdown
-                  showSelectedAsTitle={true}
-                  hoverActivation={false}
-                  border={true}
-                  defaultSelectedIndex={0}
-                  max={stock}
-                  options={[
-                    { label: "1", onClick: () => console.log("Opción 1") },
-                    { label: "2", onClick: () => console.log("Opción 2") },
-                    { label: "3", onClick: () => console.log("Opción 3") },
-                    { label: "4", onClick: () => console.log("Opción 4") },
-                    { label: "5", onClick: () => console.log("Opción 5") },
-                    { label: "6", onClick: () => console.log("Opción 6") },
+            <section className="text-gray-700 p-3 border-b border-gray-200">
+              <h1 className="text-2xl mb-5">Descripción</h1>
+              <p className="font-semibold text-gray-500 text-md">
+                Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
+                Electrónico Inteligente con Pedal de Sostenido, Cable de Carga
+                USB, Soporte de Música y Estuche de Transporte - Negro/Blanco
+              </p>
+            </section>
+            <section className="p-3 border-b border-gray-200 flex flex-col">
+              <h1 className="text-2xl mb-5 text-gray-700">
+                Detalles del Producto
+              </h1>
+              <ul className="[column-count:2] [column-gap:2rem] list-none p-0 m-0">
+                {items.map((item, index) => (
+                  <div
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-[#f0ecec]"
+                    }`}
+                    key={index}
+                  >
+                    <li
+                      className={`mb-0 h-12 break-inside-avoid-column flex items-center ml-5`}
+                    >
+                      {item}
+                    </li>
+                  </div>
+                ))}
+              </ul>
+            </section>
+            <section className="text-gray-700 p-3 w-full">
+              <h1 className="text-2xl mb-5">Comentarios</h1>
+              <div className="p-3 rounded-md mb-15 w-full">
+                <Form
+                  className="w-[400px] -translate-x-10 p-0 shadow-none!"
+                  fields={[
+                    <Rating
+                      key="rating"
+                      id="user-rating"
+                      name="rating"
+                      initialRating={ratings.userRating}
+                      onRatingChange={handleRatingChange}
+                      showValue={true}
+                      className="ml-4"
+                    />,
+                    <Input
+                      key="input"
+                      name="comentarios"
+                      type="textarea"
+                      placeholder="Haz una opinión..."
+                      required={true}
+                      minLength={5}
+                      maxLength={300}
+                      className="h-15 w-full!"
+                    />,
                   ]}
-                  onSelectionChange={(selectedOption) =>
-                    console.log("Seleccionado:", selectedOption)
+                  button={
+                    <ProtectedComponent>
+                      <Button
+                        color="sky"
+                        text="Publicar"
+                        size="md"
+                        className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold ml-4!"
+                      />
+                    </ProtectedComponent>
                   }
                 />
               </div>
-              <div>
-                <p className="text-sm text-gray-500">
-                  {/*data.producto?.stock ||*/} {stock} disponibles
-                </p>
-              </div>
-            </div>
-
-            <ProtectedComponent>
-              <Button
-                color="sky"
-                text="Comprar ahora"
-                className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem]"
-              />
-            </ProtectedComponent>
-
-            <ProtectedComponent>
-              <Button
-                color="sky"
-                onClick={() => navigate("/")}
-                theme="blue"
-                text="Añadir al carrito"
-                className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] mt-2"
-              />
-            </ProtectedComponent>
-            <section className="flex justify-center mt-5">
-              <div>
-                <img src={matias} alt="" className="mr-6 w-10 rounded-full" />
-              </div>
-              <div className="flex flex-col">
-                <span>
-                  Vendido por:{" "}
-                  <button
-                    className="cursor-pointer text-sky-600"
-                    onClick={() => navigate("/seller_dashboard/")}
-                  >
-                    El Letra
-                  </button>{" "}
-                </span>
-              </div>
             </section>
           </div>
-          <section className="text-gray-700 p-3 border-b border-gray-200">
-            <h1 className="text-2xl mb-5">Descripción</h1>
-            <p className="font-semibold text-gray-500 text-md">
-              Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
-              Electrónico Inteligente con Pedal de Sostenido, Cable de Carga
-              USB, Soporte de Música y Estuche de Transporte - Negro/Blanco
-            </p>
-          </section>
-          <section className="p-3 border-b border-gray-200 flex flex-col">
-            <h1 className="text-2xl mb-5 text-gray-700">
-              Detalles del Producto
-            </h1>
-            <ul className="[column-count:2] [column-gap:2rem] list-none p-0 m-0">
-              {items.map((item, index) => (
-                <div
-                  className={`${index % 2 === 0 ? "bg-white" : "bg-[#f0ecec]"}`}
-                  key={index}
-                >
-                  <li
-                    className={`mb-0 h-12 break-inside-avoid-column flex items-center ml-5`}
-                  >
-                    {item}
-                  </li>
-                </div>
-              ))}
-            </ul>
-          </section>
-          <section className="text-gray-700 p-3">
-            <h1 className="text-2xl mb-5">Comentarios</h1>
-            <div className="p-3 rounded-md mb-15 w-full">
-              <Form
-                className="w-full p-0 shadow-none! max-w-none!"
-                fields={[
-                  <Rating
-                    key="rating"
-                    id="user-rating"
-                    name="rating"
-                    initialRating={ratings.userRating}
-                    onRatingChange={handleRatingChange}
-                    showValue={true}
-                    className="ml-4"
-                  />,
-                  <Input
-                    key="input"
-                    name="comentarios"
-                    type="textarea"
-                    placeholder="Haz una opinión..."
-                    required={true}
-                    minLength={5}
-                    maxLength={300}
-                    className="h-15 w-full min-w-full max-w-full!"
-                  />,
-                ]}
-                button={
-                  <ProtectedComponent>
-                    <Button
-                      color="sky"
-                      text="Publicar"
-                      size="md"
-                      className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold ml-4!"
-                    />
-                  </ProtectedComponent>
-                }
-              />
-            </div>
-          </section>
-        </div>
-      </article>
+        </article>
+      )}
     </section>
   );
 }
