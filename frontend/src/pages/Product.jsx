@@ -14,36 +14,32 @@ import Input from "../components/Input";
 import Form from "../components/Form";
 
 export default function Product(productId) {
-   const [data, setData] = useState(null);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // FIX 1: Mover axios dentro de useEffect
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.post("/api/product.php", {
-          idProducto: 1,
-        });
-
+    setLoading(true);
+    axios
+      .post("/api/product.php", { idProducto: 1 })
+      .then((response) => {
         if (response.data.success) {
           setData(response.data.data);
           console.log("Datos del producto:", response.data.data);
         } else {
           setError(response.data.message);
         }
-      } catch (err) {
+      })
+      .catch((err) => {
         console.error("Error fetching product:", err);
         setError("Error al cargar el producto");
-      } finally {
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, []); // Solo ejecuta una vez al montar el componente
-  const stock = 100;
+      });
+  }, []);
+  const stock = data?.stock || 100;
   const caract = "Marca";
   const valor = "Yamaha";
 
@@ -237,10 +233,10 @@ export default function Product(productId) {
           {/* Columna derecha (info + botones) */}
           <div className="flex flex-col items-start w-full md:w-[400px] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
             <h1 className="text-4xl font-semibold">
-             {data?.nombre_producto || "Teclado Electrónico Portátil"}
+              {data?.nombre_producto || "Teclado Electrónico Portátil"}
             </h1>
             <h2 className="text-4xl mt-6">
-              {/* $ {data.producto?.precio || */}"5.093"{/*}}*/}
+              $ {data?.precio || "5.093"}
             </h2>
             <div className="flex items-center gap-2">
               <Rating
@@ -319,7 +315,7 @@ export default function Product(productId) {
                   hoverActivation={false}
                   border={true}
                   defaultSelectedIndex={0}
-                  stock={55}
+                  stock={data?.stock || 55}
                   options={[
                     { label: "1", onClick: () => console.log("Opción 1") },
                     { label: "2", onClick: () => console.log("Opción 2") },
@@ -335,7 +331,7 @@ export default function Product(productId) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">
-                  {/*data.producto?.stock ||*/} 100 disponibles
+                  {data?.stock || 100} disponibles
                 </p>
               </div>
             </div>

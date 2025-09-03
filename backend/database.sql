@@ -137,7 +137,7 @@ INSERT INTO categorias (nombre_categoria, descripcion) VALUES
 ('Alquiler de herramientas', 'Herramientas disponibles para alquiler');
 
 
-SELECT * FROM categorias
+SELECT * FROM categorias;
 
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
