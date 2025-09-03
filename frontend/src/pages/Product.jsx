@@ -13,36 +13,36 @@ import matias from "../assets/matias.jpg";
 import Input from "../components/Input";
 import Form from "../components/Form";
 
-export default function Product() {
-  // const [data, setData] = useState(null);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(null);
+export default function Product(productId) {
+   const [data, setData] = useState(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
 
   // FIX 1: Mover axios dentro de useEffect
-  // useEffect(() => {
-  //   const fetchProduct = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.post("/api/product.php", {
-  //         idProducto: 1
-  //       });
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.post("/api/product.php", {
+          idProducto: 1,
+        });
 
-  //       if (response.data.success) {
-  //         setData(response.data.data);
-  //         console.log("Datos del producto:", response.data.data);
-  //       } else {
-  //         setError(response.data.message);
-  //       }
-  //     } catch (err) {
-  //       console.error("Error fetching product:", err);
-  //       setError("Error al cargar el producto");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+        if (response.data.success) {
+          setData(response.data.data);
+          console.log("Datos del producto:", response.data.data);
+        } else {
+          setError(response.data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("Error al cargar el producto");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   fetchProduct();
-  // }, []); // Solo ejecuta una vez al montar el componente
+    fetchProduct();
+  }, []); // Solo ejecuta una vez al montar el componente
   const stock = 100;
   const caract = "Marca";
   const valor = "Yamaha";
@@ -65,7 +65,7 @@ export default function Product() {
 
   // FIX 2: Crear colorImages de forma segura
   const getColorImages = () => {
-    // if (!data) return {};
+    if (!data) return {};
 
     return {
       // FIX 3: Manejar imagen de BD correctamente
@@ -115,29 +115,29 @@ export default function Product() {
   };
 
   // FIX 4: Mostrar loading/error states
-  // if (loading) {
-  //   return (
-  //     <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
-  //       <p>Cargando producto...</p>
-  //     </div>
-  //   );
-  // }
+  //  if (loading) {
+  //    return (
+  //      <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
+  //        <p>Cargando producto...</p>
+  //      </div>
+  //    );
+  //  }
 
-  // if (error) {
-  //   return (
-  //     <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
-  //       <p className="text-red-500">Error: {error}</p>
-  //     </div>
-  //   );
-  // }
+  //  if (error) {
+  //    return (
+  //      <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
+  //        <p className="text-red-500">Error: {error}</p>
+  //      </div>
+  //    );
+  //  }
 
-  // if (!data) {
-  //   return (
-  //     <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
-  //       <p>No se encontraron datos del producto</p>
-  //     </div>
-  //   );
-  // }
+  //  if (!data) {
+  //    return (
+  //      <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
+  //        <p>No se encontraron datos del producto</p>
+  //      </div>
+  //    );
+  //  }
 
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
@@ -168,9 +168,7 @@ export default function Product() {
             <section className="text-gray-700 p-3 border-b border-gray-200">
               <h1 className="text-3xl mb-5">Descripción</h1>
               <p className="font-semibold text-gray-500 text-xl">
-                Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
-                Electrónico Inteligente con Pedal de Sostenido, Cable de Carga
-                USB, Soporte de Música y Estuche de Transporte - Negro/Blanco
+                {data?.descripcion}
               </p>
             </section>
             <section className="p-3 border-b border-gray-200 flex flex-col">
@@ -239,8 +237,7 @@ export default function Product() {
           {/* Columna derecha (info + botones) */}
           <div className="flex flex-col items-start w-full md:w-[400px] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
             <h1 className="text-4xl font-semibold">
-              {/* {data.producto?.nombre_producto ||  */}"Teclado Electrónico
-              Portátil"{/*}}*/}
+             {data?.nombre_producto || "Teclado Electrónico Portátil"}
             </h1>
             <h2 className="text-4xl mt-6">
               {/* $ {data.producto?.precio || */}"5.093"{/*}}*/}

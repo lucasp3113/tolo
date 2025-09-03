@@ -139,8 +139,6 @@ INSERT INTO categorias (nombre_categoria, descripcion) VALUES
 
 SELECT * FROM categorias
 
-
-
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_vendedor INT UNSIGNED NOT NULL,
@@ -149,13 +147,30 @@ CREATE TABLE productos (
     descripcion TEXT DEFAULT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL,
-    caracteristicas STRING NOT NULL,
-    colores STRING NOT NULL,
+    caracteristicas VARCHAR(50) NOT NULL,
+    colores VARCHAR(30),
+    talles VARCHAR(5),
+    totalRating DECIMAL(2,1),
+    comentarios VARCHAR(250),
+    ventas INT NOT NULL,
     fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id_vendedor) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
+
+INSERT INTO usuarios (nombre_usuario, email, contraseña, tipo_usuario)
+VALUES 
+('juan23', 'juan@example.com', '1234segura', 'cliente'),
+('tienda_luz', 'contacto@tiendaluz.com', 'claveVendedor!', 'vendedor_particular'),
+('megastore', 'ventas@megastore.com', 'passwordEcommerce', 'ecommerce');
+
+
+INSERT INTO productos 
+(id_vendedor, nombre_producto, descripcion, precio, stock, totalRating, ventas) 
+VALUES 
+(1, 'Teclado electrónico portátil', '88 teclas, incluye pedal', 5093.00, 100, 4.5, 25);
+
 
 SELECT * FROM imagenes_productos;
 DELETE FROM imagenes_productos;
@@ -176,6 +191,7 @@ CREATE TABLE imagenes_productos (
     id_imagen INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     ruta_imagen VARCHAR(255) NOT NULL,
+    color VARCHAR(20),
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
