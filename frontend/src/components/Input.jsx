@@ -1,3 +1,52 @@
+/*
+📝 Input — Campo de entrada versátil con soporte para validación, íconos y múltiples tipos
+
+🧩 Uso:
+   Se utiliza para renderizar un campo de entrada adaptable que funciona con 
+   formularios controlados por React Hook Form. Admite distintos tipos como 
+   texto, contraseña, email, checkbox, textarea, select y carga de archivos 
+   (con validación de imágenes). Incluye manejo automático de errores con 
+   vibración y mensajes de validación, así como soporte para íconos y estilos dinámicos.
+
+🔧 Props:
+  - register: función de React Hook Form para registrar el campo.
+  - errors: objeto de errores proporcionado por React Hook Form.
+  - watch: función de React Hook Form para observar valores en tiempo real.
+  - type: tipo de input. Valores posibles:
+      • "text", "password", "email", "checkbox", "textarea", "select", "file"
+  - name: nombre único del campo.
+  - value: valor actual del campo (no aplicable a "file" o "select").
+  - required: booleano que indica si el campo es obligatorio.
+  - minLength: número mínimo de caracteres permitidos.
+  - maxLength: número máximo de caracteres permitidos.
+  - validate: función de validación personalizada.
+  - pattern: objeto con { regex, message } para validar con expresiones regulares.
+  - onChange: función que se ejecuta al cambiar el valor.
+  - placeholder: texto de ayuda dentro del campo.
+  - label: etiqueta visible asociada al campo.
+  - icon: ícono a mostrar dentro del campo.
+  - options: array de opciones (solo para type="select").
+  - className: clases adicionales de TailwindCSS.
+  - multiple: booleano que habilita selección múltiple (en type="file" o "select").
+
+📌 Ejemplo de uso:
+
+<Input
+  name="email"
+  type="email"
+  label="Correo electrónico"
+  placeholder="ejemplo@correo.com"
+  required={true}
+  minLength={5}
+  maxLength={50}
+  register={register}
+  errors={errors}
+  watch={watch}
+  icon={<MailIcon />}
+  className="mb-4"
+/>
+*/
+
 import React, { useEffect } from 'react';
 
 export default function Input({

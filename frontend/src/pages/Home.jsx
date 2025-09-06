@@ -22,7 +22,8 @@ export default function Home({ searchData }) {
   }, [searchData])
 
   return (
-    <section className='flex items-center flex-col justify-center'>
+    <section className="flex items-center flex-col justify-center">
+      
       {windowWidth < 500 ? (
         //celu
         <>
@@ -58,5 +59,5 @@ export default function Home({ searchData }) {
 
 
     </section>
-  )
+  );
 }

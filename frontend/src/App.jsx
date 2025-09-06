@@ -13,6 +13,7 @@ import ProductCRUD from './pages/ProductCRUD';
 import Settings from './pages/Settings';
 import { DarkModeProvider } from './components/DarkModeProvider';
 import ChangePassword from './pages/ChangePassword';
+import Product from "./pages/Product";
 import { useState } from 'react';
 
 function App() {
@@ -55,9 +56,7 @@ function App() {
                 path="/seller_dashboard/"
                 element={
                   <Layout>
-                    <ProtectedRoute>
                       <SellerDashboard />
-                    </ProtectedRoute>
                   </Layout>
                 }
               />
@@ -94,6 +93,12 @@ function App() {
                   <ProtectedRoute>
                     <ChangePassword />
                   </ProtectedRoute>
+                </Layout>
+              }>
+              </Route>
+              <Route path='/product' element={
+                <Layout>
+                    <Product />
                 </Layout>
               }>
               </Route>

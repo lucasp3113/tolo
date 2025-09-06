@@ -24,10 +24,23 @@
 
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate }) {
+export default function ProductCard({
+  name,
+  price,
+  image,
+  stock,
+  freeShipping,
+  phone = false,
+  client = true,
+  onDelete,
+  onUpdate,
+  onClick,
+}) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const navigate = useNavigate();
 
   let stockMessage = "";
   let stockColor = "";
@@ -61,27 +74,43 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   if (phone && useOverlayLayout && imageLoaded) {
     return (
       <div className="cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0">
-        <div className="w-44 aspect-square flex-shrink-0 bg-gray-100"> 
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-full object-cover" 
-          />
+        <div className="w-44 aspect-square flex-shrink-0 bg-gray-100">
+          <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
 
         <div className="p-4 flex flex-col w-full items-center justify-center">
-          <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">{name}</h2>
+          <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">
+            {name}
+          </h2>
           <p className="text-xl m-1 font-bold text-gray-900 mt-2">${price}</p>
           {freeShipping && (
-            <p className="text-green-500 m-1 text-sm font-medium mt-1">Envío gratis</p>
+            <p className="text-green-500 m-1 text-sm font-medium mt-1">
+              Envío gratis
+            </p>
           )}
-          <p className={`text-sm font-medium m-1 ${stockColor}`}>{stockMessage}</p>
-          {client ? <Button color={"blue"} size={"md"} text={"Añadir al carrito"} /> :
+          <p className={`text-sm font-medium m-1 ${stockColor}`}>
+            {stockMessage}
+          </p>
+          {client ? (
+            <Button color={"blue"} size={"md"} text={"Añadir al carrito"} />
+          ) : (
             <section className="flex">
-              <Button color={"blue"} size={"md"} className={"w-23 !rounded-lg"} text={"Editar"} onClick={onUpdate} />
-              <Button color={"red"} size={"md"} className={"w-23 !rounded-lg"} text={"Borrar"} onClick={onDelete} />
+              <Button
+                color={"blue"}
+                size={"md"}
+                className={"w-23 !rounded-lg"}
+                text={"Editar"}
+                onClick={onUpdate}
+              />
+              <Button
+                color={"red"}
+                size={"md"}
+                className={"w-23 !rounded-lg"}
+                text={"Borrar"}
+                onClick={onDelete}
+              />
             </section>
-          }
+          )}
         </div>
       </div>
     );
@@ -97,49 +126,90 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           className="w-44 h-full sm:h-full md:h-full object-cover"
         />
         <div className="p-4 flex flex-col w-full items-center justify-center">
-          <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">{name}</h2>
+          <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">
+            {name}
+          </h2>
           <p className="text-xl m-1 font-bold text-gray-900 mt-2">${price}</p>
           {freeShipping && (
-            <p className="text-green-500 m-1 text-sm font-medium mt-1">Envío gratis</p>
+            <p className="text-green-500 m-1 text-sm font-medium mt-1">
+              Envío gratis
+            </p>
           )}
-          <p className={`text-sm font-medium m-1 ${stockColor}`}>{stockMessage}</p>
-          {client ? <Button color={"blue"} size={"md"} text={"Añadir al carrito"} /> :
+          <p className={`text-sm font-medium m-1 ${stockColor}`}>
+            {stockMessage}
+          </p>
+          {client ? (
+            <Button color={"blue"} size={"md"} text={"Añadir al carrito"} />
+          ) : (
             <section className="flex">
-              <Button color={"blue"} size={"md"} className={"w-23 !rounded-lg"} text={"Editar"} onClick={onUpdate} />
-              <Button color={"red"} size={"md"} className={"w-23 !rounded-lg"} text={"Borrar"} onClick={onDelete} />
+              <Button
+                color={"blue"}
+                size={"md"}
+                className={"w-23 !rounded-lg"}
+                text={"Editar"}
+                onClick={onUpdate}
+              />
+              <Button
+                color={"red"}
+                size={"md"}
+                className={"w-23 !rounded-lg"}
+                text={"Borrar"}
+                onClick={onDelete}
+              />
             </section>
-          }
+          )}
+        </div>
+      </div>
+    );
+
+    // compu
+    return (
+      <div className="cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow">
+        <div className="w-full h-44 mt-4">
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        </div>
+
+        <div className="p-4 flex flex-col w-full items-center justify-center">
+          <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">
+            {name}
+          </h2>
+          <p className="text-xl m-1 font-bold text-gray-900 mt-2">${price}</p>
+
+          {freeShipping && (
+            <p className="text-green-500 m-1 text-sm font-medium mt-1">
+              Envío gratis
+            </p>
+          )}
+          <p className={`text-sm font-medium m-1 mb-10 ${stockColor}`}>
+            {stockMessage}
+          </p>
+          {client ? (
+            <Button
+              color={"blue"}
+              size={"md"}
+              className={"w-40"}
+              text={"Añadir al carrito"}
+            />
+          ) : (
+            <section className="flex absolute bottom-0">
+              <Button
+                color={"blue"}
+                size={"md"}
+                className={"w-23 !rounded-lg"}
+                text={"Editar"}
+                onClick={onUpdate}
+              />
+              <Button
+                color={"red"}
+                size={"md"}
+                className={"w-23 !rounded-lg"}
+                text={"Borrar"}
+                onClick={onDelete}
+              />
+            </section>
+          )}
         </div>
       </div>
     );
   }
-
-  // compu
-  return (
-    <div className="cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center h-96 w-56 flex-col m-8 hover:shadow-lg transition-shadow">
-      <div className="w-full h-44 mt-4">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      <div className="p-4 flex flex-col w-full items-center justify-center">
-        <h2 className="text-xl m-1 font-semibold text-gray-800 line-clamp-2">{name}</h2>
-        <p className="text-xl m-1 font-bold text-gray-900 mt-2">${price}</p>
-
-        {freeShipping && (
-          <p className="text-green-500 m-1 text-sm font-medium mt-1">Envío gratis</p>
-        )}
-        <p className={`text-sm font-medium m-1 mb-10 ${stockColor}`}>{stockMessage}</p>
-        {client ? <Button color={"blue"} size={"md"} className={"w-40"} text={"Añadir al carrito"} /> :
-          <section className="flex absolute bottom-0">
-            <Button color={"blue"} size={"md"} className={"w-23 !rounded-lg"} text={"Editar"} onClick={onUpdate} />
-            <Button color={"red"} size={"md"} className={"w-23 !rounded-lg"} text={"Borrar"} onClick={onDelete} />
-          </section>
-        }
-      </div>
-    </div>
-  );
 }

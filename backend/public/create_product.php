@@ -15,6 +15,9 @@ if ($data_base) {
         $product_price = $_POST["productPrice"];
         $product_stock = $_POST["productStock"];
         $product_description = $_POST["productDescription"] ?? null;
+        $product_characteristics = $_POST["productCharacteristics"];
+        $product_colors = $_POST["productColors"];
+
         $categories_json = $_POST["categories"] ?? "[]";
         $categories_array = json_decode($categories_json, true);
         $category_list = [];

@@ -55,6 +55,7 @@ export default function Login() {
                 <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>Login</h2>
                 <p className="text-sm whitespace-nowrap text-gray-600">Completá el formulario para iniciar sesión.</p>
             </div>
+            <div>
             <Input
                 icon={<FaUserCircle />}
                 type={"text"}
@@ -64,6 +65,7 @@ export default function Login() {
                 label={"Usuario"}
                 register={register}
                 errors={errors}
+                className='pr-[2.5rem]'
             />
             <Input
                 icon={
@@ -78,7 +80,9 @@ export default function Login() {
                 required={true}
                 register={register}
                 errors={errors}
+                className='pr-[2.5rem]'
             />
+            </div>
             <Button className={"w-50"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
 
             <div className="flex flex-col items-center justify-center mt-3">

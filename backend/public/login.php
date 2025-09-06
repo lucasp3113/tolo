@@ -37,7 +37,7 @@ if ($data_base) {
     // Si hay un error en la consulta sql:
     if ($query->error) {
         //Genera un codigo http 400
-        http_response_code(400);
+        http_response_code(response_code: 400);
         //Y manda los siguientes datos al frontend:
         echo json_encode([
             "success" => false,
