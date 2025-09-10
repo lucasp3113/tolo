@@ -1,4 +1,4 @@
--- Active: 1753920206856@@localhost@3306@tolo
+-- Active: 1754922890600@@127.0.0.1@3306@tolo
 CREATE DATABASE tolo;
 
 
@@ -12,7 +12,8 @@ CREATE TABLE usuarios (
     tipo_usuario ENUM(
         'cliente',
         'vendedor_particular',
-        'ecommerce'
+        'ecommerce',
+        'admin'
     ) NOT NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
@@ -244,3 +245,6 @@ CREATE TABLE notificaciones (
     fecha_envio DATETIME,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
+
+UPDATE usuarios SET tipo_usuario = 'admin' WHERE nombre_usuario = 'admin';
+
