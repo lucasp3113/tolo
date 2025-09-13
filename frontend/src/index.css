@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.animation-shake {
+  animation: shake 0.8s ease-in-out;
+}
+
+.font-quicksand{
+  font-family: 'Quicksand', sans-serif;
+}
+
+/* DARK MODE CSS COMPLETO - Para todos los componentes EXCEPTO BOTONES Y SPANS */
+
+/* Solo el HTML y BODY para el fondo principal */
+.dark,
+.dark body {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+}
+
+/* Textos principales - EXCLUYENDO SPANS */
+.dark p,
+.dark h1,
+.dark h2, 
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #ffffff !important;
+}
+
+/* FORMULARIOS - Fondos blancos a oscuros */
+.dark form {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Card component específico */
+.dark .card-component {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* INPUTS - Todos los tipos */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark textarea,
+.dark select {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border-color: #4b5563 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* LABELS */
+.dark label {
+  color: #e5e7eb !important;
+}
+
+/* BOTONES Y SPANS COMPLETAMENTE EXCLUIDOS DEL MODO OSCURO */
+/* Los botones y spans mantendrán sus estilos originales */
+
+/* ELEMENTOS CON FONDO BLANCO específicos */
+.dark .bg-white,
+.dark [class*="bg-white"] {
+  background-color: #1f2937 !important;
+}
+
+/* TEXTOS GRISES a más claros */
+.dark .text-gray-600,
+.dark [class*="text-gray-6"] {
+  color: #9ca3af !important;
+}
+
+/* ICONOS - Mantener colores originales pero ajustar si son muy oscuros */
+.dark svg:not(button svg):not(button *):not(span svg):not(span *) {
+  filter: brightness(1.2);
+}
+
+/* CIRCULAR PROGRESSBAR TEXT */
+.dark .CircularProgressbar-text {
+  fill: #ffffff !important;
+}
+
+/* MENSAJES de error/éxito */
+.dark .text-red-600 {
+  color: #f87171 !important;
+}
+
+.dark .text-green-600 {
+  color: #4ade80 !important;
+}
+
+/* SHADOWS - Más oscuras en modo oscuro (pero no en botones ni spans) */
+.dark .shadow:not(button):not(button *):not(span):not(span *),
+.dark [class*="shadow"]:not(button):not(button *):not(span):not(span *) {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ROUNDED elementos - mantener pero con fondo oscuro (excepto botones y spans) */
+.dark .rounded:not(button):not(button *):not(span):not(span *),
+.dark .rounded-xl:not(button):not(button *):not(span):not(span *),
+.dark [class*="rounded"]:not(button):not(button *):not(span):not(span *) {
+  background-color: #1f2937 !important;
+}
+
+/* Enlaces */
+.dark a:not([class*="transition"]):not([class*="hover"]):not(button):not(button *):not(span):not(span *) {
+  color: #60a5fa !important;
+}
+
+.dark a:not([class*="transition"]):not([class*="hover"]):not(button):not(button *):not(span):not(span *):hover {
+  color: #93c5fd !important;
+}
+
+/* Transiciones SOLO para cambios de modo oscuro (sin afectar botones ni spans) */
+html, body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card-component, form {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:not(button), textarea, select {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+

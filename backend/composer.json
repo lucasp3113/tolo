@@ -1,0 +1,13 @@
+{
+    "require": {
+        "firebase/php-jwt": "^6.11",
+        "meilisearch/meilisearch-php": "^1.15",
+        "guzzlehttp/guzzle": "^7.9",
+        "php-http/guzzle7-adapter": "^1.1"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}
