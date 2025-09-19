@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import Menu from './Menu';
@@ -13,10 +13,16 @@ import { TiShoppingCart } from "react-icons/ti";
 
 export default function MovileNav() {
   const navigate = useNavigate();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { ecommerce: ecommerceName } = useParams()
   const { isLoggedIn, logout } = useContext(AuthContext);
   const [userType, setUserType] = useState(null);
   const [loading, setLoading] = useState(isLoggedIn);
-
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   useEffect(() => {
     if (!isLoggedIn) return;
 
@@ -53,7 +59,7 @@ export default function MovileNav() {
   }
 
   return (
-    <nav className="fixed h-22 bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4">
+    <nav className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
       <Menu
         className="w-full max-w-md flex justify-center"
         model3d={[]}
@@ -66,7 +72,7 @@ export default function MovileNav() {
               expand: true,
             },
             animation: false,
-            onClick: () => navigate('/'),
+            onClick: () => ecommerceName ? navigate(`/${ecommerceName}/`) : navigate("/")
           },
           !isLoggedIn && {
             title: 'Iniciar Sesión',
@@ -76,7 +82,7 @@ export default function MovileNav() {
               expand: true,
             },
             animation: false,
-            onClick: () => navigate('/login'),
+            onClick: () => ecommerceName ? navigate(`/${ecommerceName}/login/`) : navigate('/login')
           },
           !isLoggedIn && {
             title: 'Crear cuenta',
@@ -86,7 +92,7 @@ export default function MovileNav() {
               expand: true,
             },
             animation: false,
-            onClick: () => navigate('/register'),
+            onClick: () => ecommerceName ? navigate(`/${ecommerceName}/register/`) : navigate('/register'),
           },
           isLoggedIn && userType && {
             title: userType === 'ecommerce' || userType === 'vendedor_particular' ? 'Panel de control' : "Carrito",
@@ -94,14 +100,14 @@ export default function MovileNav() {
               name: userType === 'ecommerce' || userType === 'vendedor_particular' ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" /> : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />,
               expand: true,
             },
-            animation: false,
+            animation: false, 
             onClick: () => {
               if (userType === 'ecommerce') {
-                navigate('/ecommerce_dashboard/');
+                ecommerceName ? navigate(`/${ecommerceName}/ecommerce_dashboard/`) : navigate('/ecommerce_dashboard/');
               } else if (userType === 'cliente') {
-                navigate('/shopping_cart/');
+                ecommerceName ? navigate(`/${ecommerceName}/shopping_cart/`) : navigate('/shopping_cart/');
               } else {
-                navigate('/seller_dashboard/');
+                ecommerceName ? navigate(`/${ecommerceName}/seller_dashboard/`) : navigate('/seller_dashboard/');
               }
             },
           },
@@ -112,7 +118,7 @@ export default function MovileNav() {
               expand: true,
             },
             animation: false,
-            onClick: () => navigate('/settings/'),
+            onClick: () => ecommerceName ? navigate(`/${ecommerceName}/settings/`) : navigate('/settings/')
           },
           isLoggedIn && {
             title: 'Cerrar sesión',
@@ -125,7 +131,7 @@ export default function MovileNav() {
               localStorage.removeItem('token');
               localStorage.removeItem('token_expiration');
               logout();
-              navigate('/');
+              ecommerceName ? navigate(`/${ecommerceName}/`) : navigate('/');
             },
           },
         ].filter(Boolean)}

@@ -6,7 +6,13 @@ header("Access-Control-Allow-Origin: *");
 require __DIR__ . '/../vendor/autoload.php';
 use MeiliSearch\Client;
 
-$data_base = new mysqli("localhost", "root", "", "tolo");
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
 
 if ($data_base) {
     if (!empty($_POST)) {

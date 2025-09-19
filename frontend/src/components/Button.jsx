@@ -44,7 +44,8 @@ export default function Button ({
     blue: "bg-sky-800",
     purple: "bg-purple-500",
     sky: "bg-sky-500",
-    black: "bg-gray-900"
+    black: "bg-gray-900",
+    transparent: "bg-transparent"
   };
 
    const sizes = {

@@ -69,7 +69,7 @@ export default function Menu({ elements, model3d, className = "" }) {
                 >
                     <span
                         className={`${element.icon.expand
-                            ? "opacity-0 max-w-0 overflow-hidden group-hover:opacity-100 group-hover:sm:max-w-[100px] group-hover:md:max-w-[150px] group-hover:lg:max-w-[200px] transition-all duration-900 ease-in-out whitespace-nowrap inline-block font-[Montserrat,sans-serif] m-2 sm:text-[8px] md:text-[20px] lg:text-[20px]"
+                            ? "opacity-0 max-w-0 overflow-hidden group-hover:opacity-100 group-hover:sm:max-w-[100px] group-hover:md:max-w-[150px] group-hover:lg:max-w-[200px] transition-all duration-900 ease-in-out whitespace-nowrap inline-block font-[Montserrat,sans-serif] m-1 sm:text-[8px] md:text-[20px] lg:text-[20px]"
                             : ""
                             } group-hover:inline-block font-[Montserrat,sans-serif] m-2 sm:text-[8px] md:text-[20px] lg:text-[20px]`}
                     >
@@ -79,12 +79,12 @@ export default function Menu({ elements, model3d, className = "" }) {
                         {React.cloneElement(
                             element.icon.name,
                             {
-                                className: `${element.icon.name.props.className || ""} ${selected === index ? "scale-140 mb-1" : undefined}`,
+                                className: `${element.icon.name.props.className || ""} ${selected === index ? "scale-140 mb-" : undefined}`,
                                 onClick: () => element.onClick && windowWidth < 500 ? setSelected(index) : undefined
 
                             }
                         )}
-                        {selected === index ? <span className='absolute translate-y-8 font-mono text-xs tracking-tighter font-
+                        {selected === index ? <span className='absolute translate-y-7 font-mono text-xs tracking-tighter font-
  '>{element.title}</span> : undefined}
                     </div>
 

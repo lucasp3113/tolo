@@ -4,8 +4,10 @@ import Input from '../components/Input'
 import axios from 'axios'
 import { FaCircleUser } from "react-icons/fa6";
 import Button from '../components/Button';
+import { useParams } from 'react-router-dom';
 
 export default function ProfilePicture() {
+    const {ecommerce: nameEcommerce} = useParams()
     const [profilePicture, setProfilePicture] = useState(null)
     const [preview, setPreview] = useState(null)
 
@@ -18,8 +20,11 @@ export default function ProfilePicture() {
 
     // Cargar imagen de perfil actual
     useEffect(() => {
-        axios.post("/api/show_profile_picture.php", { user })
-            .then((res) => setProfilePicture(res.data.logo))
+        axios.post("/api/show_profile_picture.php", { nameEcommerce })
+            .then((res) => {
+                setProfilePicture(res.data.logo)
+                console.log(res)
+            })
             .catch((err) => console.log(err))
     }, [user])
 

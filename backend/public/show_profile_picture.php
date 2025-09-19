@@ -2,11 +2,17 @@
 mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
-$data_base = new mysqli("localhost", "root", "", "tolo");
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
 if ($data_base) {
     $body = json_decode(file_get_contents("php://input"), true);
-    $query = $data_base->prepare("SELECT e.logo FROM usuarios u JOIN ecommerces e ON e.id_usuario = u.id_usuario WHERE u.nombre_usuario = ?");
-    $query->bind_param("s", $body["user"]);
+    $query = $data_base->prepare("SELECT e.logo FROM ecommerces e WHERE nombre_ecommerce = ?");
+    $query->bind_param("s", $body["nameEcommerce"]);
     if($query->execute()) {
         $logo = $query->get_result()->fetch_assoc()["logo"];
         http_response_code(200);

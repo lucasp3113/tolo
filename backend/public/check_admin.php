@@ -2,7 +2,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-
+$config = require __DIR__ . '/../config.php';
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Authorization, Content-Type");
@@ -13,7 +13,12 @@ $token = $input['token'] ?? null;
 $decoded = JWT::decode($token, new Key($secret_key, "HS256"));
 
 // 4. Conectarse a la base de datos
-$data_base = new mysqli("localhost", "root", "", "tolo");
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
 if ($data_base->connect_error) {
     http_response_code(500);
     echo json_encode(["success" => false, "error" => "Error de conexión a la base de datos"]);

@@ -1,6 +1,6 @@
 <?php
-mysqli_report(MYSQLI_REPORT_OFF);
-error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+error_reporting(E_ALL);
 
 require '../vendor/autoload.php';
 use Firebase\JWT\JWT;
@@ -12,8 +12,14 @@ $expiration_time = $issued_at + 8000;
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
-$data_base = new mysqli("localhost", "root", "", "tolo");
-if ($data_base) {
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
+if (!$data_base->connect_error) {
     $body = json_decode(file_get_contents("php://input"), true);
     $user = $body["user"];
     $password = $body["password"];
@@ -74,7 +80,7 @@ if ($data_base) {
     http_response_code(500);
     echo json_encode([
         "success" => false,
-        "message" => "ERROR, Vuelve a intentarlo"
+        "message" => $data_base->connect_error
     ]);
 }
 ?>

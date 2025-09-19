@@ -1,9 +1,10 @@
--- Active: 1753920206856@@localhost@3306@tolo
+-- Active: 1758104807084@@127.0.0.1@3306@tolo
 CREATE DATABASE tolo;
 
 USE tolo;
 
 SELECT * from usuarios
+
 
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -13,13 +14,12 @@ CREATE TABLE usuarios (
     tipo_usuario ENUM(
         'cliente',
         'vendedor_particular',
-        'ecommerce'
+        'ecommerce',
+        'admin'
     ) NOT NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
 );
-
-SELECT * FROM usuarios
 
 DELETE FROM categorias;
 
@@ -77,7 +77,7 @@ CREATE TABLE ecommerces (
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
 
-SELECT logo from ecommerces
+SELECT * FROM usuarios
 
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -86,6 +86,46 @@ CREATE TABLE categorias (
 );
 
 SELECT * FROM productos
+
+SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
+        SELECT i.ruta_imagen
+        FROM imagenes_productos i
+        WHERE
+            p.id_producto = i.id_producto
+        ORDER BY i.id_imagen ASC
+        LIMIT 1
+    ) AS ruta_imagen
+FROM
+    productos p
+    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
+    JOIN categorias c ON c.id_categoria = pc.id_categoria
+    JOIN ecommerces e ON e.nombre_ecommerce = 'Ferreteria'
+WHERE
+    nombre_producto = 'Taladro Tolsen'
+    AND p.id_ecommerce = e.id_ecommerce
+
+SELECT * FROM productos
+
+SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
+        SELECT i.ruta_imagen
+        FROM imagenes_productos i
+        WHERE
+            p.id_producto = i.id_producto
+        ORDER BY i.id_imagen ASC
+        LIMIT 1
+    ) AS ruta_imagen
+FROM
+    productos p
+    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
+    JOIN categorias c ON c.id_categoria = pc.id_categoria
+    JOIN ecommerces e ON e.nombre_ecommerce = 'Ferreteria'
+WHERE
+    nombre_producto = 'Taladro Tolsen'
+    AND p.id_ecommerce = e.id_ecommerce
+    AND c.nombre_categoria = 'Herramientas y Ferreteria'
+    ORDER BY p.precio ASC
+
+SELECT * FROM usuarios
 
 SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
         SELECT i.ruta_imagen
@@ -311,7 +351,7 @@ VALUES (
         'Herramientas disponibles para alquiler'
     );
 
-SELECT * FROM categorias
+SELECT * FROM productos
 
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -320,7 +360,7 @@ CREATE TABLE productos (
     nombre_producto VARCHAR(100) NOT NULL,
     descripcion TEXT DEFAULT NULL,
     precio DECIMAL(10, 2) NOT NULL,
-    stock INT NOT NULL,
+    stock INT DEFAULT NULL,
     envio_gratis BOOLEAN NOT NULL DEFAULT FALSE,
     fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN NOT NULL DEFAULT TRUE,
@@ -331,7 +371,6 @@ CREATE TABLE productos (
 select * from productos WHERE envio_gratis = 1
 
 delete from compras
- 
 
 SELECT * FROM imagenes_productos;
 
@@ -438,7 +477,6 @@ WHERE
 
 select nombre_categoria from categorias
 
-
 SELECT * FROM productos
 
 SELECT * FROM ecommerces
@@ -510,7 +548,49 @@ CREATE TABLE notificaciones (
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
 
-SELECT * FROM compras
+CREATE TABLE colores_producto (
+    id_color INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_producto INT UNSIGNED NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
+);
+
+CREATE TABLE imagenes_color_producto(
+    id_imagen_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_color INT UNSIGNED NOT NULL,
+    ruta_imagen VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE CASCADE
+);
+
+DROP TABLE colores_producto;
+SELECT * FROM imagenes_color_producto;
+INSERT INTO colores_producto(id_color, id_producto, nombre) VALUES(2, 1, "rojo");
+
+CREATE TABLE talles_color_producto(
+    id_talle_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_color INT UNSIGNED NOT NULL,
+    talle VARCHAR(100) NOT NULL,
+    stock SMALLINT NOT NULL,
+    FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE CASCADE
+);
+
+SELECT * FROM caracteristicas_producto;
+
+CREATE TABLE talles_producto(
+    id_talle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_producto INT UNSIGNED NOT NULL,
+    talle VARCHAR(100) NOT NULL,
+    stock SMALLINT NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE
+);
+
+CREATE TABLE caracteristicas_producto(
+    id_caracteristica INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_producto INT UNSIGNED NOT NULL,
+    caracteristica VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
+);
+SELECT * FROM categorias
 
 SELECT * FROM productos
 

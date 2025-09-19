@@ -6,7 +6,13 @@ header("Access-Control-Allow-Origin: *");
 require __DIR__ . '/../vendor/autoload.php';
 use MeiliSearch\Client;
 
-$data_base = new mysqli("localhost", "root", "", "tolo");
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
 
 if ($data_base) {
     if (!empty($_POST)) {
@@ -25,19 +31,19 @@ if ($data_base) {
 
         function saveImages($product_id, $data_base)
         {
-            $saved_images = [];
-
             if (!isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
-                return true;
+                return false; // No se guardó ninguna imagen
             }
 
+            $saved_images = [];
             $upload_dir = "uploads/products/";
+
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
 
             $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            $max_size = 5 * 1024 * 1024;
+            $max_size = 5 * 1024 * 1024; // 5 MB
 
             for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
                 $file_name = $_FILES['images']['name'][$i];
@@ -65,12 +71,15 @@ if ($data_base) {
                     if ($query->execute()) {
                         $saved_images[] = $relative_path;
                     } else {
+                        // Si falla al guardar en DB, borrar archivo
                         unlink($file_path);
                     }
                 }
             }
-            return count($saved_images) > 0;
+
+            return count($saved_images) > 0 ? $saved_images : false;
         }
+
 
         $query = $data_base->prepare("SELECT id_usuario, tipo_usuario FROM usuarios WHERE nombre_usuario = ?");
         $query->bind_param("s", $username);

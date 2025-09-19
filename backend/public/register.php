@@ -10,7 +10,13 @@ $secret_key = "LA_CACHIMBA_AMA";
 $issued_at = time();
 $expiration_time = $issued_at + 8000;
 
-$data_base = new mysqli("localhost", "root", "", "tolo");
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
 
 if ($data_base) {
    $body = json_decode(file_get_contents('php://input'), true);

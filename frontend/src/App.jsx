@@ -23,11 +23,14 @@ import ProfilePicture from './pages/ProfilePicture';
 
 
 function App() {
+  //pasar el tipo de usuario de header nav, a layaut, de layaut a home, para verificar si es admin
+  const [userType, setUserType] = useState(null);
+  const admin = userType === "admin" ? true : false;
+
   /*esto es para conectar la peticion q hace el formualrio de busqueda en el
     componente HeaderNav con la page Home, para renderizar los productos
   */
   const [searchData, setSearchData] = useState(null)
-
   return (
     <div className="Tolo">
       <DarkModeProvider>
@@ -35,83 +38,83 @@ function App() {
           <AuthProvider>
             <Routes>
               <Route
-                path="/"
+                path="/:ecommerce?"
                 element={
-                  <Layout search={true} setSearchData={setSearchData} >
-                    <Home searchData={searchData} />
+                  <Layout search={true} setUserType={setUserType} setSearchData={setSearchData}>
+                    <Home searchData={searchData} setSearchData={setSearchData} userType={admin}/>
                   </Layout>
                 }
               />
               <Route
-                path="/login/"
+                path="/:ecommerce?/login/"
                 element={
-                  <Layout>
+                  <Layout setUserType={setUserType}>
                     <Login />
                   </Layout>
                 }
               />
               <Route
-                path="/register/"
+                path="/:ecommerce?/register/"
                 element={
-                  <Layout>
+                  <Layout >
                     <Register />
                   </Layout>
                 }
               />
               <Route
-                path="/seller_dashboard/"
+                path="/:ecommerce?/seller_dashboard/"
                 element={
-                  <Layout>
+                  <Layout >
                     <ProtectedRoute>
                       <SellerDashboard />
                     </ProtectedRoute>
                   </Layout>
                 }
               />
-              <Route path='/ecommerce_dashboard/' element={
-                <Layout>
+              <Route path='/:ecommerce?/ecommerce_dashboard/' element={
+                <Layout >
                   <ProtectedRoute>
                     <EcommerceDashboard />
                   </ProtectedRoute>
                 </Layout>
               } />
-              <Route path='/create_product/' element={
-                <Layout>
+              <Route path='/:ecommerce?/create_product/' element={
+                <Layout >
                   <ProtectedRoute>
                     <CreateProduct />
                   </ProtectedRoute>
                 </Layout>
               } />
-              <Route path='/product_crud/' element={
-                <Layout>
+              <Route path='/:ecommerce?/product_crud/' element={
+                <Layout >
                   <ProtectedRoute>
                     <ProductCRUD />
                   </ProtectedRoute>
                 </Layout>
               } />
-              <Route path='/settings/' element={
-                <Layout>
+              <Route path='/:ecommerce?/settings/' element={
+                <Layout >
                   <ProtectedRoute>
                     <Settings />
                   </ProtectedRoute>
                 </Layout>
               } />
-              <Route path='/change_password' element={
-                <Layout>
+              <Route path='/:ecommerce?/change_password' element={
+                <Layout >
                   <ProtectedRoute>
                     <ChangePassword />
                   </ProtectedRoute>
                 </Layout>
               }>
               </Route>
-              <Route path='/product/:id' element={
-                <Layout>
+              <Route path='/:ecommerce?/product/:id' element={
+                <Layout >
                   <Product />
                 </Layout>
               }>
               </Route>
-              <Route path='/shopping_cart' element={
-                <Layout logo={false}>
+              <Route path='/:ecommerce?/shopping_cart/' element={
+                <Layout logo={false} >
                   <ProtectedRoute>
                     <ShoppingCart />
                   </ProtectedRoute>
@@ -121,29 +124,29 @@ function App() {
               <Route
                 path="/admin_panel/"
                 element={
-                  <Layout>
+                  <Layout >
                     <AdminPanel />
                   </Layout>
                 }
               />
               <Route
-                path="/change_user/"
+                path="/:ecommerce?/change_user/"
                 element={
-                  <Layout>
+                  <Layout >
                     <ChangeUser />
                   </Layout>
                 }
               />
-              <Route path='/change_ecommerce/' element={
-                <Layout>
+              <Route path='/:ecommerce?/change_ecommerce/' element={
+                <Layout >
                   <ChangeEcommerce />
                 </Layout>
               } />
-              <Route path='/profile_picture/' element={
-                <Layout>
+              <Route path='/:ecommerce?/profile_picture/' element={
+                <Layout >
                   <ProfilePicture />
                 </Layout>
-              }/>
+              } />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

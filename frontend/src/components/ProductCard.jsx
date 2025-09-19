@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ImBin } from "react-icons/im";
 import axios from "axios";
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, id_compra = null }) {
+export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, id_compra = null, admin = false }) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate()
@@ -54,6 +54,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
       <div onClick={onClick} className={`cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
         <div className="w-44 aspect-square flex-shrink-0 bg-gray-100">
           <img
+            loading="lazy"
             src={image}
             alt={name}
             className={`${cart ? "w-36" : "w-44"} h-full sm:h-full md:h-full object-cover`}
@@ -61,6 +62,11 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
         </div>
 
         <div className="p-6 flex flex-col w-full justify-center space-y-3">
+          {amount && (
+            <p className={`text-xl font-light text-gray-900`}>
+              Cantidad: {amount}
+            </p>
+          )}
           {cart && (
             <div onClick={() => deleteCart()} className="flex w-full justify-end -mb-2">
               <ImBin className="text-gray-600 hover:text-red-600 text-xl -translate-y-2 translate-x-4 cursor-pointer transition-colors duration-200" />
@@ -78,7 +84,9 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
             )}
             <span className={`text-sm font-medium ${stockColor}`}>{stockMessage}</span>
           </div>
-
+          {admin && (
+            <ImBin onClick={() => onDelete()} className="text-3xl text-red-600" />
+          )}
           {!client && (
             <div className="flex gap-2 pt-2">
               <Button color={"blue"} size={"md"} className={"w-23 !rounded-lg"} text={"Editar"} onClick={onUpdate} />
@@ -95,6 +103,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
     return (
       <div onClick={onClick} className={`cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
         <img
+          loading="lazy"
           src={image}
           alt={name}
           className={`${cart ? "w-36" : "w-44"} h-full sm:h-full md:h-full object-cover`}
@@ -120,7 +129,9 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
               </p>
             )}
           </section>
-
+          {admin && (
+            <ImBin onClick={() => onDelete()} className="text-3xl text-red-600" />
+          )}
           {!cart && (
             <div className="flex flex-col space-y-1">
               {freeShipping && (
@@ -146,6 +157,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
     <div onClick={onClick} className={`cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center h-100 w-56 flex-col m-5 hover:shadow-lg transition-shadow`}>
       <div className={`w-full h-48 ${client ? "mt-8" : "mt-0"}`}>
         <img
+          loading="lazy"
           src={image}
           alt={name}
           className="w-full h-full object-cover"
@@ -160,7 +172,11 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
         <p className="text-2xl font-semibold text-gray-900">
           ${price.toLocaleString()}
         </p>
-
+        {amount && (
+          <p className={`text-xl font-light text-gray-900`}>
+            Cantidad: {amount}
+          </p>
+        )}
         {!cart && (
           <div className="flex flex-col items-center space-y-1">
             {freeShipping && (
@@ -171,8 +187,11 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
         )}
         {cart && (
           <div className="flex w-full justify-end -mb-2">
-            <ImBin onClick={() => deleteCart()} className="text-gray-600 hover:text-red-600 text-2xl translate-y-4 translate-x-4 cursor-pointer transition-colors duration-200" />
+            <ImBin onClick={() => deleteCart()} className="text-gray-600 hover:text-red-600 text-2xl translate-y-2 translate-x-4 cursor-pointer transition-colors duration-200" />
           </div>
+        )}
+        {admin && (
+          <ImBin onClick={() => onDelete()} className="text-3xl text-red-600" />
         )}
         {!client && (
           <div className="flex gap-2 pt-4 absolute bottom-2">

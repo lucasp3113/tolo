@@ -9,16 +9,16 @@ import logoToloBlue from '../assets/LogoToloBlue.png'
 import { FaUserCircle } from 'react-icons/fa'
 import { HiMail, HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 
 export default function Register() {
+    const {ecommerce} = useParams()
     const { login } = useContext(AuthContext);
-    const [message, setMessage] = useState(null);
 
     const navigate = useNavigate()
 
-    const { register, watch, handleSubmit, formState: { errors } } = useForm()
+    const { register, watch, handleSubmit, formState: { errors }, setError } = useForm()
     const selected = watch("select")
 
     const [showEcommerce, setShowEcommerce] = useState(false)
@@ -40,9 +40,22 @@ export default function Register() {
                 const token = res.data.token
                 const expiration = res.data.expiration
                 login(token, expiration);
-                navigate("/seller_dashboard")
+                const userType = data["select"] === "e-commerce(tienda)" ? "ecommerce" : data["select"] === "Vendedor" ? "vendedor_particular" : "cliente"
+                const urls = {
+                    ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
+                    vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
+                    cliente: ecommerce ? `/${ecommerce}/` : "/"
+
+                }
+                navigate(urls[userType])
+                console.log(res)
             })
-            .catch((err) => setMessage([err.response.data.message, err.response.data.success]))
+            .catch((err) => {
+                setError("user", {
+                    type: "manual",
+                    message: err.response.data.message
+                })
+            })
     }
         
 
@@ -160,7 +173,6 @@ export default function Register() {
             <div className="flex flex-col items-center justify-center mt-3">
                 <span>O ingresa por:</span>
                 <FcGoogle className="text-4xl mt-2 mb-3 hover:scale-120 transition-transform ease-in-out duration-200" />
-                <span className={message && message[1] ? "text-green-600": "text-red-600"}>{message ? message[0]: undefined}</span>
             </div>
         </form>
     )

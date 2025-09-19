@@ -6,8 +6,10 @@ import { TbRuler2 } from 'react-icons/tb';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { FaOpencart } from "react-icons/fa";
+import { useParams } from 'react-router-dom';
 
 export default function ShoppingCart() {
+  const {ecommerce} = useParams();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [update, setUpdate] = useState(false);
   const [productos, setProductos] = useState([]);
@@ -48,7 +50,7 @@ export default function ShoppingCart() {
 
         const dataSellers = Array.from(new Set(uniqueProducts.map(p => p.vendedor)));
         setSellers(dataSellers);
-        setSelectedSeller(dataSellers[0]);
+        ecommerce ? setSelectedSeller(ecommerce) : setSelectedSeller(dataSellers[0]);
 
         const objectPrice = {};
         const objectCategories = {};
@@ -173,7 +175,7 @@ export default function ShoppingCart() {
   return (
     productos.filter(producto => producto.vendedor === selectedSeller).length > 0 ? (
       <div className={`mb-22 ${windowWidth >= 500 ? 'flex flex-wrap justify-center gap-4' : ''}`}>
-      {sellers?.length > 1 && (
+      {sellers?.length > 1 && !ecommerce && (
         <>
           <section className="w-full flex items-center justify-center">
             {sellers.map(seller => (

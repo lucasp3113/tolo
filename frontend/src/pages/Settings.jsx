@@ -9,7 +9,7 @@ import { FaHeadset } from "react-icons/fa6";
 import { IoBagHandleSharp } from "react-icons/io5";
 import { FaHome } from 'react-icons/fa';
 import { FaRegCreditCard } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaLock } from "react-icons/fa";
 import { IoReturnUpBack } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
@@ -19,6 +19,7 @@ import axios from 'axios';
 
 
 export default function Settings() {
+    const {ecommerce} = useParams()
     const [width, setWidth] = useState(window.innerWidth)
 
     const navigate = useNavigate()
@@ -70,14 +71,14 @@ export default function Settings() {
                  flex flex-col items-start justify-start`}>
                 {perfil ? (
                     <>
-                        <li onClick={() => navigate("/change_user/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_user/`) : navigate("/change_user/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
                                 <FaUser className="text-green-600 mr-2 text-[30px]" />
                                 <h2>Cambiar nombre de usuario</h2>
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
-                        <li onClick={() => navigate("/change_password/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_password/`) : navigate("/change_password/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
                                 <FaLock className="text-amber-400 mr-2 text-[30px]" />
                                 <h2>Cambiar contraseña</h2>
@@ -86,14 +87,14 @@ export default function Settings() {
                         </li>
                         {typeUser === 'ecommerce' && (
                             <>
-                                <li onClick={() => navigate("/profile_picture/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                                     <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
                                         <FaUserCircle className="text-indigo-500 mr-2 text-[30px]" />
                                         <h2>Añadir/Cambiar foto de perfil</h2>
                                     </div>
                                     <p><IoIosArrowForward /></p>
                                 </li>
-                                <li onClick={() => navigate("/change_ecommerce/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_ecommerce/`) : navigate("/change_ecommerce/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                                     <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
                                         <FaOpencart className="text-red-500 mr-3 ml-2 text-[20px] scale-150" />
                                         <h2 className='whitespace-nowrap'>Cambiar nombre del ecommerce</h2>
@@ -112,7 +113,7 @@ export default function Settings() {
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
-                        <li onClick={() => navigate("/shopping_cart/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/shopping_cart/`) : navigate("/shopping_cart/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
                                 <TiShoppingCart className="text-indigo-500 mr-2 text-[30px] scale-130" />
                                 <h2>Carrito</h2>

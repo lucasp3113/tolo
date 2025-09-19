@@ -3,8 +3,14 @@ mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
-$data_base = new mysqli("localhost", "root", "", "tolo");
-if (!$data_base) {
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
+if ($data_base->connect_error) {
     http_response_code(500);
     echo json_encode(["success" => false, "message" => "Error de conexión a la base de datos"]);
     exit;
@@ -32,7 +38,7 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
         echo json_encode(["success" => false, "message" => "La imagen es demasiado grande"]);
         exit;
     }
-    $upload_dir = "public/uploads/profile_pictures/";
+    $upload_dir = "uploads/profile_pictures/";
     if (!file_exists($upload_dir))
         mkdir($upload_dir, 0777, true);
 

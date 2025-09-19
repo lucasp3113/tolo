@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 export default function RutaProtegida({ children }) {
   const [validando, setValidando] = useState(true);
   const [valido, setValido] = useState(false);
-
+  const {ecommerce} = useParams()
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -29,7 +29,7 @@ export default function RutaProtegida({ children }) {
 
   if (validando) return null
 
-  if (!valido) return <Navigate to="/login" replace />;
+  if (!valido) return <Navigate to={ecommerce ? `/${ecommerce}/login/` : "/login"} replace />;
 
   return children;
 }

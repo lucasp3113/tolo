@@ -10,9 +10,10 @@ import { HiLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import { FcGoogle } from 'react-icons/fc'
 import logoToloBlue from '../assets/logoToloBlue.png'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export default function Login() {
+    const {ecommerce} = useParams()
     const { login } = useContext(AuthContext);
     const navigate = useNavigate()
 
@@ -31,9 +32,9 @@ export default function Login() {
                 const userType = res.data.user_type
                 login(token, expiration);
                 const urls = {
-                    ecommerce: "/ecommerce_dashboard",
-                    vendedor_particular: "/seller_dashboard",
-                    cliente: "/"
+                    ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
+                    vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
+                    cliente: ecommerce ? `/${ecommerce}/` : "/"
 
                 }
                 navigate(urls[userType])
