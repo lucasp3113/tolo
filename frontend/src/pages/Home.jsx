@@ -109,7 +109,7 @@ export default function Home({ searchData, userType, setSearchData }) {
         </section>
       ) : (
         <section className={`flex flex-col mb-20 w-full items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}>
-          {uniqueProducts.length > 2 && windowWidth > 500 ? showProducts(uniqueProducts) : uniqueProducts.map((producto) => (
+          {uniqueProducts.length > 1 && windowWidth > 500 ? showProducts(uniqueProducts) : uniqueProducts.map((producto) => (
             <AnimationScroll key={producto.id_producto}>
               <ProductCard
                 key={producto.id_producto}

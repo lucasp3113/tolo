@@ -20,11 +20,14 @@ import { data } from 'react-router-dom'
 
 
 export default function CreateProduct({ edit = false, onCancel, id }) {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm()
-    const [color, setColor] = useState(true)
+    const formProduct = useForm();
+    const formCharac = useForm();
+    const formColor = useForm();
+
+    const [color, setColor] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
     const [currentStep, setCurrentStep] = useState(null)
-    const [sizes, setSizes] = useState(true)
+    const [sizes, setSizes] = useState(false)
 
     const [numColor, setNumColor] = useState(1)
     const [visibleColors, setVisibleColors] = useState([true])
@@ -41,7 +44,6 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
     const [productId, setProductId] = useState(1);
 
     const [dataColors, setDataColors] = useState(null)
-    const [dataSizes, setDataSizes] = useState(null)
     const [dataCharac, setDataCharac] = useState(null)
 
     useEffect(() => {
@@ -54,14 +56,6 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                 })
                 .catch((err) => console.log(err))
 
-        } else if (currentStep === "showSizes") {
-            axios.post("/api/show_sizes.php", {
-                productId: productId
-            })
-                .then((res) => {
-                    setDataSizes(res.data.data)
-                })
-                .catch((err) => console.log(err))
         } else if (currentStep === "showCharac") {
             axios.post("/api/show_charac.php", {
                 productId: productId
@@ -94,15 +88,14 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                 idProducto: productId,
                 nameColor: colorName,
                 nameSizes: arrSizes,
-                nameStocks: arrStocks
+                nameStocks: arrStocks,
+                nameStockColor: formValues["nameStockColor"]
             };
-
             const fd = new FormData();
             fd.append('json', JSON.stringify(payload));
-
-            const files = watch(`imagesColor${i}`) || [];
+            console.log(payload)
+            const files = formColor.watch(`imagesColor${i}`) || [];
             Array.from(files).forEach(file => fd.append('images[]', file));
-
             axios.post('/api/add_color.php', fd, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
@@ -126,44 +119,13 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .catch((err) => console.log(err))
     }
 
-    function createSize(data) {
-        const sizes = [];
-        const stocks = [];
-
-        Object.keys(data).forEach(key => {
-            if (key.startsWith("nameSize")) {
-                sizes.push(data[key]);
-            }
-            if (key.startsWith("nameStockSize")) {
-                stocks.push(data[key]);
-            }
-        });
-        axios.post("/api/create_size.php", {
-            productId: productId,
-            sizes: sizes,
-            stocks: stocks
-        })
-            .then((res) => setCurrentStep("showSizes"))
-            .catch((err) => console.log(err))
-    }
-
-    function deleteSize(idSize) {
-        console.log(idSize)
-        axios.post("/api/delete_size.php", {
-            idSize: idSize
-        })
-            .then((res) => {
-                setDataSizes(prevSizes => prevSizes.filter(s => s.id_talle !== idSize));
-                console.log(res);
-            })
-            .catch((err) => console.log(err))
-    }
-
     function createCharac(dataForm) {
         const data = [];
         Object.values(dataForm).forEach((d) => {
             data.push(d)
         })
+        console.log(dataForm)
+        console.log(data)
         axios.post("/api/create_charac.php", {
             productId: productId,
             data: data
@@ -268,7 +230,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
 
     const jsxColor = Array.from({ length: numColor }).map((_, colorIdx) => {
         const displayNumber = colorIdx + 1
-        const watchedColorFiles = watch(`imagesColor${displayNumber}`)
+        const watchedColorFiles = formColor.watch(`imagesColor${displayNumber}`)
         const selectedColorFiles = watchedColorFiles ? Array.from(watchedColorFiles) : []
 
         const colorVisible = visibleColors[colorIdx] ?? false
@@ -281,8 +243,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     name={`nameColor${displayNumber}`}
                     label={"Color"}
                     placeholder={"Color"}
-                    register={register}
-                    errors={errors}
+                    register={formColor.register}
+                    errors={formColor.formState.errors}
                     required={true}
                     minLength={3}
                     maxLength={25}
@@ -293,17 +255,17 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     type="file"
                     name={`imagesColor${displayNumber}`}
                     label="Imágenes del producto"
-                    register={register}
-                    errors={errors}
+                    register={formColor.register}
+                    errors={formColor.formState.errors}
                     multiple={true}
                     required={true}
                 />
 
-                {(watch(`imagesColor${displayNumber}`) && watch(`imagesColor${displayNumber}`).length > 0) && (
+                {(formColor.watch(`imagesColor${displayNumber}`) && formColor.watch(`imagesColor${displayNumber}`).length > 0) && (
                     <div className="m-3">
-                        <p className="text-sm text-gray-600 mb-2">{watch(`imagesColor${displayNumber}`).length} imagen(es) seleccionada(s):</p>
+                        <p className="text-sm text-gray-600 mb-2">{formColor.watch(`imagesColor${displayNumber}`).length} imagen(es) seleccionada(s):</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {Array.from(watch(`imagesColor${displayNumber}`)).map((file, idx) => {
+                            {Array.from(formColor.watch(`imagesColor${displayNumber}`)).map((file, idx) => {
                                 const url = URL.createObjectURL(file);
                                 return (
                                     <div key={idx} className="relative">
@@ -319,87 +281,64 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     </div>
                 )}
 
-                <h3 className='font-quicksand m-auto w-full font-semibold text-md'>Talles del color</h3>
-
-                {visibleSizesForColor.map((isVisible, sizeIdx) => (
-                    isVisible && (
-                        <section key={`${colorIdx}-${sizeIdx}`} className={`transition-opacity ease-in-out duration-700 opacity-100`}>
-                            <Input
-                                name={`nameSizeColor${displayNumber}${sizeIdx}`}
-                                label={"Talle"}
-                                placeholder={"Talle Ej: XS, M, XXL, 35, 40"}
-                                register={register}
-                                errors={errors}
-                                required={true}
-                                minLength={1}
-                                maxLength={10}
-                            />
-                            <Input
-                                name={`nameStockSizeColor${displayNumber}${sizeIdx}`}
-                                label={"Stock del talle"}
-                                placeholder={"Stock"}
-                                register={register}
-                                type={"number"}
-                                errors={errors}
-                                required={true}
-                                validate={value => Number(value) >= 0 || "El stock no puede ser negativo"}
-                            />
-                            <section className='w-full flex items-center justify-end'>
-                                {visibleSizesForColor.filter(v => v).length > 1 && (
-                                    <span
-                                        onClick={() => removeColorSize(colorIdx, sizeIdx)}
-                                        className='text-red-600 text-sm mr-3 cursor-pointer hover:text-red-800'
-                                    >
-                                        Eliminar talle
-                                    </span>
-                                )}
-                            </section>
+                {sizes ? (
+                    <>
+                        <h3 className='font-quicksand m-auto w-full font-semibold text-md'>Talles del color</h3>
+                        {visibleSizesForColor.map((isVisible, sizeIdx) => (
+                            isVisible && (
+                                <section key={`${colorIdx}-${sizeIdx}`} className={`transition-opacity ease-in-out duration-700 opacity-100`}>
+                                    <Input
+                                        name={`nameSizeColor${displayNumber}${sizeIdx}`}
+                                        label={"Talle"}
+                                        placeholder={"Talle Ej: XS, M, XXL, 35, 40"}
+                                        register={formColor.register}
+                                        errors={formColor.formState.errors}
+                                        required={true}
+                                        minLength={1}
+                                        maxLength={10}
+                                    />
+                                    <Input
+                                        name={`nameStockSizeColor${displayNumber}${sizeIdx}`}
+                                        label={"Stock del talle"}
+                                        placeholder={"Stock"}
+                                        register={formColor.register}
+                                        type={"number"}
+                                        errors={formColor.formState.errors}
+                                        required={true}
+                                        validate={value => Number(value) >= 0 || "El stock no puede ser negativo"}
+                                    />
+                                    <section className='w-full flex items-center justify-end'>
+                                        {visibleSizesForColor.filter(v => v).length > 1 && (
+                                            <span
+                                                onClick={() => removeColorSize(colorIdx, sizeIdx)}
+                                                className='text-red-600 text-sm mr-3 cursor-pointer hover:text-red-800'
+                                            >
+                                                Eliminar talle
+                                            </span>
+                                        )}
+                                    </section>
+                                </section>
+                            )
+                        ))}
+                        <section className='flex items-center justify-end'>
+                            <FiPlus onClick={() => addColorSize(colorIdx)} className='text-black text-3xl mt-2 mr-3 transition-transform duration-300 ease-in-out hover:scale-125' />
                         </section>
-                    )
-                ))}
-                <section className='flex items-center justify-end'>
-                    <FiPlus onClick={() => addColorSize(colorIdx)}  className='text-black text-3xl mt-2 mr-3 transition-transform duration-300 ease-in-out hover:scale-125' />
-                </section>
+                    </>
+                ) : (
+                    <Input
+                        name={`nameStockColor`}
+                        label={"Stock del color"}
+                        placeholder={"Stock"}
+                        register={formColor.register}
+                        type={"number"}
+                        errors={formColor.formState.errors}
+                        required={true}
+                        validate={value => Number(value) >= 0 || "El stock no puede ser negativo"}
+                    />
+                )}
             </section>
         )
     })
-
-    const jsxSize = Array.from({ length: numSize }).map((_, idx) => (
-        visibleSize[idx] && (
-            <section key={idx} className={`transition-opacity ease-in-out duration-700 ${visibleSize[idx] ? "opacity-100" : "opacity-0"}`}>
-                <Input
-                    name={`nameSize${idx + 1}`}
-                    label={"Talle"}
-                    placeholder={"Talle Ej: XS, M, XXL, 35, 40"}
-                    register={register}
-                    errors={errors}
-                    required={true}
-                    minLength={1}
-                    maxLength={10}
-                />
-                <Input
-                    name={`nameStockSize${idx + 1}`}
-                    label={"Stock del talle"}
-                    placeholder={"Stock"}
-                    register={register}
-                    type={"number"}
-                    errors={errors}
-                    required={true}
-                    validate={value => Number(value) >= 0 || "El stock no puede ser negativo"}
-                />
-                <section className='w-full flex items-center justify-end'>
-                    {visibleSize.filter(v => v).length > 1 && (
-                        <span
-                            onClick={() => removeSize(idx)}
-                            className='text-red-600 text-sm mr-3 cursor-pointer hover:text-red-800'
-                        >
-                            Eliminar talle
-                        </span>
-                    )}
-                </section>
-            </section>
-        )
-    ))
 
     const jsxCharac = Array.from({ length: numCharac }).map((_, idx) => (
         visibleCharac[idx] && (
@@ -408,8 +347,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     name={`nameCharac${idx + 1}`}
                     label={"Característica"}
                     placeholder={"Característica"}
-                    register={register}
-                    errors={errors}
+                    register={formCharac.register}
+                    errors={formCharac.formState.errors}
                     required={true}
                     minLength={3}
                     maxLength={25}
@@ -487,7 +426,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .then(res => {
                 console.log(res)
                 setProductId(res.data.product_id);
-                color ? setCurrentStep("addColor") : setCurrentStep("addSizes")
+                color ? setCurrentStep("addColor") : sizes ? setCurrentStep("addSizes") : setCurrentStep("addCharac")
 
             })
             .catch(err => console.log(err));
@@ -534,88 +473,96 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .catch(err => console.log(err));
     }
 
-    const watchedFiles = watch("images");
+    const watchedFiles = formProduct.watch("images");
     const selectedFiles = watchedFiles ? Array.from(watchedFiles) : [];
 
-    const men = watch("Ropa hombre");
-    const women = watch("Ropa mujer");
-    const boy = watch("Ropa niño");
-    const girl = watch("Ropa niña");
-    const unisex = watch("Ropa unisex");
-    const footwear = watch("Calzado");
-    const baby = watch("Bebés y niños");
-    const accessories = watch("Accesorios");
-    const toys = watch("Juguetes");
-    const healthBeauty = watch("Salud y Belleza");
-    const sportsOutdoor = watch("Deportes y Aire libre");
-    const pets = watch("Mascotas");
-    const computing = watch("Computación");
-    const cellphonesAccessories = watch("Celulares y accesorios");
-    const officeStationery = watch("Oficina y papelería");
-    const appliances = watch("Electrodomésticos");
-    const musicalInstruments = watch("Instrumentos Musicales");
-
-    useEffect(() => {
-        if (men || women || boy || girl || unisex || footwear || baby) {
-            setSizes(true);
-        } else {
-            setSizes(false);
-        }
-    }, [men, women, boy, girl, unisex, footwear, baby]);
+    const electronics = formProduct.watch("Electrónica");
+    const men = formProduct.watch("Ropa hombre");
+    const women = formProduct.watch("Ropa mujer");
+    const boy = formProduct.watch("Ropa niño");
+    const girl = formProduct.watch("Ropa niña");
+    const unisex = formProduct.watch("Ropa unisex");
+    const footwear = formProduct.watch("Calzado");
+    const accessories = formProduct.watch("Accesorios");
+    const toys = formProduct.watch("Juguetes");
+    const homeKitchen = formProduct.watch("Hogar y Cocina");
+    const healthBeauty = formProduct.watch("Salud y Belleza");
+    const sportsOutdoor = formProduct.watch("Deportes y Aire libre");
+    const baby = formProduct.watch("Bebés y niños");
+    const computing = formProduct.watch("Computación");
+    const cellphonesAccessories = formProduct.watch("Celulares y accesorios");
+    const officeStationery = formProduct.watch("Oficina y papelería");
+    const automotive = formProduct.watch("Automotriz");
+    const gardenOutdoor = formProduct.watch("Jardín y exteriores");
+    const vehicles = formProduct.watch("Vehículos");
+    const spareParts = formProduct.watch("Repuestos y autopartes");
+    const motorcycles = formProduct.watch("Motocicletas");
+    const nautical = formProduct.watch("Náutica");
+    const appliances = formProduct.watch("Electrodomésticos");
+    const musicalInstruments = formProduct.watch("Instrumentos Musicales");
 
     useEffect(() => {
         if (
-            men || women || boy || girl || unisex || footwear || accessories ||
-            toys || healthBeauty || sportsOutdoor || pets || baby ||
-            computing || cellphonesAccessories || officeStationery || appliances ||
-            musicalInstruments
+            electronics || men || women || boy || girl || unisex || footwear ||
+            accessories || toys || homeKitchen || healthBeauty || sportsOutdoor ||
+            baby || computing || cellphonesAccessories || officeStationery ||
+            automotive || gardenOutdoor || vehicles || spareParts || motorcycles ||
+            nautical || appliances || musicalInstruments
         ) {
             setColor(true)
         } else {
             setColor(false)
         }
+        if (men || women || boy || girl || unisex || footwear) {
+            setSizes(true)
+        } else {
+            setSizes(false)
+        }
     }, [
-        men, women, boy, girl, unisex, footwear, accessories,
-        toys, healthBeauty, sportsOutdoor, pets, baby,
-        computing, cellphonesAccessories, officeStationery, appliances,
-        musicalInstruments
-    ]);
+        electronics, men, women, boy, girl, unisex, footwear,
+        accessories, toys, homeKitchen, healthBeauty, sportsOutdoor,
+        baby, computing, cellphonesAccessories, officeStationery,
+        automotive, gardenOutdoor, vehicles, spareParts, motorcycles,
+        nautical, appliances, musicalInstruments
+    ])
+
 
     switch (currentStep) {
         case "addColor":
             return (
-                <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl' onSubmit={handleSubmit(colorSave)}>
+                <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl' onSubmit={formColor.handleSubmit(colorSave)}>
                     {color && (
                         <>
                             <h2 className='font-quicksand m-auto w-full font-semibold text-2xl'>Colores</h2>
                             {jsxColor}
                         </>
                     )}
-                    <Button onClick={handleSubmit(colorSave)} className={"w-50"} color={"blue"} size={"md"} text={"Guardar"} />
+                    <Button onClick={formColor.handleSubmit(colorSave)} className={"w-50"} color={"blue"} size={"md"} text={"Guardar"} />
                 </form>
             );
 
         case "showColors":
             return (
                 <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
-                    <h2 className='font-quicksand m-auto w-full font-semibold text-3xl'>Colores</h2>
+                    <h2 className='font-quicksand m-auto w-full font-black mb-2 text-3xl'>Colores</h2>
                     {dataColors && dataColors.map((c, index) => (
-                        <div className='flex items-center w-1/3 m-auto justify-between' key={`color${index}`}>
-                            <span className='font-quicksand text-xl font-medium'>{c.nombre}</span>
+                        <div className='flex items-center w-45 m-auto justify-between mb-1 mt-1' key={`color${index}`}>
+                            <img className={`w-10`} src={`/api/uploads/products/${c.ruta_imagen}`} loading='lazy' alt="" />
+                            <span className='font-quicksand text-2xl font-semibold'>{c.nombre}</span>
                             {dataColors.length > 1 && (
-                                <FaRegTrashCan onClick={() => colorDelete(c.id_color)} className='text-red-600 transition-transform duration-300 ease-in-out hover:scale-120' />
+                                <FaRegTrashCan onClick={() => colorDelete(c.id_color)} className='text-red-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120' />
                             )}
                         </div>
                     ))}
-                    <section className='flex items-center justify-between'>
+                    <section className='flex mt-2 items-center justify-between'>
                         <Button onClick={() => setCurrentStep("addColor")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir color"} />
-                        <Button onClick={() => setCurrentStep("addSize")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
+                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
                     </section>
                 </form>
             );
         case "addSizes":
             return (
-                <form onSubmit={handleSubmit(createSize)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+                <form onSubmit={formSize.handleSubmit(createSize)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
                     <h2 className='font-quicksand m-auto w-full font-semibold text-2xl'>Talles</h2>
                     {jsxSize}
                     <section className='w-full flex items-center justify-end'>
@@ -624,27 +571,9 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     <Button className={"w-50"} color={"blue"} size={"md"} text={"Guardar"} />
                 </form>
             );
-        case "showSizes":
-            return (
-                <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
-                    <h2 className='font-quicksand m-auto w-full font-semibold text-3xl'>Talles</h2>
-                    {dataSizes && dataSizes.map((s, index) => (
-                        <div className='flex items-center w-1/3 m-auto justify-between' key={`size${index}`}>
-                            <span className='font-quicksand text-xl font-medium'>{s.talle}</span>
-                            {dataSizes.length > 1 && (
-                                <FaRegTrashCan onClick={() => deleteSize(s.id_talle)} className='text-red-600 transition-transform duration-300 ease-in-out hover:scale-120' />
-                            )}
-                        </div>
-                    ))}
-                    <section className='flex items-center justify-between'>
-                        <Button onClick={() => setCurrentStep("addSize")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir talle"} />
-                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
-                    </section>
-                </form>
-            )
         case "addCharac":
             return (
-                <form onSubmit={handleSubmit(createCharac)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+                <form onSubmit={formCharac.handleSubmit(createCharac)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
                     <h2 className='font-quicksand m-auto w-full font-semibold text-2xl'>Características</h2>
                     {jsxCharac}
                     <section className='w-full flex items-center justify-end'>
@@ -656,14 +585,14 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
         case "showCharac":
             return (
                 <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
-                    <h2 className='font-quicksand m-auto w-full font-semibold text-3xl'>Características</h2>
+                    <h2 className='font-quicksand m-auto w-full font-black text-3xl mb-2'>Características</h2>
                     {dataCharac && dataCharac.map((c, index) => (
                         <div className='flex items-center w-full m-auto justify-between' key={`size${index}`}>
-                            <span className='font-quicksand text-xl font-medium'>{c.caracteristica}</span>
-                                <FaRegTrashCan onClick={() => deleteCharac(c.id_caracteristica)} className='text-red-600 transition-transform duration-300 ease-in-out hover:scale-120' />
+                            <span className='font-quicksand text-xl font-semibold mt-2 mb-2'>{c.caracteristica}</span>
+                            <FaRegTrashCan onClick={() => deleteCharac(c.id_caracteristica)} className='text-red-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120' />
                         </div>
                     ))}
-                    <section className='flex items-center justify-between'>
+                    <section className='flex mt-2 items-center justify-between'>
                         <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir caracteristica"} />
                         <Button onClick={() => Navigate("/")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
                     </section>
@@ -671,7 +600,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             )
         default:
             return (
-                <form onSubmit={handleSubmit(!edit ? addProduct : (data) => updateProduct(data, id))} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+                <form onSubmit={formProduct.handleSubmit(!edit ? addProduct : (data) => updateProduct(data, id))} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
                     <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
                     <div className="flex flex-col mt-3 ml-3 items-start ">
                         <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>{edit ? "Editar publicación" : "Crear publicación"}</h2>
@@ -681,8 +610,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         name={"nameProduct"}
                         label={"Nombre del producto"}
                         placeholder={"Nombre del producto"}
-                        register={register}
-                        errors={errors}
+                        register={formProduct.register}
+                        errors={formProduct.formState.errors}
                         required={true}
                         minLength={3}
                         maxLength={25}
@@ -693,22 +622,22 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         name={"productPrice"}
                         label={"Precio del producto"}
                         placeholder={"Precio del producto"}
-                        register={register}
-                        errors={errors}
+                        register={formProduct.register}
+                        errors={formProduct.formState.errors}
                         required={true}
                         icon={<FaDollarSign />}
                         maxLength={20}
                         validate={value => Number(value) > 0 || "El precio no puede ser negativo ni 0"}
                     />
-                    <DropdownCategories watch={watch} register={register} errors={errors} direction={"b"} />
-                    {!sizes && (
+                    <DropdownCategories watch={formProduct.watch} register={formProduct.register} errors={formProduct.formState.errors} direction={"b"} />
+                    {!color && (
                         <Input
                             type={"number"}
                             name={"productStock"}
                             label={"Stock del producto"}
                             placeholder={"Stock del producto"}
-                            register={register}
-                            errors={errors}
+                            register={formProduct.register}
+                            errors={formProduct.formState.errors}
                             required={true}
                             icon={<FaBoxes />}
                             validate={value => Number(value) >= 0 || "El stock no puede ser negativo"}
@@ -719,8 +648,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                             type="file"
                             name="images"
                             label="Imágenes del producto"
-                            register={register}
-                            errors={errors}
+                            register={formProduct.register}
+                            errors={formProduct.formState.errors}
                             multiple={true}
                             required={true}
                         />
@@ -761,8 +690,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         name={"productDescription"}
                         label={"Descripción del  producto"}
                         placeholder={"Descripción del producto"}
-                        register={register}
-                        errors={errors}
+                        register={formProduct.register}
+                        errors={formProduct.formState.errors}
                         maxLength={2000}
                     />
                     <Input
@@ -770,8 +699,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         name={"shipping"}
                         label={"Envío gratis"}
                         placeholder={"Envío gratis"}
-                        register={register}
-                        errors={errors}
+                        register={formProduct.register}
+                        errors={formProduct.formState.errors}
                         required={false}
                         className='flex-col-reverse'
                     />

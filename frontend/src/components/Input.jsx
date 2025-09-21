@@ -35,7 +35,7 @@ export default function Input({
   const validateImageFiles = (files) => {
     if (!files || files.length === 0) return true; // Si no hay archivos, pasa la validación
     
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     
     for (let i = 0; i < files.length; i++) {

@@ -91,7 +91,7 @@ export default function ProductCRUD() {
   return (
     <div className={`mb-20  ${windowWidth >= 500 ? "flex flex-wrap justify-center gap-4" : ""}`}>
       {!update ? (
-        productos.length > 2 && windowWidth > 500 ? showProducts(productos) : productos.map((producto) => (
+        productos.length > 1 && windowWidth > 500 ? showProducts(productos) : productos.map((producto) => (
           <AnimationScroll>
             <ProductCard
               key={producto.id_producto}
