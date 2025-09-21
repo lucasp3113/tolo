@@ -19,20 +19,105 @@ if ($data_base) {
         $username = $_POST["username"];
         $name_product = $_POST["nameProduct"];
         $product_price = $_POST["productPrice"];
-        $product_stock = $_POST["productStock"];
+        $product_stock = $_POST["productStock"] ?? null;
         $product_description = $_POST["productDescription"] ?? null;
         $categories_json = $_POST["categories"] ?? "[]";
         $categories_array = json_decode($categories_json, true);
         $category_list = [];
         $shipping = !empty($_POST["shipping"]) ? 1 : 0;
+
         foreach ($categories_array as $item) {
             $category_list[] = $item[0];
         }
 
+        $clothing_categories = [
+            "Electrónica",
+            "Ropa hombre",
+            "Ropa mujer",
+            "Ropa niño",
+            "Ropa niña",
+            "Ropa unisex",
+            "Calzado",
+            "Accesorios",
+            "Juguetes",
+            "Hogar y Cocina",
+            "Salud y Belleza",
+            "Deportes y Aire libre",
+            "Bebés y niños",
+            "Computación",
+            "Celulares y accesorios",
+            "Oficina y papelería",
+            "Automotriz",
+            "Jardín y exteriores",
+            "Vehículos",
+            "Repuestos y autopartes",
+            "Motocicletas",
+            "Náutica",
+            "Electrodomésticos",
+            "Instrumentos Musicales"
+        ];
+
+        $color_categories = [
+            "Electrónica",
+            "Ropa hombre",
+            "Ropa mujer",
+            "Ropa niño",
+            "Ropa niña",
+            "Ropa unisex",
+            "Calzado",
+            "Accesorios",
+            "Juguetes",
+            "Hogar y Cocina",
+            "Salud y Belleza",
+            "Deportes y Aire libre",
+            "Bebés y niños",
+            "Computación",
+            "Celulares y accesorios",
+            "Oficina y papelería",
+            "Automotriz",
+            "Jardín y exteriores",
+            "Vehículos",
+            "Repuestos y autopartes",
+            "Motocicletas",
+            "Náutica",
+            "Electrodomésticos",
+            "Instrumentos Musicales"
+        ];
+
+        $no_image_categories = [
+            "Electrónica",
+            "Ropa hombre",
+            "Ropa mujer",
+            "Ropa niño",
+            "Ropa niña",
+            "Ropa unisex",
+            "Calzado",
+            "Accesorios",
+            "Juguetes",
+            "Hogar y Cocina",
+            "Salud y Belleza",
+            "Deportes y Aire libre",
+            "Bebés y niños",
+            "Computación",
+            "Celulares y accesorios",
+            "Oficina y papelería",
+            "Automotriz",
+            "Jardín y exteriores",
+            "Vehículos",
+            "Repuestos y autopartes",
+            "Motocicletas",
+            "Náutica",
+            "Electrodomésticos",
+            "Instrumentos Musicales"
+        ];
+
+        $is_clothing = !empty(array_intersect($category_list, $clothing_categories));
+        $skip_images = !empty(array_intersect($category_list, $no_image_categories));
+
         function saveImages($product_id, $data_base)
         {
             if (!isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
-                return false; // No se guardó ninguna imagen
+                return false;
             }
 
             $saved_images = [];
@@ -43,7 +128,7 @@ if ($data_base) {
             }
 
             $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            $max_size = 5 * 1024 * 1024; // 5 MB
+            $max_size = 5 * 1024 * 1024;
 
             for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
                 $file_name = $_FILES['images']['name'][$i];
@@ -71,7 +156,6 @@ if ($data_base) {
                     if ($query->execute()) {
                         $saved_images[] = $relative_path;
                     } else {
-                        // Si falla al guardar en DB, borrar archivo
                         unlink($file_path);
                     }
                 }
@@ -79,7 +163,6 @@ if ($data_base) {
 
             return count($saved_images) > 0 ? $saved_images : false;
         }
-
 
         $query = $data_base->prepare("SELECT id_usuario, tipo_usuario FROM usuarios WHERE nombre_usuario = ?");
         $query->bind_param("s", $username);
@@ -95,8 +178,14 @@ if ($data_base) {
 
                 if ($query->execute()) {
                     $id_ecommerce = $query->get_result()->fetch_assoc()["id_ecommerce"];
-                    $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock, envio_gratis) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    $query->bind_param("iissdii", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock, $shipping);
+
+                    if ($is_clothing) {
+                        $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, envio_gratis) VALUES (?, ?, ?, ?, ?, ?)");
+                        $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $shipping);
+                    } else {
+                        $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock, envio_gratis) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $query->bind_param("iissdii", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock, $shipping);
+                    }
 
                     if ($query->execute()) {
                         $product_id = $data_base->insert_id;
@@ -127,9 +216,12 @@ if ($data_base) {
                                 }
                             }
                         }
-                        $images_saved = saveImages($product_id, $data_base);
 
-                        // 🔹 Agregar producto a MeiliSearch
+                        $images_saved = false;
+                        if (!$skip_images) {
+                            $images_saved = saveImages($product_id, $data_base);
+                        }
+
                         $client = new Client('http://127.0.0.1:7700');
                         $index = $client->getIndex('productos');
                         $name_product_clean = str_replace(" ", "", $name_product);
@@ -138,19 +230,23 @@ if ($data_base) {
                             'name' => $name_product
                         ];
                         $index->addDocuments([$producto_index]);
+
                         http_response_code(200);
                         echo json_encode([
                             "success" => true,
                             "message" => "Producto creado e indexado exitosamente",
                             "product_id" => $product_id,
                             "images_uploaded" => $images_saved,
-                            "shipping" => $shipping
+                            "shipping" => $shipping,
+                            "is_clothing" => $is_clothing,
+                            "skip_images" => $skip_images
                         ]);
                         exit;
                     } else {
                         http_response_code(400);
                         echo json_encode([
                             "success" => false,
+                            "error" => $query->error,
                             "message" => "Error al crear el producto"
                         ]);
                         exit;
@@ -167,8 +263,15 @@ if ($data_base) {
             } else {
                 if ($user_type === "vendedor_particular") {
                     $id_ecommerce = null;
-                    $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock) VALUES (?, ?, ?, ?, ?, ?)");
-                    $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock);
+
+                    if ($is_clothing) {
+                        $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio) VALUES (?, ?, ?, ?, ?)");
+                        $query->bind_param("iissd", $id, $id_ecommerce, $name_product, $product_description, $product_price);
+                    } else {
+                        $query = $data_base->prepare("INSERT INTO productos(id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock) VALUES (?, ?, ?, ?, ?, ?)");
+                        $query->bind_param("iissdi", $id, $id_ecommerce, $name_product, $product_description, $product_price, $product_stock);
+                    }
+
                     if ($query->execute()) {
                         $product_id = $data_base->insert_id;
 
@@ -198,9 +301,12 @@ if ($data_base) {
                                 }
                             }
                         }
-                        $images_saved = saveImages($product_id, $data_base);
 
-                        // 🔹 Agregar producto a MeiliSearch
+                        $images_saved = false;
+                        if (!$skip_images) {
+                            $images_saved = saveImages($product_id, $data_base);
+                        }
+
                         $client = new Client('http://127.0.0.1:7700');
                         $index = $client->getIndex('productos');
                         $name_product_clean = str_replace(" ", "", $name_product);
@@ -209,13 +315,16 @@ if ($data_base) {
                             'name' => $name_product
                         ];
                         $index->addDocuments([$producto_index]);
+
                         http_response_code(200);
                         echo json_encode([
                             "success" => true,
                             "message" => "Producto creado e indexado exitosamente",
                             "product_id" => $product_id,
                             "images_uploaded" => $images_saved,
-                            "shipping" => $shipping
+                            "shipping" => $shipping,
+                            "is_clothing" => $is_clothing,
+                            "skip_images" => $skip_images
                         ]);
                         exit;
                     } else {
@@ -262,4 +371,3 @@ if ($data_base) {
     ]);
     exit;
 }
-?>

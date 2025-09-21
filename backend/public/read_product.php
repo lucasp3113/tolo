@@ -51,7 +51,94 @@ if (!$id) {
     exit;
 }
 
-$query = $data_base->prepare("SELECT id_producto, nombre_producto, precio, stock FROM productos WHERE id_vendedor = ?");
+$special_image_categories = [
+    "Electrónica",
+    "Ropa hombre",
+    "Ropa mujer",
+    "Ropa niño",
+    "Ropa niña",
+    "Ropa unisex",
+    "Calzado",
+    "Accesorios",
+    "Juguetes",
+    "Hogar y Cocina",
+    "Salud y Belleza",
+    "Deportes y Aire libre",
+    "Bebés y niños",
+    "Computación",
+    "Celulares y accesorios",
+    "Oficina y papelería",
+    "Automotriz",
+    "Jardín y exteriores",
+    "Vehículos",
+    "Repuestos y autopartes",
+    "Motocicletas",
+    "Náutica",
+    "Electrodomésticos",
+    "Instrumentos Musicales"
+];
+
+$color_stock_categories = [
+    "Accesorios",
+    "Juguetes",
+    "Hogar y Cocina",
+    "Salud y Belleza",
+    "Deportes y Aire libre",
+    "Bebés y niños",
+    "Computación",
+    "Celulares y accesorios",
+    "Oficina y papelería",
+    "Automotriz",
+    "Jardín y exteriores",
+    "Vehículos",
+    "Repuestos y autopartes",
+    "Motocicletas",
+    "Náutica",
+    "Electrodomésticos",
+    "Instrumentos Musicales",
+    "Electrónica"
+];
+
+$query = $data_base->prepare("
+    SELECT 
+        p.id_producto, 
+        p.nombre_producto, 
+        p.precio,
+        GROUP_CONCAT(DISTINCT c.nombre_categoria) as categorias,
+        CASE 
+            WHEN GROUP_CONCAT(DISTINCT c.nombre_categoria) REGEXP '" . implode("|", array_map('preg_quote', $color_stock_categories)) . "' THEN
+                (SELECT SUM(cp.stock)
+                 FROM colores_producto cp
+                 WHERE cp.id_producto = p.id_producto)
+            WHEN GROUP_CONCAT(DISTINCT c.nombre_categoria) REGEXP '" . implode("|", array_map('preg_quote', $special_image_categories)) . "' THEN
+                (SELECT SUM(tcp.stock)
+                 FROM colores_producto cp
+                 JOIN talles_color_producto tcp ON tcp.id_color = cp.id_color
+                 WHERE cp.id_producto = p.id_producto)
+            ELSE p.stock
+        END AS stock,
+        CASE 
+            WHEN GROUP_CONCAT(DISTINCT c.nombre_categoria) REGEXP '" . implode("|", array_map('preg_quote', $special_image_categories)) . "' THEN
+                (SELECT CONCAT('uploads/products/', icp.ruta_imagen) 
+                 FROM imagenes_color_producto icp
+                 JOIN colores_producto cp ON cp.id_color = icp.id_color
+                 WHERE cp.id_producto = p.id_producto
+                 ORDER BY cp.id_color ASC, icp.id_imagen_color_producto ASC 
+                 LIMIT 1)
+            ELSE
+                (SELECT i.ruta_imagen 
+                 FROM imagenes_productos i
+                 WHERE p.id_producto = i.id_producto
+                 ORDER BY i.id_imagen ASC 
+                 LIMIT 1)
+        END AS ruta_imagen
+    FROM productos p
+    JOIN productos_categorias pc ON pc.id_producto = p.id_producto 
+    JOIN categorias c ON c.id_categoria = pc.id_categoria
+    WHERE p.id_vendedor = ?
+    GROUP BY p.id_producto, p.nombre_producto, p.precio, p.stock
+");
+
 $query->bind_param("i", $id);
 if (!$query->execute()) {
     http_response_code(400);
@@ -62,49 +149,22 @@ if (!$query->execute()) {
     exit;
 }
 
-$products = $query->get_result()->fetch_all(MYSQLI_ASSOC);
-if (count($products) === 0) {
+$result = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+if (count($result) === 0) {
     echo json_encode([]);
     exit;
 }
 
-$IDs_products = array_column($products, "id_producto");
-$number_of_question_marks = implode(",", array_fill(0, count($IDs_products), "?"));
-$types = str_repeat("i", count($IDs_products));
-
-$sql = "SELECT id_producto, ruta_imagen FROM imagenes_productos WHERE id_producto IN ($number_of_question_marks)";
-$query = $data_base->prepare($sql);
-
-$params = [];
-$params[] = &$types;
-foreach ($IDs_products as $key => &$val) {
-    $params[] = &$val;
-}
-call_user_func_array([$query, 'bind_param'], $params);
-
-if (!$query->execute()) {
-    http_response_code(400);
-    echo json_encode([
-        "success" => false,
-        "message" => "Error al obtener imágenes"
-    ]);
-    exit;
-}
-
-$routes = $query->get_result()->fetch_all(MYSQLI_ASSOC);
-
-$map_images = [];
-foreach ($routes as $ruta) {
-    $id_prod = $ruta['id_producto'];
-    if (!isset($map_images[$id_prod])) {
-        $map_images[$id_prod] = $ruta['ruta_imagen'];
-    }
-}
-
 $data = [];
-foreach ($products as $producto) {
-    $producto['ruta_imagen'] = $map_images[$producto['id_producto']] ?? null;
-    $data[] = $producto;
+foreach ($result as $producto) {
+    $data[] = [
+        'id_producto' => $producto['id_producto'],
+        'nombre_producto' => $producto['nombre_producto'],
+        'precio' => $producto['precio'],
+        'stock' => $producto['stock'] ?: 0,
+        'ruta_imagen' => $producto['ruta_imagen']
+    ];
 }
 
 echo json_encode($data);

@@ -548,10 +548,12 @@ CREATE TABLE notificaciones (
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
 
+
 CREATE TABLE colores_producto (
     id_color INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     nombre VARCHAR(100) NOT NULL,
+    stock SMALLINT UNSIGNED DEFAULT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
@@ -562,10 +564,6 @@ CREATE TABLE imagenes_color_producto(
     FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE CASCADE
 );
 
-DROP TABLE colores_producto;
-SELECT * FROM imagenes_color_producto;
-INSERT INTO colores_producto(id_color, id_producto, nombre) VALUES(2, 1, "rojo");
-
 CREATE TABLE talles_color_producto(
     id_talle_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
@@ -574,24 +572,9 @@ CREATE TABLE talles_color_producto(
     FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE CASCADE
 );
 
-SELECT * FROM caracteristicas_producto;
-
-CREATE TABLE talles_producto(
-    id_talle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    id_producto INT UNSIGNED NOT NULL,
-    talle VARCHAR(100) NOT NULL,
-    stock SMALLINT NOT NULL,
-    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE
-);
-
 CREATE TABLE caracteristicas_producto(
     id_caracteristica INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     caracteristica VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
-SELECT * FROM categorias
-
-SELECT * FROM productos
-
-SELECT * FROM usuarios

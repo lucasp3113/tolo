@@ -18,19 +18,20 @@ $idProducto = $body['idProducto'] ?? null;
 $nameColor = $body['nameColor'] ?? null;
 $nameSizes = $body['nameSizes'] ?? [];
 $nameStocks = $body['nameStocks'] ?? [];
+$nameStockColor = $body['nameStockColor'] ?? false;
 
-if (!$idProducto || !$nameColor) {
-    http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Faltan datos del producto o color"]);
-    exit;
+$query_text = $nameStockColor ? "INSERT INTO colores_producto(id_producto, nombre, stock) VALUES(?, ?, ?)" : "INSERT INTO colores_producto(id_producto, nombre) VALUES(?, ?)";
+
+$query = $data_base->prepare($query_text);
+if($nameStockColor) {
+    $query->bind_param("isi", $idProducto, $nameColor, $nameStockColor);
+} else {
+    $query->bind_param("is", $idProducto, $nameColor);
 }
-
-$query = $data_base->prepare("INSERT INTO colores_producto(id_producto, nombre) VALUES(?, ?)");
-$query->bind_param("is", $idProducto, $nameColor);
 
 if (!$query->execute()) {
     http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Error al agregar color"]);
+    echo json_encode(["success" => false, $query->error, "message" => "Error al agregar color"]);
     exit;
 }
 
