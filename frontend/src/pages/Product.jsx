@@ -521,7 +521,7 @@ export default function Product(productId) {
               </ul>
             </section>
 
-            <CommentsSection productId={id} currentUserId={currentUserId} />
+            <CommentsSection productId={id} currentUserId={userId} />
           </div>
         </article>
       )}
