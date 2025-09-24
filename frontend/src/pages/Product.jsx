@@ -52,6 +52,8 @@ export default function Product(productId) {
         setData(res.data.data);
         (res);
         setLoading(false);
+        console.log(res)
+        console.log("ID desde useParams:", id);
       })
       .catch((err) => {
         setError(err);
