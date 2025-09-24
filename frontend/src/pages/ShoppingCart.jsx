@@ -9,7 +9,7 @@ import { FaOpencart } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
 
 export default function ShoppingCart() {
-  const {ecommerce} = useParams();
+  const { ecommerce } = useParams();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [update, setUpdate] = useState(false);
   const [productos, setProductos] = useState([]);
@@ -19,6 +19,10 @@ export default function ShoppingCart() {
   const [categories, setCategories] = useState(null);
   const [priceShipping, setPriceShipping] = useState(null);
 
+  const [proceedToPayment, setProceedToPayment] = useState({});
+  useEffect(() => {
+    console.log(proceedToPayment)
+  }, [proceedToPayment])
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
@@ -71,6 +75,35 @@ export default function ShoppingCart() {
       })
       .catch(err => console.log(err));
   }, []);
+
+  useEffect(() => {
+    if (!productos.length) return;
+
+    const dataSellers = Array.from(new Set(productos.map(p => p.vendedor)));
+
+    const objectPrice = {};
+    const objectCategories = {};
+
+    dataSellers.forEach(seller => {
+      objectPrice[seller] = 0;
+      objectCategories[seller] = [];
+    });
+
+    productos.forEach(p => {
+      objectPrice[p.vendedor] += parseFloat(p.precio_unitario) * p.cantidad;
+      if (!objectCategories[p.vendedor].includes(p.nombre_categoria) && !p.envio_gratis) {
+        objectCategories[p.vendedor].push(p.nombre_categoria);
+      }
+    });
+
+    setTotalPrice(objectPrice);
+    setCategories(objectCategories);
+
+    if (selectedSeller) {
+      calculateShipping(objectCategories[selectedSeller]);
+    }
+  }, [productos, selectedSeller]);
+
 
   function deleteProduct(id_producto) {
     axios.post('/api/delete_product.php', { id_producto })
@@ -175,83 +208,90 @@ export default function ShoppingCart() {
   return (
     productos.filter(producto => producto.vendedor === selectedSeller).length > 0 ? (
       <div className={`mb-22 ${windowWidth >= 500 ? 'flex flex-wrap justify-center gap-4' : ''}`}>
-      {sellers?.length > 1 && !ecommerce && (
-        <>
-          <section className="w-full flex items-center justify-center">
-            {sellers.map(seller => (
-              <span
-                key={seller}
-                onClick={() => setSelectedSeller(seller)}
-                className='m-3 select-none font-quicksand font-semibold text-lg bg-gray-300 hover:bg-gray-200 p-2 min-w-24 cursor-pointer rounded-3xl'
-              >
-                {seller}
-              </span>
-            ))}
-          </section>
-          <h2 className='font-quicksand font-semibold text-3xl mb-4'>
-            Tu pedido en {selectedSeller}
-          </h2>
-        </>
-      )}
+        {sellers?.length > 1 && !ecommerce && (
+          <>
+            <section className="w-full flex items-center justify-center">
+              {sellers.map(seller => (
+                <span
+                  key={seller}
+                  onClick={() => setSelectedSeller(seller)}
+                  className='m-3 select-none font-quicksand font-semibold text-lg bg-gray-300 hover:bg-gray-200 p-2 min-w-24 cursor-pointer rounded-3xl'
+                >
+                  {seller}
+                </span>
+              ))}
+            </section>
+            <h2 className='font-quicksand font-semibold text-3xl mb-4'>
+              Tu pedido en {selectedSeller}
+            </h2>
+          </>
+        )}
 
-      {!update ? (
-        windowWidth > 500 ? (
-          showProducts(productos)
+        {!update ? (
+          windowWidth > 500 ? (
+            showProducts(productos)
+          ) : (
+            productos
+              .filter(producto => producto.vendedor === selectedSeller)
+              .map(producto => (
+                <AnimationScroll key={`${producto.id_producto}-${producto.vendedor}`}>
+                  <ProductCard
+                    cart={TbRuler2}
+                    id_compra={producto.id_compra}
+                    onDelete={(id) => {
+                      setProductos(prev => prev.filter(p => p.id_compra !== id));
+                    }}
+                    name={producto.nombre_producto}
+                    price={producto.precio_unitario}
+                    image={`/api/${producto.ruta_imagen}`}
+                    amount={producto.cantidad}
+                    stock={producto.stock}
+                    freeShipping={producto.envio_gratis === 1}
+                    phone={true}
+                    client={true}
+                  />
+                </AnimationScroll>
+              ))
+          )
         ) : (
-          productos
-            .filter(producto => producto.vendedor === selectedSeller)
-            .map(producto => (
-              <AnimationScroll key={`${producto.id_producto}-${producto.vendedor}`}>
-                <ProductCard
-                  cart={TbRuler2}
-                  id_compra={producto.id_compra}
-                  onDelete={(id) => {
-                    setProductos(prev => prev.filter(p => p.id_compra !== id));
-                  }}
-                  name={producto.nombre_producto}
-                  price={producto.precio_unitario}
-                  image={`/api/${producto.ruta_imagen}`}
-                  amount={producto.cantidad}
-                  stock={producto.stock}
-                  freeShipping={producto.envio_gratis === 1}
-                  phone={true}
-                  client={true}
-                />
-              </AnimationScroll>
-            ))
-        )
-      ) : (
-        <CreateProduct edit={true} onCancel={() => setUpdate(false)} id={update[1]} />
-      )}
+          <CreateProduct edit={true} onCancel={() => setUpdate(false)} id={update[1]} />
+        )}
 
-      {totalPrice && (
-        <Card className={`${windowWidth < 500 ? "!w-88 m-auto" : "!w-[31rem]"} ${productos
-          .filter(producto => producto.vendedor === selectedSeller).length > 1 ? "mt-4 mb-28" : "mt-12"} !shadow !bg-gray-50 !rounded-4xl`}>
-          <h2 className='font-quicksand -translate-y-3 font-bold text-2xl'>Detalles de la compra</h2>
-          <section className='flex items-center justify-between w-full'>
-            <h2 className='font-quicksand ml-3 font-medium text-xl'>Subtotal</h2>
-            <span className='font-quicksand font-medium text-xl'>${totalPrice[selectedSeller]}</span>
-          </section>
-          <section className='flex items-center justify-between w-full mt-4'>
-            <h2 className='font-quicksand ml-3 font-medium text-xl'>Envio</h2>
-            <span className='font-quicksand mr-1 font-medium text-xl'>${priceShipping}</span>
-          </section>
-          <section className='flex items-center justify-between w-full mt-4'>
-            <h2 className='font-quicksand ml-3 font-bold text-xl'>Total</h2>
-            <span className='font-quicksand font-bold text-xl'>
-              ${priceShipping + totalPrice[selectedSeller]}
-            </span>
-          </section>
-          <Button
-            onClick={() => alert("Botón clickeado")}
-            color="black"
-            size="lg"
-            text="Finalizar pedido"
-            className={"!w-72 mr-3 mt-4 !rounded-2xl font-quicksand font-semibold"}
-          />
-        </Card>
-      )}
-    </div>
-    ) : <section className='w-full h-full flex justify-center items-center flex-col'><FaOpencart className=' -translate-y-14 text-gray-500 text-6xl'/> <span className='text-gray 500 text-2xl -translate-y-14'>Agrega un producto a tu carrito</span></section>
+        {totalPrice && (
+          <Card className={`${windowWidth < 500 ? "!w-88 m-auto" : "!w-[31rem]"} ${productos
+            .filter(producto => producto.vendedor === selectedSeller).length > 1 ? "mt-4 mb-28" : "mt-12"} !shadow !bg-gray-50 !rounded-4xl`}>
+            <h2 className='font-quicksand -translate-y-3 font-bold text-2xl'>Detalles de la compra</h2>
+            <section className='flex items-center justify-between w-full'>
+              <h2 className='font-quicksand ml-3 font-medium text-xl'>Subtotal</h2>
+              <span className='font-quicksand font-medium text-xl'>${totalPrice[selectedSeller]}</span>
+            </section>
+            <section className='flex items-center justify-between w-full mt-4'>
+              <h2 className='font-quicksand ml-3 font-medium text-xl'>Envio</h2>
+              <span className='font-quicksand mr-1 font-medium text-xl'>${priceShipping}</span>
+            </section>
+            <section className='flex items-center justify-between w-full mt-4'>
+              <h2 className='font-quicksand ml-3 font-bold text-xl'>Total</h2>
+              <span className='font-quicksand font-bold text-xl'>
+                ${priceShipping + totalPrice[selectedSeller]}
+              </span>
+            </section>
+            <Button
+              onClick={() => setProceedToPayment({
+                idCompra: productos
+                  .filter(producto => producto.vendedor === selectedSeller)[0].id_compra,
+                totalPrice: priceShipping + totalPrice[selectedSeller],
+                metodo_envio: "Esto se realizará en la tercera entrega",
+                direccion_entrega: "Esto se realizará en la tercera entrega",
+                metodo_envio: "Esto se realizará en la tercera entrega"
+              })}
+              color="black"
+              size="lg"
+              text="Finalizar pedido"
+              className={"!w-72 mr-3 mt-4 !rounded-2xl font-quicksand font-semibold"}
+            />
+          </Card>
+        )}
+      </div>
+    ) : <section className='w-full h-full flex justify-center items-center flex-col'><FaOpencart className=' -translate-y-14 text-gray-500 text-6xl' /> <span className='text-gray 500 text-2xl -translate-y-14'>Agrega un producto a tu carrito</span></section>
   );
 }

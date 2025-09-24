@@ -20,6 +20,12 @@ import { data } from 'react-router-dom'
 
 
 export default function CreateProduct({ edit = false, onCancel, id }) {
+    function finish() {
+        axios.post("/api/create_notifications.php", {
+            userId: userId,
+            message: "Producto creado exitosamente"
+        })
+    }
     const formProduct = useForm();
     const formCharac = useForm();
     const formColor = useForm();
@@ -236,7 +242,6 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
         const colorVisible = visibleColors[colorIdx] ?? false
         const sizesCount = colorSizes[colorIdx] ?? 1
         const visibleSizesForColor = visibleColorSizes[colorIdx] ?? Array.from({ length: sizesCount }).map((_, i) => i === 0)
-
         return (
             <section key={colorIdx} className={`transition-opacity ease-in-out duration-700 ${colorVisible ? "opacity-100" : "opacity-0"}`}>
                 <Input
@@ -369,11 +374,13 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
     ))
 
     let user = null;
+    let userId = null
     const token = localStorage.getItem("token");
 
     if (token) {
         const payload = JSON.parse(atob(token.split('.')[1]));
         user = payload.user
+        userId = payload.id_usuario
     }
 
     useEffect(() => {
@@ -469,7 +476,12 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
         }
 
         axios.post("/api/update_product.php", formData)
-            .then(res => console.log(res))
+            .then(res => {
+                axios.post("/api/create_notifications.php", {
+                    userId: userId,
+                    message: "Producto eliminado exitosamente"
+                })
+            })
             .catch(err => console.log(err));
     }
 
@@ -594,7 +606,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     ))}
                     <section className='flex mt-2 items-center justify-between'>
                         <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir caracteristica"} />
-                        <Button onClick={() => Navigate("/")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
+                        <Button onClick={() => finish()} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
                     </section>
                 </form>
             )
@@ -614,7 +626,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         errors={formProduct.formState.errors}
                         required={true}
                         minLength={3}
-                        maxLength={25}
+                        maxLength={30}
                         icon={<FaBoxOpen />}
                     />
                     <Input

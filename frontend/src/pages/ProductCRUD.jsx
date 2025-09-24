@@ -38,10 +38,12 @@ export default function ProductCRUD() {
   }
 
   let user = null;
+  let userId = null
   const token = localStorage.getItem("token");
   if (token) {
     const payload = JSON.parse(atob(token.split('.')[1]));
     user = payload.user
+    userId = payload.id_usuario
   }
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -54,7 +56,10 @@ export default function ProductCRUD() {
         setProductos(prevProductos =>
           prevProductos.filter(p => p && p.id_producto !== id)
         );
-        console.log(res)
+        axios.post("/api/create_notifications.php", {
+          userId: userId,
+          message: "Producto eliminado exitosamente"
+        })
       })
       .catch((err) => console.log(err))
 

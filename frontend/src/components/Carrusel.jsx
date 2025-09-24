@@ -16,8 +16,8 @@ const ChevronRight = ({ className }) => (
 const Carousel = ({
   images = [],
   className = "",
-  draggable = false,      // ✅ Nuevo prop: permite arrastrar con mouse
-  showArrows = false      // ✅ Nuevo prop: muestra siempre las flechas si es true
+  draggable = false,
+  showArrows = false
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [imageError, setImageError] = useState({});

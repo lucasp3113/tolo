@@ -3,9 +3,6 @@ CREATE DATABASE tolo;
 
 USE tolo;
 
-SELECT * from usuarios
-
-
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_usuario VARCHAR(15) NOT NULL UNIQUE,
@@ -21,20 +18,7 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
-DELETE FROM categorias;
-
-SELECT nombre_usuario, contraseña
-FROM usuarios
-WHERE
-    nombre_usuario = "Lucas";
-
-ALTER TABLE imagenes_productos AUTO_INCREMENT = 1;
-
-SELECT * FROM usuarios;
-
-DELETE FROM usuarios WHERE nombre_usuario = "lucas";
-
-SELECT * FROM ecommerces;
+INSERT INTO usuarios(nombre_usuario, email, contraseña, tipo_usuario) VALUES ("admin", "luuucaspereyra31@gmail.com", "admin", "admin");
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -49,7 +33,6 @@ CREATE TABLE rangos (
     porcentaje_comision DECIMAL(4, 2) NOT NULL
 );
 
-SELECT * FROM rangos
 
 INSERT INTO
     rangos (
@@ -63,8 +46,6 @@ VALUES ('junior', 0, 10),
     ('senior', 75000, 4),
     ('elite', 350000, 2)
 
-SELECT * FROM rangos;
-
 CREATE TABLE ecommerces (
     id_ecommerce INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT UNSIGNED UNIQUE,
@@ -77,79 +58,11 @@ CREATE TABLE ecommerces (
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
 
-SELECT * FROM usuarios
-
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_categoria VARCHAR(30) NOT NULL,
     descripcion TEXT DEFAULT NULL
 );
-
-SELECT * FROM productos
-
-SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            p.id_producto = i.id_producto
-        ORDER BY i.id_imagen ASC
-        LIMIT 1
-    ) AS ruta_imagen
-FROM
-    productos p
-    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
-    JOIN categorias c ON c.id_categoria = pc.id_categoria
-    JOIN ecommerces e ON e.nombre_ecommerce = 'Ferreteria'
-WHERE
-    nombre_producto = 'Taladro Tolsen'
-    AND p.id_ecommerce = e.id_ecommerce
-
-SELECT * FROM productos
-
-SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            p.id_producto = i.id_producto
-        ORDER BY i.id_imagen ASC
-        LIMIT 1
-    ) AS ruta_imagen
-FROM
-    productos p
-    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
-    JOIN categorias c ON c.id_categoria = pc.id_categoria
-    JOIN ecommerces e ON e.nombre_ecommerce = 'Ferreteria'
-WHERE
-    nombre_producto = 'Taladro Tolsen'
-    AND p.id_ecommerce = e.id_ecommerce
-    AND c.nombre_categoria = 'Herramientas y Ferreteria'
-    ORDER BY p.precio ASC
-
-SELECT * FROM usuarios
-
-SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            p.id_producto = i.id_producto
-        ORDER BY i.id_imagen ASC
-        LIMIT 1
-    ) AS ruta_imagen
-FROM
-    productos p
-    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
-    JOIN categorias c ON c.id_categoria = pc.id_categoria
-WHERE
-    nombre_producto = "Taladro";
-
-(
-    SELECT i.ruta_imagen
-    FROM imagenes_productos i
-    WHERE
-        p.id_producto = i.id_producto
-    ORDER BY i.id_imagen ASC
-    LIMIT 1
-) AS ruta_imagen
 
 INSERT INTO
     categorias (nombre_categoria, descripcion)
@@ -351,8 +264,6 @@ VALUES (
         'Herramientas disponibles para alquiler'
     );
 
-SELECT * FROM productos
-
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_vendedor INT UNSIGNED NOT NULL,
@@ -367,16 +278,6 @@ CREATE TABLE productos (
     FOREIGN KEY (id_vendedor) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
-
-select * from productos WHERE envio_gratis = 1
-
-delete from compras
-
-SELECT * FROM imagenes_productos;
-
-DELETE FROM imagenes_productos;
-
-SELECT * FROM detalles_compras;
 
 CREATE TABLE productos_categorias (
     id_producto INT UNSIGNED NOT NULL,
@@ -393,43 +294,6 @@ CREATE TABLE imagenes_productos (
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
-SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.stock, c.nombre_categoria, (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            p.id_producto = i.id_producto
-        ORDER BY i.id_imagen ASC
-        LIMIT 1
-    ) AS ruta_imagen
-FROM
-    productos p
-    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
-    JOIN categorias c ON c.id_categoria = pc.id_categoria
-WHERE
-    c.nombre_categoria = 'Bebés y niños'
-ORDER BY p.precio DESC;
-
-SELECT * FROM categorias
-
-SELECT p.nombre_producto, p.id_producto, p.precio, p.stock, i.ruta_imagen
-FROM
-    productos p
-    JOIN imagenes_productos i ON p.id_producto = i.id_producto
-
-SELECT p.nombre_producto, p.precio, p.stock, (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            p.id_producto = i.id_producto
-        ORDER BY i.id_imagen ASC
-        LIMIT 1
-    ) AS ruta_imagen
-FROM productos p
-WHERE
-    id_producto = 91
-
-SELECT * FROM productos
-
 CREATE TABLE compras (
     id_compra INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_cliente INT UNSIGNED NOT NULL,
@@ -444,55 +308,6 @@ CREATE TABLE compras (
     FOREIGN KEY (id_cliente) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
 
-SELECT
-    c.estado,
-    c.id_compra,
-    d.cantidad,
-    d.precio_unitario,
-    p.stock,
-    p.nombre_producto,
-    ca.nombre_categoria,
-    COALESCE(
-        e.nombre_ecommerce,
-        u.nombre_usuario
-    ) AS vendedor,
-    e.logo,
-    (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            i.id_producto = p.id_producto
-        LIMIT 1
-    ) AS ruta_imagen
-FROM
-    compras c
-    JOIN detalles_compras d ON d.id_compra = c.id_compra
-    JOIN productos p ON p.id_producto = d.id_producto
-    LEFT JOIN ecommerces e ON e.id_usuario = p.id_vendedor
-    LEFT JOIN usuarios u ON u.id_usuario = p.id_vendedor
-    JOIN productos_categorias pd ON pd.id_producto = p.id_producto
-    JOIN categorias ca on ca.id_categoria = pd.id_categoria
-WHERE
-    c.id_cliente = 3;
-
-select nombre_categoria from categorias
-
-SELECT * FROM productos
-
-SELECT * FROM ecommerces
-
-ALTER TABLE compras AUTO_INCREMENT = 1;
-
-DELETE FROM compras
-
-SELECT * FROM compras;
-
-SELECT * FROM detalles_compras
-
-SELECT * FROM usuarios
-
-DELETE FROM compras WHERE id_compra = 1
-
 CREATE TABLE detalles_compras (
     id_detalle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_compra INT UNSIGNED NOT NULL,
@@ -501,6 +316,20 @@ CREATE TABLE detalles_compras (
     precio_unitario DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE RESTRICT
+);
+
+CREATE TABLE comentarios_productos (
+    id_comentario INT PRIMARY KEY AUTO_INCREMENT,
+    id_producto INT UNSIGNED NOT NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    rating DECIMAL(2,1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
+    comentario TEXT NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_product (id_usuario, id_producto)
 );
 
 CREATE TABLE metodos_pagos (
@@ -547,7 +376,6 @@ CREATE TABLE notificaciones (
     fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
-
 
 CREATE TABLE colores_producto (
     id_color INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

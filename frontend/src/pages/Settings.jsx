@@ -120,7 +120,7 @@ export default function Settings() {
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
-                        <li className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/notifications/`) : navigate("/notifications/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
                                 <IoNotifications className="text-sky-800 -translate-x-1 mr-2 text-[35px]" />
                                 <h2>Notificaciones</h2>

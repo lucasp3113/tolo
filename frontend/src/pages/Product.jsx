@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import image from "../assets/auris.jpg";
-import ProtectedComponent from "../components/ProtectedComponent"
+import ProtectedComponent from "../components/ProtectedComponent";
 import Rating from "../components/Rating";
 import { useNavigate } from "react-router-dom";
 import Carrusel from "../components/Carrusel";
@@ -13,116 +13,142 @@ import matias from "../assets/matias.jpg";
 import Input from "../components/Input";
 import Form from "../components/Form";
 import { useParams } from "react-router-dom";
+import CommentsSection from "../components/Comments";
 
-export default function Product() {
-  const [idCliente, setIdCliente] = useState(null)
+
+export default function Product(productId) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { id } = useParams();
+
+  const [quantity, setQuantity] = useState(1);
+
+  let userId = null
   const token = localStorage.getItem("token");
+  if (token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    userId = payload.id_usuario
+  }
+
+  function handleAddToCart() {
+    axios.post("/api/add_to_cart.php", {
+      id_client: userId,
+      id_product: id,
+      amount: quantity,
+      price: data.precio
+    })
+      .then((res) => console.log(res))
+      .catch((res) => console.log(res))
+
+  }
 
   useEffect(() => {
-    axios.get(`/api/verify_token.php?token=${token}`)
-      .then((res) => {
-        setIdCliente(res.data.id_usuario)
-        console.log(res)
+    axios
+      .post("/api/show_product.php", {
+        idProducto: id,
       })
-      .catch(err => console.error(err));
-  }, [])
+      .then((res) => {
+        setData(res.data.data);
+        (res);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [id]);
 
-  const { id } = useParams();
-  function addToCart() {
-    axios.post("/api/add_to_cart.php", {
-      "id_product": id,
-      "id_client": idCliente,
-      "amount": 3,
-      "price": 2000
-    })
-      .then(res => console.log(res))
-      .catch(err => console.log(err))
-  }
-  const [selectedAmount, setSelectedAmount] = useState(1);
-  // const [data, setData] = useState(null);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(null);
+  const getAvailableColors = () => {
+    if (!data) return [];
+    if (data.colores) {
+      if (Array.isArray(data.colores)) {
+        return data.colores.map(color => color.nombre);
+      } else {
+        return Object.keys(data.colores);
+      }
+    }
+    return [];
+  };
 
-  // FIX 1: Mover axios dentro de useEffect
-  // useEffect(() => {
-  //   const fetchProduct = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.post("/api/product.php", {
-  //         idProducto: 1
-  //       });
+  const getAvailableSizes = () => {
+    if (!data || !data.colores) return [];
+    if (Array.isArray(data.colores)) return [];
 
-  //       if (response.data.success) {
-  //         setData(response.data.data);
-  //         console.log("Datos del producto:", response.data.data);
-  //       } else {
-  //         setError(response.data.message);
-  //       }
-  //     } catch (err) {
-  //       console.error("Error fetching product:", err);
-  //       setError("Error al cargar el producto");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+    const firstColor = Object.keys(data.colores)[0];
+    if (firstColor && data.colores[firstColor].talles) {
+      return data.colores[firstColor].talles.map(talle => talle.talle);
+    }
+    return [];
+  };
 
-  //   fetchProduct();
-  // }, []); // Solo ejecuta una vez al montar el componente
-  const stock = 100;
-  const caract = "Marca";
-  const valor = "Yamaha";
+  const availableColors = getAvailableColors();
+  const availableSizes = getAvailableSizes();
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState(availableSizes[0] || null);
 
-  const items = [
-    `${caract}: ${valor}`,
-    "Modelo: PSR-EW310",
-    "Teclas: 88",
-    "Consumo: 8W",
-    "Entrada de cable: USB",
-    "Estuche: Sí",
-    "Inalámbrico: Sí",
-  ];
+  useEffect(() => {
+    if (availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0]);
+    }
+  }, [availableColors]);
 
-  const availableColors = ["Blanco", "Negro", "Rojo"];
-  const [selectedColor, setSelectedColor] = useState(availableColors[0]); // Default value
-  const availableSizes = ["XL", "M", "S"];
-  const [selectedSize, setSelectedSize] = useState(null);
-  const showSizes = false;
+  const showSizes = availableSizes.length > 0;
 
-  // FIX 2: Crear colorImages de forma segura
   const getColorImages = () => {
-    // if (!data) return {};
+    if (!data) return {};
 
-    return {
-      // FIX 3: Manejar imagen de BD correctamente
-      // Blanco: data.imagen?.ruta_imagen ? [`/api/${data.imagen.ruta_imagen}`] : [image],
-      Blanco: [
-        "https://m.media-amazon.com/images/I/31bCPm6G7EL._AC_.jpg",
-        "https://m.media-amazon.com/images/I/21AfSg2p9mL._AC_.jpg",
-        "https://m.media-amazon.com/images/I/31WDLQ34cfL._AC_.jpg",
-        "https://m.media-amazon.com/images/I/71FbHNM-JbL._AC_SL1500_.jpg",
-      ],
-      Negro: [
-        "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
-      ],
-      Rojo: [
-        "https://http2.mlstatic.com/D_NQ_NP_638458-MLA82191983612_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_835517-MLA82192156920_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_757803-MLA82191964650_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_809364-MLA82192127900_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_879207-MLA82191964658_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_811094-MLA82191973680_022025-O.webp",
-        "https://http2.mlstatic.com/D_NQ_NP_2X_920028-MLA82191964674_022025-F.webp",
-      ],
-    };
+    if (data.imagenes && Array.isArray(data.imagenes)) {
+      return {
+        default: data.imagenes.map(img => `/api/uploads/products/${img}`)
+      };
+    }
+
+    if (data.colores) {
+      const images = {};
+      if (Array.isArray(data.colores)) {
+        data.colores.forEach(color => {
+          images[color.nombre] = color.imagenes ?
+            color.imagenes.map(img => `/api/uploads/products/${img}`) : [image];
+        });
+      } else {
+        Object.keys(data.colores).forEach(colorName => {
+          images[colorName] = data.colores[colorName].imagenes ?
+            data.colores[colorName].imagenes.map(img => `/api/uploads/products/${img}`) : [image];
+        });
+      }
+      return images;
+    }
+
+    return { default: [image] };
   };
 
   const colorImages = getColorImages();
+
+  const getCurrentStock = () => {
+    if (!data) return 0;
+
+    if (data.stock !== undefined) {
+      return data.stock;
+    }
+
+    if (data.colores && selectedColor) {
+      if (Array.isArray(data.colores)) {
+        const colorData = data.colores.find(color => color.nombre === selectedColor);
+        return colorData?.stock || 0;
+      } else if (data.colores[selectedColor]) {
+        if (selectedSize && data.colores[selectedColor].talles) {
+          const talleData = data.colores[selectedColor].talles.find(talle => talle.talle === selectedSize);
+          return talleData?.stock || 0;
+        }
+        return data.colores[selectedColor].stock || 0;
+      }
+    }
+
+    return 0;
+  };
+
+  const stock = getCurrentStock();
 
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
@@ -139,31 +165,6 @@ export default function Product() {
     }));
   };
 
-  // FIX 4: Mostrar loading/error states
-  // if (loading) {
-  //   return (
-  //     <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
-  //       <p>Cargando producto...</p>
-  //     </div>
-  //   );
-  // }
-
-  // if (error) {
-  //   return (
-  //     <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
-  //       <p className="text-red-500">Error: {error}</p>
-  //     </div>
-  //   );
-  // }
-
-  // if (!data) {
-  //   return (
-  //     <div className="w-[90%] lg:w-[70%] rounded-md flex justify-center bg-white shadow-xl mt-10 p-5 mx-auto">
-  //       <p>No se encontraron datos del producto</p>
-  //     </div>
-  //   );
-  // }
-
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
     window.addEventListener("resize", () => {
@@ -171,117 +172,101 @@ export default function Product() {
     });
   });
 
+  const generateQuantityOptions = () => {
+    const maxQuantity = Math.min(stock, 10);
+    const options = [];
+    for (let i = 1; i <= maxQuantity; i++) {
+      options.push({
+        label: i.toString(),
+        onClick: () => console.log(`Cantidad ${i}`)
+      });
+    }
+    return options;
+  };
+
+  const getCurrentImages = () => {
+
+    if (availableColors.length > 0 && selectedColor) {
+      const images = colorImages[selectedColor] || [image];
+      return images;
+    }
+
+    if (data?.imagenes && Array.isArray(data.imagenes)) {
+      const directImages = data.imagenes.map(img =>
+        img.startsWith('uploads/') ? `/api/${img}` : `/api/uploads/products/${img}`
+      );
+      return directImages;
+    }
+
+    const defaultImages = colorImages.default || [image];
+    return defaultImages;
+  };
+
+  if (loading) return <div className="flex justify-center items-center p-10">Cargando...</div>;
+  if (error) return <div className="flex justify-center items-center p-10 text-red-500">Error al cargar el producto</div>;
+  if (!data) return <div className="flex justify-center items-center p-10">No se encontró el producto</div>;
+
   return (
-    <section>
+    <section className="">
       {width >= 500 ? (
-        <article
-          className={`${width < 500 ? "w-full" : "w-100 m-auto"
-            } w-[90%] lg:w-[70%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-5 mx-auto text-left`}
-        >
-          {/* Columna izquierda (Carrusel + descripción) */}
-          <div className="flex flex-col mr-7 w-full md:w-[60%] lg:w-[65%]">
-            <div className="flex justify-center border-b border-gray-200">
+        <article className="w-[95%] lg:w-[85%] xl:w-[80%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-6 mx-auto text-left gap-8">
+          <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+            <div className="flex justify-center border-b border-gray-200 mb-6">
               <Carrusel
                 autoPlay={false}
                 productData={false}
                 showProductInfo={false}
-                className="w-2xl"
-                images={colorImages[selectedColor] || ["Blanco", "Negro"]}
+                className="w-full max-w-2xl"
+                images={getCurrentImages()}
               />
             </div>
-            <section className="text-gray-700 p-3 border-b border-gray-200">
+            <section className="text-gray-700  p-4 border-b border-gray-200">
               <h1 className="text-3xl mb-5">Descripción</h1>
               <p className="font-semibold text-gray-500 text-xl">
-                Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
-                Electrónico Inteligente con Pedal de Sostenido, Cable de Carga
-                USB, Soporte de Música y Estuche de Transporte - Negro/Blanco
+                {data.descripcion}
               </p>
             </section>
-            <section className="p-3 border-b border-gray-200 flex flex-col">
+            <section className="p-4 border-b border-gray-200 flex flex-col">
               <h1 className="text-3xl mb-5 text-gray-700">
                 Detalles del Producto
               </h1>
               <ul className="[column-count:2] [column-gap:2rem] list-none p-0 m-0">
-                {items.map((item, index) => (
+                {data.caracteristicas?.map((caracteristica, index) => (
                   <div
                     className={`${index % 2 === 0 ? "bg-white" : "bg-[#f0ecec]"
                       }`}
                     key={index}
                   >
                     <li
-                      className={`mb-0 h-12 break-inside-avoid-column flex items-center ml-5`}
+                      className={`mb-0 h-12 break-inside-avoid-column flex items-center pl-5`}
                     >
-                      {item}
+                      {caracteristica}
                     </li>
                   </div>
                 ))}
               </ul>
             </section>
-            <section className="text-gray-700 p-3">
-              <h1 className="text-3xl mb-5">Comentarios</h1>
-              <div className="p-3 rounded-md">
-                <Form
-                  className="w-160! shadow-none!  "
-                  fields={[
-                    <Rating
-                      key="rating"
-                      id="user-rating"
-                      name="rating"
-                      initialRating={ratings.userRating}
-                      onRatingChange={handleRatingChange}
-                      showValue={true}
-                      className="ml-4"
-                    />,
-                    <Input
-                      key="input"
-                      name="comentarios"
-                      type="textarea"
-                      placeholder="Haz una opinión..."
-                      required={true}
-                      minLength={5}
-                      maxLength={300}
-                      className="h-30 w-150!"
-                    />,
-                  ]}
-                  // onSubmit={(data) => console.log(data)}
-                  button={
-                    <ProtectedComponent>
-                      <Button
-                        color="sky"
-                        text="Publicar"
-                        size="md"
-                        className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold ml-4!"
-                      />
-                    </ProtectedComponent>
-                  }
-                />
-              </div>
-            </section>
+
+            <CommentsSection
+              productId={id}
+              currentUser={JSON.parse(
+                localStorage.getItem("user_data") || "null"
+              )}
+            />
           </div>
 
-          {/* Columna derecha (info + botones) */}
-          <div className="flex flex-col items-start w-full md:w-[400px] lg:w-[30%] ml-auto border border-gray-200 rounded-md p-3">
-            <h1 className="text-4xl font-semibold">
-              {/* {data.producto?.nombre_producto ||  */}"Teclado Electrónico
-              Portátil"{/*}}*/}
+          <div className="flex flex-col items-start w-full max-w-[320px] min-w-[280px] border border-gray-200 rounded-md p-6">
+            <h1 className="text-4xl font-quicksand font-black mb-4">
+              {data.nombre_producto}
             </h1>
-            <h2 className="text-4xl mt-6">
-              {/* $ {data.producto?.precio || */}"5.093"{/*}}*/}
-            </h2>
-            <div className="flex items-center gap-2">
-              <Rating
-                id="product-average"
-                value={4.5}
-                readonly={true}
-                showValue={true}
-                size="lg"
-              />
-              <div className="h-5 w-px bg-gray-300 mx-4"></div>
-              <p className="text-sm font-semibold">+50 ventas</p>
+            <div className="flex items-center gap-4 mt-2 mb-6 w-full">
+              <h2 className="text-4xl whitespace-nowrap">{"$ " + data.precio}</h2>
+              <div className="h-6 w-px bg-gray-300"></div>
+              <p className="text-sm font-semibold whitespace-nowrap">0 ventas</p>
             </div>
 
-            {availableColors.length > 1 && (
-              <div className="flex items-center gap-2 my-6 w-full ml-3">
+            {availableColors.length > 0 && (
+              <div className="flex items-center gap-3 my-6 w-full">
                 {availableColors.map((color) => (
                   <button
                     key={color}
@@ -292,7 +277,7 @@ export default function Product() {
                     <img
                       src={colorImages[color]?.[0] || image}
                       alt={color}
-                      className="w-10 h-10 object-cover"
+                      className="w-12 h-12 object-cover"
                     />
                     {selectedColor === color && (
                       <div className="absolute inset-0 rounded-md ring-2 ring-blue-500 pointer-events-none"></div>
@@ -302,8 +287,8 @@ export default function Product() {
               </div>
             )}
 
-            {showSizes === true && (
-              <div className="flex items-center gap-2 my-6 w-full ml-3">
+            {showSizes && (
+              <div className="flex items-center gap-3 my-6 w-full flex-wrap">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
@@ -319,90 +304,70 @@ export default function Product() {
               </div>
             )}
 
-            <div className="flex items-center gap-2 my-6 w-full ml-3">
-              {availableSizes.map((size) => (
-                <button
-                  key={size}
-                  className={`px-4 py-2 border rounded-md ${selectedSize === size
-                    ? "border-blue-500 bg-blue-50 text-blue-600"
-                    : "border-gray-300 bg-white"
-                    }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex justify-between items-center w-full my-2">
-              <div className="flex w-full">
-                <p className="mt-[0.46rem] mr-2">Cantidad:</p>
+            <div className="flex justify-between items-center w-full my-4">
+              <div className="flex items-center gap-3">
+                <p className="text-base">Cantidad:</p>
                 <Dropdown
                   showSelectedAsTitle={true}
                   hoverActivation={false}
                   border={true}
                   defaultSelectedIndex={0}
-                  stock={55}
-                  options={[
-                    { label: "1", onClick: () => setSelectedAmount(1) },
-                    { label: "2", onClick: () => setSelectedAmount(2) },
-                    { label: "3", onClick: () => setSelectedAmount(3) },
-                    { label: "4", onClick: () => setSelectedAmount(4) },
-                    { label: "5", onClick: () => setSelectedAmount(5) },
-                    { label: "6", onClick: () => setSelectedAmount(6) },
-                  ]}
+                  stock={stock}
+                  options={generateQuantityOptions()}
                   onSelectionChange={(selectedOption) =>
                     console.log("Seleccionado:", selectedOption)
                   }
                 />
               </div>
               <div>
-                <p className="text-sm text-gray-500">
-                  {/*data.producto?.stock ||*/} 100 disponibles
+                <p className="text-sm ml-0.5 text-gray-500 whitespace-nowrap">
+                  {stock + " disponibles"}
                 </p>
               </div>
             </div>
 
-            <ProtectedComponent>
-              <Button
-                color="sky"
-                text="Comprar ahora"
-                className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-[15rem] h-[3rem]"
-              />
-            </ProtectedComponent>
+            <div className="flex flex-col gap-3 w-full mt-6">
+              <ProtectedComponent>
+                <Button
+                  color="sky"
+                  text="Comprar ahora"
+                  className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                />
+              </ProtectedComponent>
 
-            <ProtectedComponent>
-              <Button
-                color="sky"
-                onClick={() => addToCart()}
-                theme="blue"
-                text="Añadir al carrito"
-                className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-[15rem] h-[3rem] mt-2"
-              />
-            </ProtectedComponent>
-            <section className="flex justify-center mt-5">
-              <div>
-                <img src={matias} alt="" className="mr-6 w-10 rounded-full" />
-              </div>
-              <div className="flex flex-col">
-                <span>
-                  Vendido por:{" "}
-                  <button
-                    className="cursor-pointer text-sky-600"
-                    onClick={() => navigate("/seller_dashboard/")}
-                  >
-                    El Letra
-                  </button>{" "}
-                </span>
+              <ProtectedComponent>
+                <Button
+                  color="sky"
+                  onClick={() => handleAddToCart()}
+                  theme="blue"
+                  text="Añadir al carrito"
+                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                />
+              </ProtectedComponent>
+            </div>
+
+            <section className="flex items-center justify-center mt-6 w-full">
+              <div className="flex items-center gap-4">
+                <img src={matias} alt="" className="w-10 h-10 rounded-full" />
+                <div className="flex flex-col">
+                  <span>
+                    Vendido por:{" "}
+                    <button
+                      className="cursor-pointer text-sky-600"
+                      onClick={() => navigate("/seller_dashboard/")}
+                    >
+                      El Letra
+                    </button>{" "}
+                  </span>
+                </div>
               </div>
             </section>
           </div>
         </article>
       ) : (
-        <article className="rounded-md flex flex-col justify-between bg-white shadow-xl p-5 mx-auto text-left w-full max-w-full overflow-hidden sm:p-5">
-          {/* Columna izquierda (Carrusel + descripción) */}
-          <div className="flex flex-col mr-7 w-[50%]">
-            <div className="flex items-center gap-2 w-full justify-between mb-2">
+        <article className="rounded-md flex flex-col justify-between bg-white shadow-xl p-5 mx-auto text-left w-full max-w-full overflow-hidden">
+          <div className="flex flex-col w-full">
+            <div className="flex items-center gap-2 w-full justify-between mb-4">
               <Rating
                 id="product-average"
                 value={4.5}
@@ -413,28 +378,25 @@ export default function Product() {
               />
               <p className="text-sm font-semibold text-gray-400">+50 ventas</p>
             </div>
-            <h1 className="text-lg font-semibold self-center">
-              {/* {data.producto?.nombre_producto ||  */}Teclado Electrónico
-              Portátil CON TODA LA MANDOLE DEL MUHNDO AYHI CON TUCO{/*}}*/}
+            <h1 className="text-2xl font-black font-quicksand text-center mb-4">
+              {data.nombre_producto}
             </h1>
-            <div className="flex justify-center">
+            <div className="flex justify-center mb-6">
               <Carrusel
                 autoPlay={false}
                 productData={false}
                 showProductInfo={false}
                 draggable={true}
                 showArrows={true}
-                className="w-2xl"
-                images={colorImages[selectedColor] || [image]}
+                className="w-full"
+                images={getCurrentImages()}
               />
             </div>
-            <div className="flex flex-col items-start w-full md:w-[40%] lg:w-[30%] ml-auto rounded-md p-3">
-              <h2 className="text-2xl mt-6">
-                {/* $ {data.producto?.precio || */}"5.093"{/*}}*/}
-              </h2>
+            <div className="flex flex-col items-start w-full p-4 border border-gray-200 rounded-md">
+              <h2 className="text-2xl font-semibold mb-4">{"$ " + data.precio}</h2>
 
-              {availableColors.length > 1 && (
-                <div className="flex items-center gap-2 my-6 w-full ml-3">
+              {availableColors.length > 0 && (
+                <div className="flex items-center gap-3 my-4 w-full">
                   {availableColors.map((color) => (
                     <button
                       key={color}
@@ -455,8 +417,8 @@ export default function Product() {
                 </div>
               )}
 
-              {showSizes === true && (
-                <div className="flex items-center gap-2 my-6 w-full ml-3">
+              {showSizes && (
+                <div className="flex items-center gap-2 my-4 w-full flex-wrap">
                   {availableSizes.map((size) => (
                     <button
                       key={size}
@@ -472,151 +434,92 @@ export default function Product() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 my-6 w-full ml-3">
-                {availableSizes.map((size) => (
-                  <button
-                    key={size}
-                    className={`px-4 py-2 border rounded-md ${selectedSize === size
-                      ? "border-blue-500 bg-blue-50 text-blue-600"
-                      : "border-gray-300 bg-white"
-                      }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex justify-between items-center w-full my-2">
-                <div className="flex w-full">
-                  <p className="mt-[0.46rem] mr-2 ml-4">Cantidad:</p>
+              <div className="flex justify-between items-center w-full my-4">
+                <div className="flex items-center gap-3">
+                  <p className="text-base">Cantidad:</p>
                   <Dropdown
                     showSelectedAsTitle={true}
                     hoverActivation={false}
                     border={true}
                     defaultSelectedIndex={0}
                     max={stock}
-                    options={[
-                      { label: "1", onClick: () => console.log("Opción 1") },
-                      { label: "2", onClick: () => console.log("Opción 2") },
-                      { label: "3", onClick: () => console.log("Opción 3") },
-                      { label: "4", onClick: () => console.log("Opción 4") },
-                      { label: "5", onClick: () => console.log("Opción 5") },
-                      { label: "6", onClick: () => console.log("Opción 6") },
-                    ]}
+                    options={generateQuantityOptions()}
                     onSelectionChange={(selectedOption) =>
                       console.log("Seleccionado:", selectedOption)
                     }
                   />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">
-                    {/*data.producto?.stock ||*/} {stock} disponibles
-                  </p>
+                  <p className="text-sm text-gray-500">{stock} disponibles</p>
                 </div>
               </div>
 
-              <ProtectedComponent>
-                <Button
-                  color="sky"
-                  text="Comprar ahora"
-                  className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem]"
-                />
-              </ProtectedComponent>
+              <div className="flex flex-col gap-3 w-full mt-4">
+                <ProtectedComponent>
+                  <Button
+                    color="sky"
+                    text="Comprar ahora"
+                    className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                  />
+                </ProtectedComponent>
 
-              <ProtectedComponent>
-                <Button
-                  color="sky"
-                  onClick={() => addToCart()}
-                  theme="blue"
-                  text="Añadir al carrito"
-                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] mt-2"
-                />
-              </ProtectedComponent>
-              <section className="flex justify-center mt-5">
-                <div>
-                  <img src={matias} alt="" className="mr-6 w-10 rounded-full" />
-                </div>
-                <div className="flex flex-col">
-                  <span>
-                    Vendido por:{" "}
-                    <button
-                      className="cursor-pointer text-sky-600"
-                      onClick={() => navigate("/seller_dashboard/")}
-                    >
-                      El Letra
-                    </button>{" "}
-                  </span>
+                <ProtectedComponent>
+                  <Button
+                    color="sky"
+                    onClick={() => handleAddToCart()}
+                    theme="blue"
+                    text="Añadir al carrito"
+                    className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                  />
+                </ProtectedComponent>
+              </div>
+
+              <section className="flex items-center justify-center mt-5 w-full">
+                <div className="flex items-center gap-4">
+                  <img src={matias} alt="" className="w-10 h-10 rounded-full" />
+                  <div className="flex flex-col">
+                    <span>
+                      Vendido por:{" "}
+                      <button
+                        className="cursor-pointer text-sky-600"
+                        onClick={() => navigate("/seller_dashboard/")}
+                      >
+                        El Letra
+                      </button>{" "}
+                    </span>
+                  </div>
                 </div>
               </section>
             </div>
-            <section className="text-gray-700 p-3 border-b border-gray-200">
+
+            <section className="text-gray-700 p-4 border-b border-gray-200 mt-6">
               <h1 className="text-2xl mb-5">Descripción</h1>
-              <p className="font-semibold text-gray-500 text-md">
-                Piano Portátil de Teclado Dual Plegable de 88 Teclas - Teclado
-                Electrónico Inteligente con Pedal de Sostenido, Cable de Carga
-                USB, Soporte de Música y Estuche de Transporte - Negro/Blanco
+              <p className="font-semibold max-w-84 break-words text-gray-500 text-md">
+                {data.descripcion}
               </p>
             </section>
-            <section className="p-3 border-b border-gray-200 flex flex-col">
+            <section className="p-4 border-b border-gray-200 flex flex-col">
               <h1 className="text-2xl mb-5 text-gray-700">
                 Detalles del Producto
               </h1>
               <ul className="[column-count:2] [column-gap:2rem] list-none p-0 m-0">
-                {items.map((item, index) => (
+                {data.caracteristicas?.map((caracteristica, index) => (
                   <div
                     className={`${index % 2 === 0 ? "bg-white" : "bg-[#f0ecec]"
                       }`}
                     key={index}
                   >
                     <li
-                      className={`mb-0 h-12 break-inside-avoid-column flex items-center ml-5`}
+                      className={`mb-0 h-12 break-inside-avoid-column flex items-center pl-5`}
                     >
-                      {item}
+                      {caracteristica}
                     </li>
                   </div>
                 ))}
               </ul>
             </section>
-            <section className="text-gray-700 p-3 w-full">
-              <h1 className="text-2xl mb-5">Comentarios</h1>
-              <div className="p-3 rounded-md mb-15 w-full">
-                <Form
-                  className="w-[400px] -translate-x-10 p-0 shadow-none!"
-                  fields={[
-                    <Rating
-                      key="rating"
-                      id="user-rating"
-                      name="rating"
-                      initialRating={ratings.userRating}
-                      onRatingChange={handleRatingChange}
-                      showValue={true}
-                      className="ml-4"
-                    />,
-                    <Input
-                      key="input"
-                      name="comentarios"
-                      type="textarea"
-                      placeholder="Haz una opinión..."
-                      required={true}
-                      minLength={5}
-                      maxLength={300}
-                      className="h-15 w-full!"
-                    />,
-                  ]}
-                  button={
-                    <ProtectedComponent>
-                      <Button
-                        color="sky"
-                        text="Publicar"
-                        size="md"
-                        className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold ml-4!"
-                      />
-                    </ProtectedComponent>
-                  }
-                />
-              </div>
-            </section>
+
+            <CommentsSection productId={id} currentUserId={currentUserId} />
           </div>
         </article>
       )}

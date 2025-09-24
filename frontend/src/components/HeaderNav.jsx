@@ -52,10 +52,8 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     axios.post("/api/type_user.php", { usuario: user })
       .then((res) => {
         setUserType(res.data.user_type?.toLowerCase())
-        setUserTypeForAdmin(res.data.user_type)
-        console.log(res.data.user_type)
+        setUserTypeForAdmin && setUserTypeForAdmin(res.data.user_type)
       })
-      .catch(err => console.error("Error al obtener datos del usuario:", err));
   }, [user]);
 
   useEffect(() => {
@@ -86,6 +84,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
       .then(res => {
         setWord(dataForm.search);
         setSearchData(res.data.data);
+        console.log(res)
         const categories = [];
         res.data.data?.forEach(e => {
           if (!categories.includes(e.nombre_categoria)) categories.push(e.nombre_categoria);

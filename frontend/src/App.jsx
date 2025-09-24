@@ -20,6 +20,7 @@ import AdminPanel from './pages/AdminPanel';
 import ChangeUser from './pages/ChangeUser';
 import ChangeEcommerce from './pages/ChangeEcommerce';
 import ProfilePicture from './pages/ProfilePicture';
+import Notifications from './pages/Notifications';
 
 
 function App() {
@@ -67,6 +68,16 @@ function App() {
                   <Layout >
                     <ProtectedRoute>
                       <SellerDashboard />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+              <Route
+                path="/:ecommerce?/notifications/"
+                element={
+                  <Layout >
+                    <ProtectedRoute>
+                      <Notifications />
                     </ProtectedRoute>
                   </Layout>
                 }
