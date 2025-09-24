@@ -406,3 +406,69 @@ CREATE TABLE caracteristicas_producto(
     caracteristica VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
+SELECT * FROM imagenes_color_producto
+
+--Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
+INSERT INTO usuarios (id_usuario, nombre_usuario, email, contraseña, tipo_usuario, fecha_registro, estado)
+VALUES
+    (1, 'Ferreteria', 'ferreteria@gmail.com', '12345678P_', 'ecommerce', '2025-09-24 01:02:59', 1),
+    (2, 'admin', 'luuucaspereyra31@gmail.com', '12345678P_', 'admin', '2025-09-24 01:05:13', 1),
+    (3, 'BohemianDesign', 'bohemian@gmail.com', '12345678P_', 'ecommerce', '2025-09-24 01:11:54', 1),
+    (4, 'Cliente', 'cliente@gmail.com', '12345678P_', 'cliente', '2025-09-24 01:35:30', 1);
+
+INSERT INTO ecommerces (id_ecommerce, id_usuario, nombre_ecommerce, descripcion, rango_actual, facturacion_acumulada)
+VALUES
+    (1, 1, 'LaFerre', NULL, 1, 0),
+    (2, 3, 'Bohemian Design', NULL, 1, 0);
+
+INSERT INTO productos 
+(id_producto, id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock, envio_gratis, fecha_publicacion, estado)
+VALUES
+(1, 1, 1, 'Taladro Trupper', NULL, 1000.00, 1000, 1, '2025-09-24 01:03:32', 1),
+(2, 1, 1, 'Taladro DrWalt', 'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.', 500.00, 100, 1, '2025-09-24 01:06:32', 1),
+(3, 1, 1, 'Taladro Tolsen', 'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.', 4000.00, 20, 0, '2025-09-24 01:08:48', 1),
+(4, 1, 1, 'Taladro Total', 'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.', 2300.00, 1000, 0, '2025-09-24 01:10:41', 1),
+(5, 3, 2, 'Pantalon Black Gastado', 'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look', 3250.00, NULL, 1, '2025-09-24 01:12:54', 1),
+(9, 3, 2, 'Pantalon BAGGY Jean Claro', 'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu lookPantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look', 4000.00, NULL, 0, '2025-09-24 01:30:00', 1),
+(10, 3, 2, 'Pantalon BAGGY Cargo Arena', 'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look', 3800.00, NULL, 0, '2025-09-24 01:32:34', 1);
+
+
+INSERT INTO colores_producto (id_color, id_producto, nombre, stock)
+VALUES
+    (1, 5, 'Negro Gastado', NULL),
+    (4, 9, 'Claro', NULL),
+    (5, 10, 'Arena', NULL);
+
+
+INSERT INTO talles_color_producto (id_talle_color_producto, id_color, talle, stock)
+VALUES
+    (1, 1, 'M', 100),
+    (2, 1, 'L', 100),
+    (3, 1, 'XL', 1000),
+    (9, 4, 'M', 30),
+    (10, 4, 'L', 50),
+    (11, 4, 'XL', 35),
+    (12, 5, 'M', 30),
+    (13, 5, 'L', 58),
+    (14, 5, 'XL', 10);
+
+INSERT INTO imagenes_productos (id_imagen, id_producto, ruta_imagen)
+VALUES
+    (1, 1, 'uploads/products/68d36d9414373_1758686612.png'),
+    (2, 2, 'uploads/products/68d36e488a33a_1758686792.jpg'),
+    (3, 3, 'uploads/products/68d36ed02448a_1758686928.jpg'),
+    (4, 4, 'uploads/products/68d36f41e215c_1758687041.jpg');
+
+INSERT INTO imagenes_color_producto (id_imagen_color_producto, id_color, ruta_imagen)
+VALUES
+    (1, 1, 'color_1_68d36fe9b7f1a.png'),
+    (2, 1, 'color_1_68d36fe9b9138.png'),
+    (3, 1, 'color_1_68d36fe9b9e38.png'),
+    (4, 1, 'color_1_68d36fe9bad4a.png'),
+    (12, 4, 'color_4_68d373e800294.png'),
+    (13, 4, 'color_4_68d373e801101.png'),
+    (14, 4, 'color_4_68d373e801e62.png'),
+    (15, 5, 'color_5_68d374b1428c1.png'),
+    (16, 5, 'color_5_68d374b144366.png'),
+    (17, 5, 'color_5_68d374b1484cf.png');
