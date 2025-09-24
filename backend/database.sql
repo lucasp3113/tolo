@@ -18,8 +18,6 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
-INSERT INTO usuarios(nombre_usuario, email, contraseña, tipo_usuario) VALUES ("admin", "luuucaspereyra31@gmail.com", "admin", "admin");
-
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_rango ENUM(
@@ -87,7 +85,7 @@ VALUES (
         'Prendas de vestir para niñas'
     ),
     (
-        'Rop unisex',
+        'Ropa unisex',
         'Prendas de vestir para cualquier género'
     ),
     (
@@ -407,15 +405,18 @@ CREATE TABLE caracteristicas_producto(
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
-SELECT * FROM imagenes_color_producto
+-- Verifica qué se insertó realmente
+SELECT * FROM usuarios;
+SELECT * FROM ecommerces;
+SELECT * FROM productos;
 
 --Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
 INSERT INTO usuarios (id_usuario, nombre_usuario, email, contraseña, tipo_usuario, fecha_registro, estado)
 VALUES
-    (1, 'Ferreteria', 'ferreteria@gmail.com', '12345678P_', 'ecommerce', '2025-09-24 01:02:59', 1),
-    (2, 'admin', 'luuucaspereyra31@gmail.com', '12345678P_', 'admin', '2025-09-24 01:05:13', 1),
-    (3, 'BohemianDesign', 'bohemian@gmail.com', '12345678P_', 'ecommerce', '2025-09-24 01:11:54', 1),
-    (4, 'Cliente', 'cliente@gmail.com', '12345678P_', 'cliente', '2025-09-24 01:35:30', 1);
+    (1, 'Ferreteria', 'ferreteria@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'ecommerce', '2025-09-24 01:02:59', 1),
+    (2, 'admin', 'luuucaspereyra31@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'admin', '2025-09-24 01:05:13', 1),
+    (3, 'BohemianDesign', 'bohemian@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'ecommerce', '2025-09-24 01:11:54', 1),
+    (4, 'Cliente', 'cliente@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'cliente', '2025-09-24 01:35:30', 1);
 
 INSERT INTO ecommerces (id_ecommerce, id_usuario, nombre_ecommerce, descripcion, rango_actual, facturacion_acumulada)
 VALUES
@@ -472,3 +473,13 @@ VALUES
     (15, 5, 'color_5_68d374b1428c1.png'),
     (16, 5, 'color_5_68d374b144366.png'),
     (17, 5, 'color_5_68d374b1484cf.png');
+
+INSERT INTO productos_categorias (id_producto, id_categoria)
+VALUES 
+    (1, 14),
+    (2, 14),
+    (3, 14),
+    (4, 14),
+    (5, 2),
+    (9, 2),
+    (10, 2);
