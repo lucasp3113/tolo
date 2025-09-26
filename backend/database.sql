@@ -55,6 +55,13 @@ CREATE TABLE ecommerces (
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
 
+SELECT * FROM ecommerces
+
+SELECT e.logo
+         FROM ecommerces e
+         JOIN usuarios u ON u.id_usuario = e.id_usuario
+         WHERE u.nombre_usuario = 'Ferreteria'
+
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_categoria VARCHAR(30) NOT NULL,

@@ -117,7 +117,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           )}
 
           <section className={`${cart ? "justify-start" : "justify-center"} w-full flex items-center `}>
-            <h2 className={`${cart ? "text-xl -translate-y-8 font-semibold" : "text-lg font-medium"}  text-gray-900 line-clamp-2 leading-tight`}>{name}</h2>
+            <h2 className={`${cart ? "-translate-y-8 font-semibold" : "text-xl font-medium"}  text-gray-900 line-clamp-2 leading-tight font-semibold font-quicksand`}>{name}</h2>
           </section>
 
           <section className={`flex ${cart ? "translate-y-6 justify-between" : "justify-center"}`}>

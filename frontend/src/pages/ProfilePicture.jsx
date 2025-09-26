@@ -4,10 +4,8 @@ import Input from '../components/Input'
 import axios from 'axios'
 import { FaCircleUser } from "react-icons/fa6";
 import Button from '../components/Button';
-import { useParams } from 'react-router-dom';
 
 export default function ProfilePicture() {
-    const {ecommerce: nameEcommerce} = useParams()
     const [profilePicture, setProfilePicture] = useState(null)
     const [preview, setPreview] = useState(null)
 
@@ -17,12 +15,10 @@ export default function ProfilePicture() {
         const payload = JSON.parse(atob(token.split('.')[1]));
         user = payload.user
     }
-
-    // Cargar imagen de perfil actual
     useEffect(() => {
-        axios.post("/api/show_profile_picture.php", { nameEcommerce })
+        axios.post("/api/show_profile_picture.php", { user })
             .then((res) => {
-                setProfilePicture(res.data.logo)
+                setProfilePicture(res.data.logo.logo)
                 console.log(res)
             })
             .catch((err) => console.log(err))
@@ -50,8 +46,8 @@ export default function ProfilePicture() {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
             .then(res => {
-                setProfilePicture(res.data.logo)
-                setPreview(null)
+                setProfilePicture(res.data.logo.logo)
+                console.log(res)
             })
             .catch(err => console.log(err))
         }

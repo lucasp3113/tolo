@@ -99,7 +99,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     <header className="bg-sky-800 relative h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between">
       {logo ? (
         <div
-          className="flex items-center justify-center w-24 h-12 sm:w-32 sm:h-16 md:w-25 lg:w-25 md:h-20 cursor-pointer"
+          className="flex items-center justify-center w-24 h-full sm:w-32 sm:h-16 md:w-25 lg:w-25 md:h-full cursor-pointer"
           onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")}
         >
           {logoLoaded ? (
@@ -107,10 +107,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo}
               alt="Logo"
               loading="lazy"
-              className={`${windowWidth < 500 && "scale-105"} ml-2 w-full h-auto object-contain`}
+              className={`${!logoEcommerce && "scale-200"} ml-2 w-full h-full object-contain`}
             />
           ) : (
-            <img src={logoTolo} alt="Logo" className="w-full h-auto object-contain" />
+            <img src={logoTolo} alt="Logo" className="w-full scale-200 h-full object-contain" />
           )}
         </div>
 

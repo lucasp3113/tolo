@@ -44,6 +44,7 @@ const CommentsSection = ({ productId }) => {
     try {
       const response = await axios.get(`/api/show_comments.php?productId=${productId}`);
       if (response.data.success) {
+        console.log(response.data)
         setComments(response.data.comments || []);
         setStats(response.data.stats || { total_comentarios: 0, promedio_rating: 0 });
       }
@@ -278,8 +279,8 @@ const CommentsSection = ({ productId }) => {
                 size="md"
                 type="submit"
                 disabled={isSubmitting || !rating || rating === 0}
-                className={`bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${
-                  isSubmitting || !rating ? "opacity-50 cursor-not-allowed" : ""
+                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${
+                  isSubmitting || !rating ? " cursor-not-allowed" : ""
                 }`}
               />
             </ProtectedComponent>

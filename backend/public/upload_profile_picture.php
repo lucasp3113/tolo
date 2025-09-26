@@ -16,6 +16,61 @@ if ($data_base->connect_error) {
     exit;
 }
 
+function processImage($source_path, $destination_path, $max_width = 512) {
+    $image_info = getimagesize($source_path);
+    if (!$image_info) {
+        return false;
+    }
+    
+    $mime_type = $image_info['mime'];
+    $original_width = $image_info[0];
+    $original_height = $image_info[1];
+    
+    switch ($mime_type) {
+        case 'image/jpeg':
+        case 'image/jpg':
+            $source_image = imagecreatefromjpeg($source_path);
+            break;
+        case 'image/png':
+            $source_image = imagecreatefrompng($source_path);
+            break;
+        default:
+            return false;
+    }
+    
+    if (!$source_image) {
+        return false;
+    }
+
+    if ($original_width > $max_width) {
+        $new_width = $max_width;
+        $new_height = intval(($original_height * $max_width) / $original_width);
+    } else {
+        $new_width = $original_width;
+        $new_height = $original_height;
+    }
+    
+    $resized_image = imagecreatetruecolor($new_width, $new_height);
+    
+    if ($mime_type == 'image/png') {
+        imagealphablending($resized_image, false);
+        imagesavealpha($resized_image, true);
+    }
+    imagecopyresampled(
+        $resized_image, $source_image,
+        0, 0, 0, 0,
+        $new_width, $new_height,
+        $original_width, $original_height
+    );
+    
+    $result = imagewebp($resized_image, $destination_path, 85);
+    
+    imagedestroy($source_image);
+    imagedestroy($resized_image);
+    
+    return $result;
+}
+
 if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
     $username = $_POST['user'];
     $file = $_FILES['profilePicture'];
@@ -28,7 +83,11 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
         echo json_encode(["success" => false, "message" => "Error al subir la imagen"]);
         exit;
     }
-    if (!in_array($file['type'], $allowed_types)) {
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $actual_mime = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    
+    if (!in_array($actual_mime, $allowed_types)) {
         http_response_code(400);
         echo json_encode(["success" => false, "message" => "Formato no permitido. Solo PNG y JPG"]);
         exit;
@@ -38,12 +97,16 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
         echo json_encode(["success" => false, "message" => "La imagen es demasiado grande"]);
         exit;
     }
+    if (!function_exists('imagewebp')) {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "El servidor no soporta WebP"]);
+        exit;
+    }
+    
     $upload_dir = "uploads/profile_pictures/";
     if (!file_exists($upload_dir))
         mkdir($upload_dir, 0777, true);
-
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $unique_name = uniqid() . '_' . time() . '.' . $extension;
+    $unique_name = uniqid() . '_' . time() . '.webp';
     $file_path = $upload_dir . $unique_name;
     $query = $data_base->prepare("
         SELECT e.logo 
@@ -55,7 +118,7 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
     $query->execute();
     $result = $query->get_result()->fetch_assoc();
     $current_logo = $result['logo'] ?? null;
-    if (move_uploaded_file($file['tmp_name'], $file_path)) {
+    if (processImage($file['tmp_name'], $file_path, 512)) {
         $query_update = $data_base->prepare("
             UPDATE ecommerces e
             JOIN usuarios u ON e.id_usuario = u.id_usuario
@@ -72,19 +135,20 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
             http_response_code(200);
             echo json_encode([
                 "success" => true,
-                "message" => "Foto de perfil guardada exitosamente",
-                "logo" => $file_path
+                "message" => "Foto de perfil procesada y guardada exitosamente",
+                "logo" => $file_path,
+                "format" => "webp"
             ]);
             exit;
         } else {
-            unlink($file_path); // eliminar imagen si falla la base de datos
+            unlink($file_path); 
             http_response_code(500);
             echo json_encode(["success" => false, "message" => "Error al actualizar la base de datos"]);
             exit;
         }
     } else {
         http_response_code(500);
-        echo json_encode(["success" => false, "message" => "Error al mover la imagen al servidor"]);
+        echo json_encode(["success" => false, "message" => "Error al procesar la imagen"]);
         exit;
     }
 
