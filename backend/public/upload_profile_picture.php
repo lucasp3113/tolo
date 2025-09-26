@@ -16,7 +16,57 @@ if ($data_base->connect_error) {
     exit;
 }
 
-function processImage($source_path, $destination_path, $max_width = 512) {
+function removeBackground($source_image, $tolerance = 30) {
+    $width = imagesx($source_image);
+    $height = imagesy($source_image);
+    
+    $new_image = imagecreatetruecolor($width, $height);
+    imagesavealpha($new_image, true);
+    $transparency = imagecolorallocatealpha($new_image, 0, 0, 0, 127);
+    imagefill($new_image, 0, 0, $transparency);
+    
+    $corners = [
+        imagecolorat($source_image, 0, 0),
+        imagecolorat($source_image, $width-1, 0),
+        imagecolorat($source_image, 0, $height-1),
+        imagecolorat($source_image, $width-1, $height-1)
+    ];
+    
+    $bg_colors = [];
+    foreach ($corners as $corner_color) {
+        $bg_colors[] = [
+            'r' => ($corner_color >> 16) & 0xFF,
+            'g' => ($corner_color >> 8) & 0xFF,
+            'b' => $corner_color & 0xFF
+        ];
+    }
+    
+    for ($x = 0; $x < $width; $x++) {
+        for ($y = 0; $y < $height; $y++) {
+            $current_color = imagecolorat($source_image, $x, $y);
+            $current_r = ($current_color >> 16) & 0xFF;
+            $current_g = ($current_color >> 8) & 0xFF;
+            $current_b = $current_color & 0xFF;
+            
+            $is_background = false;
+            foreach ($bg_colors as $bg_color) {
+                $diff = abs($current_r - $bg_color['r']) + abs($current_g - $bg_color['g']) + abs($current_b - $bg_color['b']);
+                if ($diff <= $tolerance) {
+                    $is_background = true;
+                    break;
+                }
+            }
+            
+            if (!$is_background) {
+                imagesetpixel($new_image, $x, $y, $current_color);
+            }
+        }
+    }
+    
+    return $new_image;
+}
+
+function processImage($source_path, $destination_path, $max_width = 512, $remove_bg = false) {
     $image_info = getimagesize($source_path);
     if (!$image_info) {
         return false;
@@ -34,12 +84,21 @@ function processImage($source_path, $destination_path, $max_width = 512) {
         case 'image/png':
             $source_image = imagecreatefrompng($source_path);
             break;
+        case 'image/webp':
+            $source_image = imagecreatefromwebp($source_path);
+            break;
         default:
             return false;
     }
     
     if (!$source_image) {
         return false;
+    }
+
+    if ($remove_bg) {
+        $bg_removed_image = removeBackground($source_image);
+        imagedestroy($source_image);
+        $source_image = $bg_removed_image;
     }
 
     if ($original_width > $max_width) {
@@ -52,10 +111,11 @@ function processImage($source_path, $destination_path, $max_width = 512) {
     
     $resized_image = imagecreatetruecolor($new_width, $new_height);
     
-    if ($mime_type == 'image/png') {
-        imagealphablending($resized_image, false);
-        imagesavealpha($resized_image, true);
-    }
+    imagealphablending($resized_image, false);
+    imagesavealpha($resized_image, true);
+    $transparency = imagecolorallocatealpha($resized_image, 0, 0, 0, 127);
+    imagefill($resized_image, 0, 0, $transparency);
+    
     imagecopyresampled(
         $resized_image, $source_image,
         0, 0, 0, 0,
@@ -74,8 +134,9 @@ function processImage($source_path, $destination_path, $max_width = 512) {
 if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
     $username = $_POST['user'];
     $file = $_FILES['profilePicture'];
+    $remove_background = isset($_POST['removeBg']) && $_POST['removeBg'] === 'true';
 
-    $allowed_types = ['image/jpeg', 'image/jpg', 'image/png'];
+    $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     $max_size = 5 * 1024 * 1024;
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -89,7 +150,7 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
     
     if (!in_array($actual_mime, $allowed_types)) {
         http_response_code(400);
-        echo json_encode(["success" => false, "message" => "Formato no permitido. Solo PNG y JPG"]);
+        echo json_encode(["success" => false, "message" => "Formato no permitido. Solo PNG, WEBP y JPG", "d"=> $actual_mime]);
         exit;
     }
     if ($file['size'] > $max_size) {
@@ -118,7 +179,7 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
     $query->execute();
     $result = $query->get_result()->fetch_assoc();
     $current_logo = $result['logo'] ?? null;
-    if (processImage($file['tmp_name'], $file_path, 512)) {
+    if (processImage($file['tmp_name'], $file_path, 512, $remove_background)) {
         $query_update = $data_base->prepare("
             UPDATE ecommerces e
             JOIN usuarios u ON e.id_usuario = u.id_usuario
@@ -137,7 +198,8 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
                 "success" => true,
                 "message" => "Foto de perfil procesada y guardada exitosamente",
                 "logo" => $file_path,
-                "format" => "webp"
+                "format" => "webp",
+                "background_removed" => $remove_background
             ]);
             exit;
         } else {
@@ -156,4 +218,3 @@ if (!empty($_POST['user']) && isset($_FILES['profilePicture'])) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "No se recibió usuario o archivo"]);
 }
-?>

@@ -59,8 +59,8 @@ SELECT * FROM ecommerces
 
 SELECT e.logo
          FROM ecommerces e
-         JOIN usuarios u ON u.id_usuario = e.id_usuario
-         WHERE u.nombre_usuario = 'Ferreteria'
+         WHERE e.nombre_ecommerce = 'HyM'
+
 
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

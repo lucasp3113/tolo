@@ -11,23 +11,31 @@ $data_base = new mysqli(
 );
 if ($data_base) {
     $body = json_decode(file_get_contents("php://input"), true);
-    $query = $data_base->prepare(
-        "SELECT e.logo
+    if (isset($body["user"])) {
+        $query_text = "SELECT e.logo
          FROM ecommerces e
          JOIN usuarios u ON u.id_usuario = e.id_usuario
-         WHERE u.nombre_usuario = ?");
-    $query->bind_param("s", $body["user"]);
-    if($query->execute()) {
+         WHERE u.nombre_usuario = ?";
+        $var_use = $body["user"];
+    } elseif (isset($body["nameEcommerce"])) {
+        $query_text = "SELECT e.logo
+         FROM ecommerces e
+         WHERE e.nombre_ecommerce = ?";
+         $var_use = $body["nameEcommerce"];
+    }
+    $query = $data_base->prepare($query_text);
+    $query->bind_param("s", $var_use);
+    if ($query->execute()) {
         $logo = $query->get_result()->fetch_assoc();
         http_response_code(200);
         echo json_encode([
-            "success"=> true,
-            "logo"=> $logo
+            "success" => true,
+            "logo" => $logo
         ]);
     } else {
         http_response_code(400);
         echo json_encode([
-            "success"=> false
+            "success" => false
         ]);
     }
 } else {

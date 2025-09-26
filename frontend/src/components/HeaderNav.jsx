@@ -60,7 +60,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     if (!nameEcommerce) return;
     axios.post("/api/show_profile_picture.php", { nameEcommerce })
       .then(res => {
-        setLogoEcommerce(res.data.logo);
+        setLogoEcommerce(res.data.logo.logo);
         console.log(res)
       })
       .catch(err => console.error(err));
@@ -96,10 +96,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   }, [dataForm]);
 
   return (
-    <header className="bg-sky-800 relative h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between">
+    <header className="bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between">
       {logo ? (
         <div
-          className="flex items-center justify-center w-24 h-full sm:w-32 sm:h-16 md:w-25 lg:w-25 md:h-full cursor-pointer"
+          className="flex items-center justify-center w-22 h-full cursor-pointer"
           onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")}
         >
           {logoLoaded ? (
@@ -107,10 +107,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo}
               alt="Logo"
               loading="lazy"
-              className={`${!logoEcommerce && "scale-200"} ml-2 w-full h-full object-contain`}
+              className={`${!logoEcommerce && ""} ml-3 h-[95%] w-full object-contain`}
             />
           ) : (
-            <img src={logoTolo} alt="Logo" className="w-full scale-200 h-full object-contain" />
+            <img src={logoTolo} alt="Logo" className="w-full  h-full object-cover" />
           )}
         </div>
 

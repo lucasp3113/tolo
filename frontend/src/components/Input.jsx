@@ -79,7 +79,7 @@ export default function Input({
             name={name}
             id={name}
             multiple={multiple}
-            accept="image/jpeg,image/jpg,image/png" 
+            accept="image/jpeg,image/jpg,image/png,image/webp" 
             {...register(`${name}`, {
               required: {
                 value: required,
