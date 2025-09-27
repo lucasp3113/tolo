@@ -103,16 +103,10 @@ export default function EcommerceDashboard() {
                     <h3 className={`text-3xl font-quicksand  font-semibold ${colorsCurrentRange[nextRange] || 'text-gray-700'}`}>{nextRange ? nextRange[0].toUpperCase() + nextRange.slice(1) : null}</h3>
                     <h4 className='mb-3 font-quicksand font-medium text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[nextRange]}`}> {nextPercentage}%</span></h4>
                 </Card>
-                {/* <section className='w-full'>
+                <section className='w-full'>
                     <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
                     <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
-                    <Card className={"w-full mb-28"}>
-                        <h2 className='text-3xl font-bold font-mono  mb-2'>Ganancias totales</h2>
-                        <p className='font-semibold text-2xl'>{cumulativeBilling}$</p>
-                    </Card>
-
-
-                </section> */}
+                </section>
             </section>
         </SellerDashboard>
     );

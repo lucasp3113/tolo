@@ -88,7 +88,7 @@ export default function SellerDashboard({ children }) {
               />
               <h2>San José, Uruguay</h2>
             </div>
-            {/* {children} */}
+            {children}
           </div>
         </div>
 
