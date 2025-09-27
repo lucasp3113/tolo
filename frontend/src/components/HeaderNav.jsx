@@ -6,7 +6,7 @@ import { IoSearch } from 'react-icons/io5';
 import { MdSpaceDashboard } from 'react-icons/md';
 import axios from 'axios';
 import { IoSettings } from "react-icons/io5";
-import logoTolo from "../assets/logoTolo.png";
+import logoTolo from "../assets/logoTolo.webp";
 import Menu from './Menu';
 import Input from './Input';
 import Form from './Form';
@@ -110,7 +110,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               className={`${!logoEcommerce && ""} ml-3 h-[95%] w-full object-contain`}
             />
           ) : (
-            <img src={logoTolo} alt="Logo" className="w-full  h-full object-cover" />
+            <img src={logoTolo} alt="Logo" className="w-full h-full object-cover" />
           )}
         </div>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from '../components/Card';
+import SellerDashboard from './SellerDashboard';
 import { FaInfoCircle } from "react-icons/fa";
 import {
     CircularProgressbar,
@@ -75,42 +76,44 @@ export default function EcommerceDashboard() {
             : 0;
 
     return (
-        <div className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
-            <Card className={`w-full max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
-                <h2 className="text-3xl font-bold tracking-tight 
-        mb-2">Rango actual de <span>{ecommerceName}</span></h2>
-                <h3 className={`text-3xl font-semibold ${colorsCurrentRange[currentRange] || 'text-gray-700'}`}>
-                    {currentRange ? currentRange[0].toUpperCase() + currentRange.slice(1) : null}
-                </h3>
-                <h4 className='mb-3 tracking-tight text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[currentRange]}`}>{commissionPercentage}%</span></h4>
+        <SellerDashboard>
+            <section className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
+                <Card className={`w-full !shadow !rounded max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
+                    <h2 className="text-3xl font-quicksand font-bold  
+        mb-2">Tu rango actual</h2>
+                    <h3 className={`text-3xl font-quicksand font-semibold ${colorsCurrentRange[currentRange] || 'text-gray-700'}`}>
+                        {currentRange ? currentRange[0].toUpperCase() + currentRange.slice(1) : null}
+                    </h3>
+                    <h4 className='mb-3 font-quicksand text-sm flex font-medium items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[currentRange]}`}>{commissionPercentage}%</span></h4>
 
-                <div className="mx-auto w-48">
-                    <CircularProgressbar
-                        value={porcentajeProgreso}
-                        text={`${Math.floor(porcentajeProgreso)}%`}
-                        styles={buildStyles({
-                            pathColor: pathColors[currentRange] || '#facc15',
-                            textColor: '#1f2937',
-                            trailColor: '#e5e7eb'
-                        })}
-                    />
-                </div>
-                <p className='m-3 font-semibold'><span className={colorsCurrentRange[currentRange] || 'text-gray-700'} >{cumulativeBilling}$</span> / <span className={colorsCurrentRange[nextRange] || 'text-gray-700'}>{minimumBilling}$</span></p>
-                <h2 className='text-2xl text-gray-700 font-semibold tracking-tight
+                    <div className="mx-auto w-48">
+                        <CircularProgressbar
+                            value={porcentajeProgreso}
+                            text={`${Math.floor(porcentajeProgreso)}%`}
+                            styles={buildStyles({
+                                pathColor: pathColors[currentRange] || '#facc15',
+                                textColor: '#1f2937',
+                                trailColor: '#e5e7eb'
+                            })}
+                        />
+                    </div>
+                    <p className='m-3 font-quicksand  font-semibold'><span className={colorsCurrentRange[currentRange] || 'text-gray-700'} >{cumulativeBilling}$</span> / <span className={colorsCurrentRange[nextRange] || 'text-gray-700'}>{minimumBilling}$</span></p>
+                    <h2 className='text-3xl font-quicksand  text-gray-700 font-semibold 
  mt-2'>Próximo rango</h2>
-                <h3 className={`text-2xl font-semibold ${colorsCurrentRange[nextRange] || 'text-gray-700'}`}>{nextRange ? nextRange[0].toUpperCase() + nextRange.slice(1) : null}</h3>
-                <h4 className='mb-3 tracking-tight text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[nextRange]}`}> {nextPercentage}%</span></h4>
-            </Card>
-            <section className='w-full'>
-                <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
-                <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
-                <Card className={"w-full mb-28"}>
-                    <h2 className='text-3xl font-bold font-mono tracking-tight mb-2'>Ganancias totales</h2>
-                    <p className='font-semibold text-2xl'>{cumulativeBilling}$</p>
+                    <h3 className={`text-3xl font-quicksand  font-semibold ${colorsCurrentRange[nextRange] || 'text-gray-700'}`}>{nextRange ? nextRange[0].toUpperCase() + nextRange.slice(1) : null}</h3>
+                    <h4 className='mb-3 font-quicksand font-medium text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[nextRange]}`}> {nextPercentage}%</span></h4>
                 </Card>
+                {/* <section className='w-full'>
+                    <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
+                    <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
+                    <Card className={"w-full mb-28"}>
+                        <h2 className='text-3xl font-bold font-mono  mb-2'>Ganancias totales</h2>
+                        <p className='font-semibold text-2xl'>{cumulativeBilling}$</p>
+                    </Card>
 
 
+                </section> */}
             </section>
-        </div>
+        </SellerDashboard>
     );
 }
