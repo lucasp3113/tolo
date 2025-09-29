@@ -21,6 +21,7 @@ import ChangeUser from './pages/ChangeUser';
 import ChangeEcommerce from './pages/ChangeEcommerce';
 import ProfilePicture from './pages/ProfilePicture';
 import Notifications from './pages/Notifications';
+import CustomizeStore from './pages/CustomizeStore';
 
 
 function App() {
@@ -32,6 +33,9 @@ function App() {
     componente HeaderNav con la page Home, para renderizar los productos
   */
   const [searchData, setSearchData] = useState(null)
+
+  //esto es para cambiar de color la pagina
+  const [colors, setColors] = useState(null)
   return (
     <div className="Tolo">
       <DarkModeProvider>
@@ -158,6 +162,14 @@ function App() {
                   <ProfilePicture />
                 </Layout>
               } />
+              <Route
+                path="/:ecommerce?/customize_store/"
+                element={
+                  <Layout colors={colors} isCustomizeStore={true}>
+                    <CustomizeStore setColorsForLayaut={setColors}/>
+                  </Layout>
+                }
+              />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

@@ -55,12 +55,13 @@ CREATE TABLE ecommerces (
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
 
-SELECT * FROM ecommerces
+SELECT c.header_color, c.main_color, c.footer_color
+FROM custom_shops c
+    JOIN ecommerces e ON e.id_usuario = 1
+WHERE
+    c.id_ecommerce = e.id_ecommerce
 
-SELECT e.logo
-         FROM ecommerces e
-         WHERE e.nombre_ecommerce = 'HyM'
-
+SELECT * FROM custom_shops
 
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -414,10 +415,20 @@ CREATE TABLE caracteristicas_producto (
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
+CREATE TABLE custom_shops (
+    id_custom_shop INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_ecommerce INT UNSIGNED NOT NULL UNIQUE,
+    header_color VARCHAR(100) NOT NULL,
+    main_color VARCHAR(100) NOT NULL,
+    footer_color VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE
+);
 
-
-
-
+SELECT c.header_color, c.main_color, c.footer_color
+FROM custom_shops c
+    JOIN ecommerces e ON e.nombre_ecommerce = 'LaFerre'
+WHERE
+    c.id_ecommerce = e.id_ecommerce
 
 --Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
 INSERT INTO
@@ -706,45 +717,81 @@ VALUES (1, 14),
     (9, 2),
     (10, 2);
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(1, 'Potencia de 750W'),
-(1, 'Velocidad variable'),
-(1, 'Mandril de 13mm'),
-(1, 'Apto para trabajos de bricolaje');
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (1, 'Potencia de 750W'),
+    (1, 'Velocidad variable'),
+    (1, 'Mandril de 13mm'),
+    (
+        1,
+        'Apto para trabajos de bricolaje'
+    );
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(2, 'Motor de alto rendimiento'),
-(2, 'Diseño ergonómico y ligero'),
-(2, 'Función reversible'),
-(2, 'Incluye kit de brocas');
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (
+        2,
+        'Motor de alto rendimiento'
+    ),
+    (
+        2,
+        'Diseño ergonómico y ligero'
+    ),
+    (2, 'Función reversible'),
+    (2, 'Incluye kit de brocas');
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(3, 'Potencia profesional de 1200W'),
-(3, 'Construcción robusta'),
-(3, 'Control de velocidad avanzado'),
-(3, 'Ideal para uso continuo');
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (
+        3,
+        'Potencia profesional de 1200W'
+    ),
+    (3, 'Construcción robusta'),
+    (
+        3,
+        'Control de velocidad avanzado'
+    ),
+    (3, 'Ideal para uso continuo');
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(4, 'Compacto y ligero'),
-(4, 'Mango antideslizante'),
-(4, 'Mandril metálico reforzado'),
-(4, 'Uso profesional y doméstico');
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (4, 'Compacto y ligero'),
+    (4, 'Mango antideslizante'),
+    (
+        4,
+        'Mandril metálico reforzado'
+    ),
+    (
+        4,
+        'Uso profesional y doméstico'
+    );
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(5, 'Corte oversize'),
-(5, 'Tela resistente de algodón'),
-(5, 'Color negro desgastado'),
-(5, 'Estilo urbano casual');
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (5, 'Corte oversize'),
+    (
+        5,
+        'Tela resistente de algodón'
+    ),
+    (5, 'Color negro desgastado'),
+    (5, 'Estilo urbano casual');
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(9, 'Corte amplio tipo baggy'),
-(9, 'Tela de jean azul claro'),
-(9, 'Alta comodidad'),
-(9, 'Perfecto para streetwear');
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (9, 'Corte amplio tipo baggy'),
+    (9, 'Tela de jean azul claro'),
+    (9, 'Alta comodidad'),
+    (9, 'Perfecto para streetwear');
 
-INSERT INTO caracteristicas_producto (id_producto, caracteristica) VALUES
-(10, 'Diseño oversize cargo'),
-(10, 'Color arena neutro'),
-(10, 'Bolsillos laterales amplios'),
-(10, 'Resistente para uso diario');
-
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (10, 'Diseño oversize cargo'),
+    (10, 'Color arena neutro'),
+    (
+        10,
+        'Bolsillos laterales amplios'
+    ),
+    (
+        10,
+        'Resistente para uso diario'
+    );

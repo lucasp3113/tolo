@@ -11,7 +11,7 @@ import Dropdown from './Dropdown';
 import ClipLoader from "react-spinners/ClipLoader";
 import { TiShoppingCart } from "react-icons/ti";
 
-export default function MovileNav() {
+export default function MovileNav({color}) {
   const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { ecommerce: ecommerceName } = useParams()
@@ -59,7 +59,7 @@ export default function MovileNav() {
   }
 
   return (
-    <nav className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
+    <nav style={{ backgroundColor: color || "#075985" }} className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
       <Menu
         className="w-full max-w-md flex justify-center"
         model3d={[]}

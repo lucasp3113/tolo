@@ -16,7 +16,7 @@ import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin }) {
+export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color }) {
   const { isLoggedIn, logout } = useContext(AuthContext);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [userType, setUserType] = useState(null);
@@ -96,7 +96,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   }, [dataForm]);
 
   return (
-    <header className="bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between">
+    <header style={{ backgroundColor: color || "#075985" }} className={"bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between"}>
       {logo ? (
         <div
           className="flex items-center justify-center w-22 h-full cursor-pointer"
