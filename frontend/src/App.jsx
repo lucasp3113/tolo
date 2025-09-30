@@ -36,6 +36,7 @@ function App() {
 
   //esto es para cambiar de color la pagina
   const [colors, setColors] = useState(null)
+
   return (
     <div className="Tolo">
       <DarkModeProvider>

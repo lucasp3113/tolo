@@ -15,7 +15,7 @@ import { RiLayoutTopLine } from "react-icons/ri";
 import { RiLayoutBottomLine } from "react-icons/ri";
 import { RiLayout4Line } from "react-icons/ri";
 
-export default function PersonalizarTienda({ setColorsForLayaut }) {
+export default function PersonalizarTienda({ setColorsForLayaut}) {
     const navigate = useNavigate()
 
     const [headerColor, setHeaderColor] = useState("#075985");
@@ -67,7 +67,7 @@ export default function PersonalizarTienda({ setColorsForLayaut }) {
         })
             .then((res) => {
                 console.log(res)
-                navigate(`/${res.data.ecommerce}`)
+                window.location.href = `/${res.data.ecommerce}`
 
             })
             .catch((res) => console.log(res))
@@ -121,8 +121,9 @@ export default function PersonalizarTienda({ setColorsForLayaut }) {
     };
 
     useEffect(() => {
-        width < 500 && setColorsForLayaut(colors)
+        setColorsForLayaut(colors)
     }, [colors])
+
 
     useEffect(() => {
         axios.post("/api/show_custom_store.php", {
@@ -141,13 +142,13 @@ export default function PersonalizarTienda({ setColorsForLayaut }) {
 
     return (
         <section className="flex justify-between p-3">
-            <section className="flex w-full md:w-1/3 lg:w-1/3 h-full flex-col">
+            <section className="flex w-full h-full flex-col">
                 <h2 className="font-quicksand text-xl font-bold mb-2">Haz clic en la <span className="text-blue-600">sección</span> que deseas modificar</h2>
-                <ul className="flex justify-between w-[58%] m-auto items-center font-quicksand font-medium text-xl mb-3">
-                    <RiLayoutTopLine onClick={() => setSelectedSection("header")} className="m-2 hover:text-blue-600 z-50 select-none font-quicksand font-semibold text-4xl scale-135">Cabeza</RiLayoutTopLine>
+                <ul className={` flex justify-center m-auto items-center font-quicksand font-medium text-xl mb-3`}>
+                    <RiLayoutTopLine onClick={() => setSelectedSection("header")} className="m-2 mr-6 hover:text-blue-600 z-50 select-none font-quicksand font-semibold text-4xl scale-135">Cabeza</RiLayoutTopLine>
                     <RiLayout4Line
-                        onClick={() => setSelectedSection("main")} className="m-2 hover:text-blue-600 z-50 select-none font-quicksand font-semibold text-4xl scale-135">Cuerpo</RiLayout4Line>
-                    <RiLayoutBottomLine onClick={() => setSelectedSection("footer")} className="m-2 z-50 select-none font-quicksand hover:text-blue-600 font-semibold text-4xl scale-135">Pie de página</RiLayoutBottomLine>
+                        onClick={() => setSelectedSection("main")} className="m-2 ml-6 mr-6 hover:text-blue-600 z-50 select-none font-quicksand font-semibold text-4xl scale-135">Cuerpo</RiLayout4Line>
+                    <RiLayoutBottomLine onClick={() => setSelectedSection("footer")} className="m-2 ml-6 z-50 select-none font-quicksand hover:text-blue-600 font-semibold text-4xl scale-135">Pie de página</RiLayoutBottomLine>
                 </ul>
                 <Sketch
                     color={colors[selectedSection]}
@@ -162,9 +163,9 @@ export default function PersonalizarTienda({ setColorsForLayaut }) {
                     disableAlpha={true}
                     className="h-[310px] shadow m-auto"
                 />
-                <Button onClick={() => save()} color={"blue"} size={"md"} text={"Guardar"} className={"mt-8 w-1/2 m-auto"} />
+                <Button onClick={() => save()} color={"blue"} size={"md"} text={"Guardar"} className={"mt-8 w-1/2 md:w-48 lg:w-44 m-auto"} />
             </section>
-            {
+            {/* {
                 width >= 500 ? (
                     <section className="flex flex-col w-2/3">
                         <ul className="flex justify-start mb-5 mt-1 m-auto items-center font-quicksand font-medium text-xl">
@@ -181,7 +182,7 @@ export default function PersonalizarTienda({ setColorsForLayaut }) {
                 ) : (
                     null
                 )
-            }
+            } */}
         </section >
     );
 }
