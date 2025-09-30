@@ -13,6 +13,33 @@ import Button from '../components/Button'
 export default function EcommerceDashboard() {
     const navigate = useNavigate()
 
+    //chatbot
+    useEffect(() => {
+    // Inicializar variables de Tawk
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_LoadStart = new Date();
+
+    // Crear el script
+    const s1 = document.createElement("script");
+    s1.async = true;
+    s1.src = "https://embed.tawk.to/68dc4ed9e69f4b194f45aee1/1j6e9813o";
+    s1.charset = "UTF-8";
+    s1.setAttribute("crossorigin", "*");
+
+    // Insertar el script en el DOM
+    const s0 = document.getElementsByTagName("script")[0];
+    s0.parentNode.insertBefore(s1, s0);
+
+    // Limpiar al desmontar el componente
+    return () => {
+        if (s1.parentNode) {
+            s1.parentNode.removeChild(s1);
+        }
+    };
+}, []);
+
+
+
     const [ecommerceName, setEcommerceName] = useState(null);
     const [cumulativeBilling, setCumulativeBilling] = useState(0);
     const [currentRange, setCurrentRange] = useState(null);
@@ -106,6 +133,7 @@ export default function EcommerceDashboard() {
                     <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
                     <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
                 </section>
+
             </section>
         </SellerDashboard>
     );

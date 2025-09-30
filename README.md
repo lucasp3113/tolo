@@ -13,7 +13,8 @@
 
 
 ### Manejo del proceso de pago
-
+ya le puse los cookies profe :(
+explicacion que te habia dado para no usar cookies:
 Para la entrega actual, se optó por usar un estado de React (`useState`) para manejar el proceso de “proceder al pago” en lugar de cookies. Esta decisión busca **hacer que el flujo de compra sea más realista desde ahora**, simulando cómo se manejarían los datos del checkout en una tienda real, y al mismo tiempo deja todo preparado para la siguiente entrega, donde se implementarán:
 
 - **Formulario de envío y método de pago**  
