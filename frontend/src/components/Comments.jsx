@@ -44,7 +44,6 @@ const CommentsSection = ({ productId }) => {
     try {
       const response = await axios.get(`/api/show_comments.php?productId=${productId}`);
       if (response.data.success) {
-        console.log(response.data)
         setComments(response.data.comments || []);
         setStats(response.data.stats || { total_comentarios: 0, promedio_rating: 0 });
       }

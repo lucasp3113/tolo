@@ -15,7 +15,7 @@ import { RiLayoutTopLine } from "react-icons/ri";
 import { RiLayoutBottomLine } from "react-icons/ri";
 import { RiLayout4Line } from "react-icons/ri";
 
-export default function PersonalizarTienda({ setColorsForLayaut}) {
+export default function PersonalizarTienda({ setColorsForLayaut, change, setChange}) {
     const navigate = useNavigate()
 
     const [headerColor, setHeaderColor] = useState("#075985");
@@ -67,7 +67,8 @@ export default function PersonalizarTienda({ setColorsForLayaut}) {
         })
             .then((res) => {
                 console.log(res)
-                window.location.href = `/${res.data.ecommerce}`
+                setChange(change + 1)
+                navigate(`/${res.data.ecommerce}`)
 
             })
             .catch((res) => console.log(res))

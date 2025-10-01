@@ -7,7 +7,7 @@ import Filters from './Filters';
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 
-export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null }) {
+export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null }) {
   const {ecommerce} = useParams()
   const [headerColor, setHeaderColor] = useState(null);
   const [mainColor, setMainColor] = useState(null);
@@ -29,7 +29,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
         setFooterColor(res.data.data.footer_color)
       })
       .catch((res) => console.log(res))
-  }, [])
+  }, [ecommerce, change])
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [panelFilter, setPanelFilter] = useState(false);

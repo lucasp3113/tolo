@@ -36,6 +36,7 @@ function App() {
 
   //esto es para cambiar de color la pagina
   const [colors, setColors] = useState(null)
+  const [change, setChange] = useState(0);
 
   return (
     <div className="Tolo">
@@ -166,8 +167,8 @@ function App() {
               <Route
                 path="/:ecommerce?/customize_store/"
                 element={
-                  <Layout colors={colors} isCustomizeStore={true}>
-                    <CustomizeStore setColorsForLayaut={setColors}/>
+                  <Layout colors={colors} isCustomizeStore={true} change={change}>
+                    <CustomizeStore setChange={setChange} change={change} setColorsForLayaut={setColors}/>
                   </Layout>
                 }
               />
