@@ -41,6 +41,7 @@ export default function Login() {
                 
             })
             .catch((err) => {
+                console.log(err)
                 setMessage([err.response.data.message, err.response.data.success])
                 message && message[1] ? undefined: setError(err.response.data.input, {
                     type: "manual",

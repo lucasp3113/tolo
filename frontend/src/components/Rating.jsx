@@ -3,20 +3,19 @@ import { useState, useEffect } from 'react';
 export default function Rating({
   maxStars = 5,
   initialRating = 0,
-  value, // Prop controlada desde afuera
+  value,
   onRatingChange = () => {},
   size = 'md',
   readonly = false,
   showValue = true,
   className = '',
   onClick,
-  id, // ID único para cada rating
-  text = "", // classname para el texto que indica el puntaje
+  id,
+  text = "",
 }) {
   const [rating, setRating] = useState(initialRating);
   const [hoverRating, setHoverRating] = useState(0);
 
-  // Si se pasa un valor controlado, usar ese en lugar del estado interno
   useEffect(() => {
     if (value !== undefined) {
       setRating(value);
@@ -39,12 +38,11 @@ export default function Rating({
 
     const newRating = starIndex + clickedHalf;
     
-    // Solo actualizar estado interno si no es controlado
     if (value === undefined) {
       setRating(newRating);
     }
     
-    onRatingChange(newRating, id); // Pasar el ID en el callback
+    onRatingChange(newRating, id);
   };
 
   const handleStarHover = (event, starIndex) => {
@@ -116,7 +114,6 @@ export default function Rating({
   );
 }
 
-// Ejemplo de uso del componente
 function App() {
   const [ratings, setRatings] = useState({
     product: 4.5,

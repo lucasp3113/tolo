@@ -65,7 +65,7 @@
 <Dropdown
   text="Selecciona una opción"
   showSelectedAsTitle={true}
-  defaultSelectedIndex={1} // Preselecciona "Opción 2"
+  defaultSelectedIndex={1}
   options={[
     { label: "Opción 1", onClick: () => console.log("Opción 1") },
     { label: "Opción 2", onClick: () => console.log("Opción 2") },
@@ -173,7 +173,6 @@ const Dropdown = ({
   const [isMobile, setIsMobile] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  // Funciones para inicializar el estado con la opción por defecto
   const getInitialSelectedOption = () => {
     if (defaultSelectedIndex !== null && options[defaultSelectedIndex]) {
       const defaultOption = options[defaultSelectedIndex];
@@ -196,7 +195,6 @@ const Dropdown = ({
   const [displayText, setDisplayText] = useState(getInitialDisplayText());
   const navigate = useNavigate();
 
-  // Detecta si es móvil al montar
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768 || "ontouchstart" in window);
@@ -206,14 +204,12 @@ const Dropdown = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Función para cerrar dropdown al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isOpen && !event.target.closest('.dropdown-container')) {
         setIsOpen(false);
-        // Si estamos en modo border, validar el valor del input
         if (border) {
-          const currentValue = inputValue || "1"; // Si está vacío, usar "1"
+          const currentValue = inputValue || "1";
           const validatedValue = validateAndCorrectValue(currentValue);
           setInputValue(validatedValue.toString());
           setDisplayText(validatedValue.toString());
@@ -225,15 +221,13 @@ const Dropdown = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, border, inputValue]);
 
-  // Ejecutar callback inicial si hay opción por defecto
   useEffect(() => {
     const initialOption = getInitialSelectedOption();
     if (initialOption && onSelectionChange) {
       onSelectionChange(initialOption);
     }
-  }, []); // Solo se ejecuta una vez al montar
+  }, []);
 
-  // Establecer opción por defecto si cambian las opciones
   useEffect(() => {
     if (defaultSelectedIndex !== null && options[defaultSelectedIndex]) {
       const defaultOption = options[defaultSelectedIndex];
@@ -243,7 +237,6 @@ const Dropdown = ({
           setDisplayText(defaultOption.label);
         }
         
-        // Ejecutar callback si existe
         if (onSelectionChange) {
           onSelectionChange(defaultOption);
         }
@@ -251,7 +244,6 @@ const Dropdown = ({
     }
   }, [showSelectedAsTitle, border, defaultSelectedIndex, options, onSelectionChange]);
 
-  // Actualiza el texto mostrado cuando cambia el texto inicial
   useEffect(() => {
     if ((!showSelectedAsTitle && !border) || !selectedOption) {
       setDisplayText(text);
@@ -287,7 +279,6 @@ const Dropdown = ({
 
   const { styles, ArrowClosed } = getDirectionConfig();
 
-  // Handlers distintos para móvil y PC con soporte para hoverActivation
   const openMenu = () => !isMobile && hoverActivation && setIsOpen(true);
   const closeMenu = () => !isMobile && hoverActivation && setIsOpen(false);
   const toggleMenu = () => (isMobile || !hoverActivation) && setIsOpen(!isOpen);

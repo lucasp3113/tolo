@@ -1,7 +1,10 @@
--- Active: 1758104807084@@127.0.0.1@3306@tolo
+-- Active: 1756304004613@@127.0.0.1@3306@tolo
+
 CREATE DATABASE tolo;
 
 USE tolo;
+
+SELECT * FROM usuarios
 
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -17,6 +20,7 @@ CREATE TABLE usuarios (
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
 );
+
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -473,6 +477,8 @@ VALUES
     (15, 5, 'color_5_68d374b1428c1.png'),
     (16, 5, 'color_5_68d374b144366.png'),
     (17, 5, 'color_5_68d374b1484cf.png');
+
+
 
 INSERT INTO productos_categorias (id_producto, id_categoria)
 VALUES 

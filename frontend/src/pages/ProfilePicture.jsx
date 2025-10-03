@@ -18,7 +18,6 @@ export default function ProfilePicture() {
         user = payload.user
     }
 
-    // Cargar imagen de perfil actual
     useEffect(() => {
         axios.post("/api/show_profile_picture.php", { nameEcommerce })
             .then((res) => {

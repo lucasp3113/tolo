@@ -10,7 +10,6 @@ export function DarkModeProvider({ children }) {
   };
 
   useEffect(() => {
-    // Aplicar o remover la clase 'dark' al elemento html
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
@@ -18,7 +17,6 @@ export function DarkModeProvider({ children }) {
     }
   }, [isDarkMode]);
 
-  // Debug - Para verificar el estado actual
   useEffect(() => {
   }, [isDarkMode]);
 
