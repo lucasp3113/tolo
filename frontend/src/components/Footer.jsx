@@ -2,8 +2,9 @@ import React from "react";
 import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaFacebookSquare } from "react-icons/fa";
+import { Color } from "three";
 
-export default function Footer() {
+export default function Footer({color}) {
     const handleFbClick = () => {
         window.open("https://www.facebook.com", "_blank");
     };
@@ -24,8 +25,8 @@ export default function Footer() {
     };
 
     return (
-        <footer className="w-full flex flex-col items-center justify-center mt-10 border-t border-gray-300 p-4 
-bg-sky-800 text-gray-400 
+        <footer style={{ backgroundColor: color || "#1F2937" }} className="w-full flex flex-col items-center justify-center mt-10 border-t border-gray-300 p-4 
+ text-gray-400 
   md:bg-gray-800 md:text-white
     lg:bg-gray-800 lg:text-white">
             <p className="text-center text-xl md:text-sm lg-text-sm mb-4 max-w-4xl">

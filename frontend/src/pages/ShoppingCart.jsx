@@ -22,6 +22,9 @@ export default function ShoppingCart() {
   const [proceedToPayment, setProceedToPayment] = useState({});
   useEffect(() => {
     console.log(proceedToPayment)
+    if (Object.keys(proceedToPayment).length > 0) {
+      document.cookie = `proceedToPayment=${encodeURIComponent(JSON.stringify(proceedToPayment))}; path=/; max-age=3600`;
+    }
   }, [proceedToPayment])
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);

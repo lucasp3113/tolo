@@ -11,8 +11,44 @@ import Dropdown from './Dropdown';
 import ClipLoader from "react-spinners/ClipLoader";
 import { TiShoppingCart } from "react-icons/ti";
 
-export default function MovileNav() {
+export default function MovileNav({ color }) {
   const navigate = useNavigate();
+
+  const [goodContrast, setGoodContrast] = useState(true);
+  function hasGoodContrast(color1, color2, threshold = 1.1) {
+    if (!color1 || !color2) return true;
+
+    const getLuminance = (hex) => {
+      if (!hex || !hex.startsWith('#')) return 0;
+
+      const rgb = parseInt(hex.slice(1), 16);
+      const r = (rgb >> 16) & 0xff;
+      const g = (rgb >> 8) & 0xff;
+      const b = (rgb >> 0) & 0xff;
+
+      const [rs, gs, bs] = [r, g, b].map(c => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    };
+
+    const lum1 = getLuminance(color1);
+    const lum2 = getLuminance(color2);
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
+    const contrast = (brightest + 0.05) / (darkest + 0.05);
+
+    return contrast >= threshold;
+  }
+
+  useEffect(() => {
+    if (color) {
+      setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
+    }
+  }, [color]);
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { ecommerce: ecommerceName } = useParams()
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -59,7 +95,7 @@ export default function MovileNav() {
   }
 
   return (
-    <nav className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
+    <nav style={{ backgroundColor: color || "#075985" }} className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
       <Menu
         className="w-full max-w-md flex justify-center"
         model3d={[]}
@@ -100,7 +136,7 @@ export default function MovileNav() {
               name: userType === 'ecommerce' || userType === 'vendedor_particular' ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" /> : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />,
               expand: true,
             },
-            animation: false, 
+            animation: false,
             onClick: () => {
               if (userType === 'ecommerce') {
                 ecommerceName ? navigate(`/${ecommerceName}/ecommerce_dashboard/`) : navigate('/ecommerce_dashboard/');
@@ -123,7 +159,7 @@ export default function MovileNav() {
           isLoggedIn && {
             title: 'Cerrar sesión',
             icon: {
-              name: <BiLogOut className="text-red-400 text-[35px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />,
+              name: <BiLogOut className={`${!goodContrast ? "text-white" : "text-red-400"} text-[35px] sm:text-[20px] md:text-[30px] lg:text-[35px]`} />,
               expand: true,
             },
             animation: false,

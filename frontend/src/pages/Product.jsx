@@ -7,11 +7,6 @@ import ProtectedComponent from "../components/ProtectedComponent";
 import Rating from "../components/Rating";
 import { useNavigate } from "react-router-dom";
 import Carrusel from "../components/Carrusel";
-import lauta from "../assets/lautaro.jpeg";
-import silvano from "../assets/silvano.jpg";
-import matias from "../assets/matias.jpg";
-import Input from "../components/Input";
-import Form from "../components/Form";
 import { useParams } from "react-router-dom";
 import CommentsSection from "../components/Comments";
 
@@ -58,6 +53,22 @@ export default function Product(productId) {
         setLoading(false);
       });
   }, [id]);
+
+  const [logoEcommerce, setLogoEcommerce] = useState(null);
+
+  useEffect(() => {
+    if (!data?.nombre_ecommerce) return;
+    console.log(data.nombre_ecommerce)
+    axios.post("/api/show_profile_picture.php", {
+      nameEcommerce: data.nombre_ecommerce
+    })
+      .then(res => {
+        setLogoEcommerce(res.data.logo.logo);
+      })
+      .catch(err => console.error(err));
+  }, [data]);
+
+
 
   const getAvailableColors = () => {
     if (!data) return [];
@@ -314,9 +325,6 @@ export default function Product(productId) {
                   defaultSelectedIndex={0}
                   stock={stock}
                   options={generateQuantityOptions()}
-                  onSelectionChange={(selectedOption) =>
-                    console.log("Seleccionado:", selectedOption)
-                  }
                 />
               </div>
               <div>
@@ -348,15 +356,15 @@ export default function Product(productId) {
 
             <section className="flex items-center justify-center mt-6 w-full">
               <div className="flex items-center gap-4">
-                <img src={matias} alt="" className="w-10 h-10 rounded-full" />
+                <img src={`/api/${logoEcommerce}`} alt="" className="w-10 h-10 rounded-full" />
                 <div className="flex flex-col">
-                  <span>
+                  <span className="font-quicksand font-medium">
                     Vendido por:{" "}
                     <button
-                      className="cursor-pointer text-sky-600"
-                      onClick={() => navigate("/seller_dashboard/")}
+                      className="cursor-pointer font-semibold text-sky-600"
+                      onClick={() => navigate(`/${data.nombre_ecommerce}`)}
                     >
-                      El Letra
+                      {data.nombre_ecommerce}
                     </button>{" "}
                   </span>
                 </div>
@@ -444,9 +452,6 @@ export default function Product(productId) {
                     defaultSelectedIndex={0}
                     max={stock}
                     options={generateQuantityOptions()}
-                    onSelectionChange={(selectedOption) =>
-                      console.log("Seleccionado:", selectedOption)
-                    }
                   />
                 </div>
                 <div>
@@ -476,15 +481,15 @@ export default function Product(productId) {
 
               <section className="flex items-center justify-center mt-5 w-full">
                 <div className="flex items-center gap-4">
-                  <img src={matias} alt="" className="w-10 h-10 rounded-full" />
+                  <img src={`/api/${logoEcommerce}`} alt="" className="w-10 h-10 rounded-full" />
                   <div className="flex flex-col">
-                    <span>
+                    <span className="font-quicksand font-medium">
                       Vendido por:{" "}
                       <button
-                        className="cursor-pointer text-sky-600"
-                        onClick={() => navigate("/seller_dashboard/")}
+                        className="cursor-pointer font-semibold text-sky-600"
+                        onClick={() => navigate(`/${data.nombre_ecommerce}`)}
                       >
-                        El Letra
+                        {data.nombre_ecommerce}
                       </button>{" "}
                     </span>
                   </div>
@@ -519,7 +524,7 @@ export default function Product(productId) {
               </ul>
             </section>
 
-            <CommentsSection productId={id} currentUserId={currentUserId} />
+            <CommentsSection productId={id} currentUserId={userId} />
           </div>
         </article>
       )}

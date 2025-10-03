@@ -35,7 +35,6 @@ CREATE TABLE rangos (
     porcentaje_comision DECIMAL(4, 2) NOT NULL
 );
 
-
 INSERT INTO
     rangos (
         nombre_rango,
@@ -59,6 +58,14 @@ CREATE TABLE ecommerces (
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
+
+SELECT c.header_color, c.main_color, c.footer_color
+FROM custom_shops c
+    JOIN ecommerces e ON e.id_usuario = 1
+WHERE
+    c.id_ecommerce = e.id_ecommerce
+
+SELECT * FROM custom_shops
 
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -324,13 +331,16 @@ CREATE TABLE comentarios_productos (
     id_comentario INT PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     id_usuario INT UNSIGNED NOT NULL,
-    rating DECIMAL(2,1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
+    rating DECIMAL(2, 1) NOT NULL CHECK (
+        rating >= 0
+        AND rating <= 5
+    ),
     comentario TEXT NOT NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     activo BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     UNIQUE KEY unique_user_product (id_usuario, id_producto)
 );
 
@@ -387,68 +397,221 @@ CREATE TABLE colores_producto (
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
-CREATE TABLE imagenes_color_producto(
+CREATE TABLE imagenes_color_producto (
     id_imagen_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
     ruta_imagen VARCHAR(255) NOT NULL,
-    FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE CASCADE
+    FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
 
-CREATE TABLE talles_color_producto(
+CREATE TABLE talles_color_producto (
     id_talle_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
     talle VARCHAR(100) NOT NULL,
     stock SMALLINT NOT NULL,
-    FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE CASCADE
+    FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
 
-CREATE TABLE caracteristicas_producto(
+CREATE TABLE caracteristicas_producto (
     id_caracteristica INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     caracteristica VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
 
--- Verifica qué se insertó realmente
-SELECT * FROM usuarios;
-SELECT * FROM ecommerces;
-SELECT * FROM productos;
+CREATE TABLE custom_shops (
+    id_custom_shop INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_ecommerce INT UNSIGNED NOT NULL UNIQUE,
+    header_color VARCHAR(100) NOT NULL,
+    main_color VARCHAR(100) NOT NULL,
+    footer_color VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE
+);
 
 --Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
-INSERT INTO usuarios (id_usuario, nombre_usuario, email, contraseña, tipo_usuario, fecha_registro, estado)
-VALUES
-    (1, 'Ferreteria', 'ferreteria@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'ecommerce', '2025-09-24 01:02:59', 1),
-    (2, 'admin', 'luuucaspereyra31@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'admin', '2025-09-24 01:05:13', 1),
-    (3, 'BohemianDesign', 'bohemian@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'ecommerce', '2025-09-24 01:11:54', 1),
-    (4, 'Cliente', 'cliente@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'cliente', '2025-09-24 01:35:30', 1);
+INSERT INTO
+    usuarios (
+        id_usuario,
+        nombre_usuario,
+        email,
+        contraseña,
+        tipo_usuario,
+        fecha_registro,
+        estado
+    )
+VALUES (
+        1,
+        'Ferreteria',
+        'ferreteria@gmail.com',
+        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
+        'ecommerce',
+        '2025-09-24 01:02:59',
+        1
+    ),
+    (
+        2,
+        'admin',
+        'luuucaspereyra31@gmail.com',
+        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
+        'admin',
+        '2025-09-24 01:05:13',
+        1
+    ),
+    (
+        3,
+        'BohemianDesign',
+        'bohemian@gmail.com',
+        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
+        'ecommerce',
+        '2025-09-24 01:11:54',
+        1
+    ),
+    (
+        4,
+        'Cliente',
+        'cliente@gmail.com',
+        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
+        'cliente',
+        '2025-09-24 01:35:30',
+        1
+    );
 
-INSERT INTO ecommerces (id_ecommerce, id_usuario, nombre_ecommerce, descripcion, rango_actual, facturacion_acumulada)
-VALUES
-    (1, 1, 'LaFerre', NULL, 1, 0),
-    (2, 3, 'Bohemian Design', NULL, 1, 0);
+INSERT INTO
+    ecommerces (
+        id_ecommerce,
+        id_usuario,
+        nombre_ecommerce,
+        descripcion,
+        rango_actual,
+        facturacion_acumulada
+    )
+VALUES (1, 1, 'LaFerre', NULL, 1, 0),
+    (
+        2,
+        3,
+        'Bohemian Design',
+        NULL,
+        1,
+        0
+    );
 
-INSERT INTO productos 
-(id_producto, id_vendedor, id_ecommerce, nombre_producto, descripcion, precio, stock, envio_gratis, fecha_publicacion, estado)
-VALUES
-(1, 1, 1, 'Taladro Trupper', NULL, 1000.00, 1000, 1, '2025-09-24 01:03:32', 1),
-(2, 1, 1, 'Taladro DrWalt', 'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.', 500.00, 100, 1, '2025-09-24 01:06:32', 1),
-(3, 1, 1, 'Taladro Tolsen', 'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.', 4000.00, 20, 0, '2025-09-24 01:08:48', 1),
-(4, 1, 1, 'Taladro Total', 'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.', 2300.00, 1000, 0, '2025-09-24 01:10:41', 1),
-(5, 3, 2, 'Pantalon Black Gastado', 'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look', 3250.00, NULL, 1, '2025-09-24 01:12:54', 1),
-(9, 3, 2, 'Pantalon BAGGY Jean Claro', 'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu lookPantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look', 4000.00, NULL, 0, '2025-09-24 01:30:00', 1),
-(10, 3, 2, 'Pantalon BAGGY Cargo Arena', 'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look', 3800.00, NULL, 0, '2025-09-24 01:32:34', 1);
+INSERT INTO
+    productos (
+        id_producto,
+        id_vendedor,
+        id_ecommerce,
+        nombre_producto,
+        descripcion,
+        precio,
+        stock,
+        envio_gratis,
+        fecha_publicacion,
+        estado
+    )
+VALUES (
+        1,
+        1,
+        1,
+        'Taladro Trupper',
+        NULL,
+        1000.00,
+        1000,
+        1,
+        '2025-09-24 01:03:32',
+        1
+    ),
+    (
+        2,
+        1,
+        1,
+        'Taladro DrWalt',
+        'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.',
+        500.00,
+        100,
+        1,
+        '2025-09-24 01:06:32',
+        1
+    ),
+    (
+        3,
+        1,
+        1,
+        'Taladro Tolsen',
+        'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.',
+        4000.00,
+        20,
+        0,
+        '2025-09-24 01:08:48',
+        1
+    ),
+    (
+        4,
+        1,
+        1,
+        'Taladro Total',
+        'Taladro eléctrico de alto rendimiento, ideal para perforar madera, metal y materiales de construcción. Su diseño ergonómico y ligero permite un uso cómodo y preciso, mientras que su motor potente garantiza eficiencia y durabilidad. Incluye múltiples brocas, ajuste de velocidad y función reversible, perfecto para proyectos domésticos o profesionales.',
+        2300.00,
+        1000,
+        0,
+        '2025-09-24 01:10:41',
+        1
+    ),
+    (
+        5,
+        3,
+        2,
+        'Pantalon Black Gastado',
+        'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look',
+        3250.00,
+        NULL,
+        1,
+        '2025-09-24 01:12:54',
+        1
+    ),
+    (
+        9,
+        3,
+        2,
+        'Pantalon BAGGY Jean Claro',
+        'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu lookPantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look',
+        4000.00,
+        NULL,
+        0,
+        '2025-09-24 01:30:00',
+        1
+    ),
+    (
+        10,
+        3,
+        2,
+        'Pantalon BAGGY Cargo Arena',
+        'Pantalón oversize de corte amplio y cómodo, diseñado para un estilo urbano y moderno. Confeccionado en tela resistente y suave al tacto, ofrece libertad de movimiento y versatilidad para combinar con diferentes outfits. Ideal para uso diario, actividades casuales o streetwear, aportando comodidad y tendencia a tu look',
+        3800.00,
+        NULL,
+        0,
+        '2025-09-24 01:32:34',
+        1
+    );
 
-
-INSERT INTO colores_producto (id_color, id_producto, nombre, stock)
-VALUES
-    (1, 5, 'Negro Gastado', NULL),
+INSERT INTO
+    colores_producto (
+        id_color,
+        id_producto,
+        nombre,
+        stock
+    )
+VALUES (1, 5, 'Negro Gastado', NULL),
     (4, 9, 'Claro', NULL),
     (5, 10, 'Arena', NULL);
 
-
-INSERT INTO talles_color_producto (id_talle_color_producto, id_color, talle, stock)
-VALUES
-    (1, 1, 'M', 100),
+INSERT INTO
+    talles_color_producto (
+        id_talle_color_producto,
+        id_color,
+        talle,
+        stock
+    )
+VALUES (1, 1, 'M', 100),
     (2, 1, 'L', 100),
     (3, 1, 'XL', 1000),
     (9, 4, 'M', 30),
@@ -458,34 +621,175 @@ VALUES
     (13, 5, 'L', 58),
     (14, 5, 'XL', 10);
 
-INSERT INTO imagenes_productos (id_imagen, id_producto, ruta_imagen)
-VALUES
-    (1, 1, 'uploads/products/68d36d9414373_1758686612.png'),
-    (2, 2, 'uploads/products/68d36e488a33a_1758686792.jpg'),
-    (3, 3, 'uploads/products/68d36ed02448a_1758686928.jpg'),
-    (4, 4, 'uploads/products/68d36f41e215c_1758687041.jpg');
+INSERT INTO
+    imagenes_productos (
+        id_imagen,
+        id_producto,
+        ruta_imagen
+    )
+VALUES (
+        1,
+        1,
+        'uploads/products/68d36d9414373_1758686612.png'
+    ),
+    (
+        2,
+        2,
+        'uploads/products/68d36e488a33a_1758686792.jpg'
+    ),
+    (
+        3,
+        3,
+        'uploads/products/68d36ed02448a_1758686928.jpg'
+    ),
+    (
+        4,
+        4,
+        'uploads/products/68d36f41e215c_1758687041.jpg'
+    );
 
-INSERT INTO imagenes_color_producto (id_imagen_color_producto, id_color, ruta_imagen)
-VALUES
-    (1, 1, 'color_1_68d36fe9b7f1a.png'),
-    (2, 1, 'color_1_68d36fe9b9138.png'),
-    (3, 1, 'color_1_68d36fe9b9e38.png'),
-    (4, 1, 'color_1_68d36fe9bad4a.png'),
-    (12, 4, 'color_4_68d373e800294.png'),
-    (13, 4, 'color_4_68d373e801101.png'),
-    (14, 4, 'color_4_68d373e801e62.png'),
-    (15, 5, 'color_5_68d374b1428c1.png'),
-    (16, 5, 'color_5_68d374b144366.png'),
-    (17, 5, 'color_5_68d374b1484cf.png');
+INSERT INTO
+    imagenes_color_producto (
+        id_imagen_color_producto,
+        id_color,
+        ruta_imagen
+    )
+VALUES (
+        1,
+        1,
+        'color_1_68d36fe9b7f1a.png'
+    ),
+    (
+        2,
+        1,
+        'color_1_68d36fe9b9138.png'
+    ),
+    (
+        3,
+        1,
+        'color_1_68d36fe9b9e38.png'
+    ),
+    (
+        4,
+        1,
+        'color_1_68d36fe9bad4a.png'
+    ),
+    (
+        12,
+        4,
+        'color_4_68d373e800294.png'
+    ),
+    (
+        13,
+        4,
+        'color_4_68d373e801101.png'
+    ),
+    (
+        14,
+        4,
+        'color_4_68d373e801e62.png'
+    ),
+    (
+        15,
+        5,
+        'color_5_68d374b1428c1.png'
+    ),
+    (
+        16,
+        5,
+        'color_5_68d374b144366.png'
+    ),
+    (
+        17,
+        5,
+        'color_5_68d374b1484cf.png'
+    );
 
-
-
-INSERT INTO productos_categorias (id_producto, id_categoria)
-VALUES 
-    (1, 14),
+INSERT INTO
+    productos_categorias (id_producto, id_categoria)
+VALUES (1, 14),
     (2, 14),
     (3, 14),
     (4, 14),
     (5, 2),
     (9, 2),
     (10, 2);
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (1, 'Potencia de 750W'),
+    (1, 'Velocidad variable'),
+    (1, 'Mandril de 13mm'),
+    (
+        1,
+        'Apto para trabajos de bricolaje'
+    );
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (
+        2,
+        'Motor de alto rendimiento'
+    ),
+    (
+        2,
+        'Diseño ergonómico y ligero'
+    ),
+    (2, 'Función reversible'),
+    (2, 'Incluye kit de brocas');
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (
+        3,
+        'Potencia profesional de 1200W'
+    ),
+    (3, 'Construcción robusta'),
+    (
+        3,
+        'Control de velocidad avanzado'
+    ),
+    (3, 'Ideal para uso continuo');
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (4, 'Compacto y ligero'),
+    (4, 'Mango antideslizante'),
+    (
+        4,
+        'Mandril metálico reforzado'
+    ),
+    (
+        4,
+        'Uso profesional y doméstico'
+    );
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (5, 'Corte oversize'),
+    (
+        5,
+        'Tela resistente de algodón'
+    ),
+    (5, 'Color negro desgastado'),
+    (5, 'Estilo urbano casual');
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (9, 'Corte amplio tipo baggy'),
+    (9, 'Tela de jean azul claro'),
+    (9, 'Alta comodidad'),
+    (9, 'Perfecto para streetwear');
+
+INSERT INTO
+    caracteristicas_producto (id_producto, caracteristica)
+VALUES (10, 'Diseño oversize cargo'),
+    (10, 'Color arena neutro'),
+    (
+        10,
+        'Bolsillos laterales amplios'
+    ),
+    (
+        10,
+        'Resistente para uso diario'
+    );

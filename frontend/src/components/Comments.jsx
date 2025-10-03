@@ -273,8 +273,8 @@ const CommentsSection = ({ productId }) => {
                 size="md"
                 type="submit"
                 disabled={isSubmitting || !rating || rating === 0}
-                className={`bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${
-                  isSubmitting || !rating ? "opacity-50 cursor-not-allowed" : ""
+                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${
+                  isSubmitting || !rating ? " cursor-not-allowed" : ""
                 }`}
               />
             </ProtectedComponent>
