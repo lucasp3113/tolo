@@ -12,6 +12,7 @@ import CommentsSection from "../components/Comments";
 
 
 export default function Product(productId) {
+  const [stats, setStats] = useState(0);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,12 +47,19 @@ export default function Product(productId) {
       .then((res) => {
         setData(res.data.data);
         (res);
+        console.log
         setLoading(false);
       })
       .catch((err) => {
         setError(err);
         setLoading(false);
       });
+    axios.get(`/api/show_comments.php?productId=${id}`)
+      .then((res) => {
+        console.log(res.data.stats.promedio_rating)
+        setStats(res.data.stats.promedio_rating)
+      })
+      .catch((res) => console.log(res))
   }, [id]);
 
   const [logoEcommerce, setLogoEcommerce] = useState(null);
@@ -166,7 +174,7 @@ export default function Product(productId) {
 
   const [ratings, setRatings] = useState({
     userRating: 0,
-    productAverage: 4.5,
+    productAverage: 4.0,
   });
 
   const handleRatingChange = (newRating, ratingId) => {
@@ -378,7 +386,7 @@ export default function Product(productId) {
             <div className="flex items-center gap-2 w-full justify-between mb-4">
               <Rating
                 id="product-average"
-                value={4.5}
+                value={stats}
                 readonly={true}
                 showValue={true}
                 size="sm"

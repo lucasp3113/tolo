@@ -85,6 +85,7 @@ if (!$data_base->connect_error) {
              FROM imagenes_color_producto icp
              JOIN colores_producto cp ON cp.id_color = icp.id_color
              JOIN talles_color_producto tcp ON tcp.id_color = cp.id_color
+             JOIN comentarios_producto com ON com.id_producto = p.id_producto
              WHERE cp.id_producto = p.id_producto
              ORDER BY cp.id_color ASC, icp.id_imagen_color_producto ASC, tcp.id_talle_color_producto ASC
              LIMIT 1)
