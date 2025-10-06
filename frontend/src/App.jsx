@@ -125,7 +125,7 @@ function App() {
               }>
               </Route>
               <Route path='/:ecommerce?/product/:id' element={
-                <Layout >
+                <Layout>
                   <Product />
                 </Layout>
               }>

@@ -68,6 +68,7 @@ export default function Home({ searchData, userType, setSearchData }) {
   }
 
   useEffect(() => {
+    setSearchData(null)
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
