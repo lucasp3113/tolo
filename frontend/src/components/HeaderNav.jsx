@@ -1,35 +1,45 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaHome, FaUserCircle, FaUserPlus } from "react-icons/fa";
 import { BiLogOut } from "react-icons/bi";
-import { IoSearch } from 'react-icons/io5';
-import { MdSpaceDashboard } from 'react-icons/md';
-import axios from 'axios';
+import { IoSearch } from "react-icons/io5";
+import { MdSpaceDashboard } from "react-icons/md";
+import axios from "axios";
 import { IoSettings } from "react-icons/io5";
 import logoTolo from "../assets/logoTolo.webp";
-import Menu from './Menu';
-import Input from './Input';
-import Form from './Form';
-import { AuthContext } from '../context/AuthContext';
-import Button from '../components/Button';
-import { CiSliderHorizontal } from 'react-icons/ci';
+import Menu from "./Menu";
+import Input from "./Input";
+import Form from "./Form";
+import { AuthContext } from "../context/AuthContext";
+import Button from "../components/Button";
+import { CiSliderHorizontal } from "react-icons/ci";
 import { TiShoppingCart } from "react-icons/ti";
-import Model3D from '../components/Model3D';
+import Model3D from "../components/Model3D";
+import { PiCrownSimpleFill } from "react-icons/pi";
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color }) {
+export default function HeaderNav({
+  search,
+  setSearchData,
+  setPanelFilter,
+  setDataCategories,
+  setWord,
+  logo = true,
+  setUserTypeForAdmin,
+  color,
+}) {
   const [goodContrast, setGoodContrast] = useState(true);
   function hasGoodContrast(color1, color2, threshold = 1.1) {
     if (!color1 || !color2) return true;
 
     const getLuminance = (hex) => {
-      if (!hex || !hex.startsWith('#')) return 0;
+      if (!hex || !hex.startsWith("#")) return 0;
 
       const rgb = parseInt(hex.slice(1), 16);
       const r = (rgb >> 16) & 0xff;
       const g = (rgb >> 8) & 0xff;
       const b = (rgb >> 0) & 0xff;
 
-      const [rs, gs, bs] = [r, g, b].map(c => {
+      const [rs, gs, bs] = [r, g, b].map((c) => {
         c = c / 255;
         return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       });
@@ -48,7 +58,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
 
   useEffect(() => {
     if (color) {
-      setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
+      setGoodContrast(hasGoodContrast("#f87171", color, 1.45));
     }
   }, [color]);
 
@@ -74,7 +84,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(atob(token.split(".")[1]));
         setUser(payload.user);
       } catch (err) {
         console.error("Error al decodificar token:", err);
@@ -84,20 +94,20 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
 
   useEffect(() => {
     if (!user) return;
-    axios.post("/api/type_user.php", { usuario: user })
-      .then((res) => {
-        setUserType(res.data.user_type?.toLowerCase())
-        setUserTypeForAdmin && setUserTypeForAdmin(res.data.user_type)
-      })
+    axios.post("/api/type_user.php", { usuario: user }).then((res) => {
+      setUserType(res.data.user_type?.toLowerCase());
+      setUserTypeForAdmin && setUserTypeForAdmin(res.data.user_type);
+    });
   }, [user]);
 
   useEffect(() => {
     if (!nameEcommerce) return;
-    axios.post("/api/show_profile_picture.php", { nameEcommerce })
-      .then(res => {
+    axios
+      .post("/api/show_profile_picture.php", { nameEcommerce })
+      .then((res) => {
         setLogoEcommerce(res.data.logo.logo);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [nameEcommerce]);
 
   useEffect(() => {
@@ -114,42 +124,66 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   useEffect(() => {
     if (!dataForm) return;
     dataForm["nameEcommerce"] = nameEcommerce || null;
-    axios.post("/api/search.php", dataForm)
-      .then(res => {
+    axios
+      .post("/api/search.php", dataForm)
+      .then((res) => {
         setWord(dataForm.search);
         setSearchData(res.data.data);
         const categories = [];
-        res.data.data?.forEach(e => {
-          if (!categories.includes(e.nombre_categoria)) categories.push(e.nombre_categoria);
+        res.data.data?.forEach((e) => {
+          if (!categories.includes(e.nombre_categoria))
+            categories.push(e.nombre_categoria);
         });
         setShowFilter(true);
         setDataCategories(categories);
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   }, [dataForm]);
 
   return (
-    <header style={{ backgroundColor: color || "#075985" }} className={"bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between"}>
+    <header
+      style={{ backgroundColor: color || "#075985" }}
+      className={
+        "bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between"
+      }
+    >
       {logo ? (
         <div
           className="flex items-center justify-center w-22 h-full cursor-pointer"
-          onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")}
+          onClick={() =>
+            nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")
+          }
         >
           {logoLoaded ? (
             <img
               src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo}
               alt="Logo"
               loading="lazy"
-              className={`${!logoEcommerce && ""} ml-3 h-[95%] w-full object-contain`}
+              className={`${
+                !logoEcommerce && ""
+              } ml-3 h-[95%] w-full object-contain`}
             />
           ) : (
-            <img src={logoTolo} alt="Logo" className="w-full h-full object-cover" />
+            <img
+              src={logoTolo}
+              alt="Logo"
+              className="w-full h-full object-cover"
+            />
           )}
         </div>
-
       ) : (
-        <section className={`flex items-center w-full ${windowWidth < 500 ? "justify-center" : "justify-start"}`}>
-          <h1 className={`font-quicksand text-2xl text-white font-black ${windowWidth ? "ml-2" : ""}`}>Tu carrito</h1>
+        <section
+          className={`flex items-center w-full ${
+            windowWidth < 500 ? "justify-center" : "justify-start"
+          }`}
+        >
+          <h1
+            className={`font-quicksand text-2xl text-white font-black ${
+              windowWidth ? "ml-2" : ""
+            }`}
+          >
+            Tu carrito
+          </h1>
           <Model3D
             src="/models/carrito.glb"
             className="w-22 h-16"
@@ -163,7 +197,11 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
         <>
           <Form
             onSubmit={(data) => setDataForm(data)}
-            className={`!bg-transparent !shadow-none !rounded-none p-0 m-0 !outline-none !border-none  ${windowWidth < 500 ? `${showFilter ? "!w-[70vw]" : ""} -translate-x-3 max-w-[80vw]` : "w-100 absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2"}`}
+            className={`!bg-transparent !shadow-none !rounded-none p-0 m-0 !outline-none !border-none  ${
+              windowWidth < 500
+                ? `${showFilter ? "!w-[70vw]" : ""} -translate-x-3 max-w-[80vw]`
+                : "w-100 absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2"
+            }`}
             fields={[
               <Input
                 key="search"
@@ -171,20 +209,32 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 name="search"
                 className="pr-10 bg-white h-9 mb-3 focus:outline-none"
                 icon={
-                  <Button type='submit' className="bg-transparent -translate-y-2 translate-x-2 shadow-none" text={<IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />} />
+                  <Button
+                    type="submit"
+                    className="bg-transparent -translate-y-2 translate-x-2 shadow-none"
+                    text={
+                      <IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />
+                    }
+                  />
                 }
                 placeholder="Buscar"
-              />
+              />,
             ]}
           />
           {showFilter && (
             <Button
               onClick={() => setPanelFilter(true)}
-              type='text'
+              type="text"
               color="blue"
               size="lg"
-              className={`!bg-transparent ${windowWidth < 500 ? windowWidth < 400 ? "-translate-x-9" : "-translate-x-8" : "absolute top-[50%] left-1/2 -translate-x-58 -translate-y-1/2 "} !shadow-none !rounded-none !m-0 !text-2xl`}
-              text={<CiSliderHorizontal className='text-4xl' />}
+              className={`!bg-transparent ${
+                windowWidth < 500
+                  ? windowWidth < 400
+                    ? "-translate-x-9"
+                    : "-translate-x-8"
+                  : "absolute top-[50%] left-1/2 -translate-x-58 -translate-y-1/2 "
+              } !shadow-none !rounded-none !m-0 !text-2xl`}
+              text={<CiSliderHorizontal className="text-4xl" />}
             />
           )}
         </>
@@ -195,54 +245,120 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
             model3d={[]}
             elements={[
               {
-                title: 'Inicio',
-                icon: { name: <FaHome className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
-                animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate('/'),
-              },
-              !isLoggedIn && {
-                title: 'Iniciar Sesión',
-                icon: { name: <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
-                animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/login/`) : navigate('/login'),
-              },
-              !isLoggedIn && {
-                title: 'Crear cuenta',
-                icon: { name: <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
-                animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/register/`) : navigate('/register'),
-              },
-              isLoggedIn && userType && {
-                title: userType === 'ecommerce' || userType === 'vendedor_particular' ? 'Panel de control' : "Carrito",
+                title: "Inicio",
                 icon: {
-                  name: userType === 'ecommerce' || userType === 'vendedor_particular'
-                    ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />
-                    : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />,
-                  expand: true
+                  name: (
+                    <FaHome className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
+                  ),
+                  expand: true,
                 },
                 animation: false,
-                onClick: () => {
-                  if (userType === "ecommerce") nameEcommerce ? navigate(`/${nameEcommerce}/ecommerce_dashboard/`) : navigate("/ecommerce_dashboard/");
-                  else if (userType === "cliente") nameEcommerce ? navigate(`/${nameEcommerce}/shopping_cart/`) : navigate("/shopping_cart/");
-                  else nameEcommerce ? navigate(`/${nameEcommerce}/seller_dashboard/`) : navigate("/seller_dashboard/");
-                },
+                onClick: () =>
+                  nameEcommerce
+                    ? navigate(`/${nameEcommerce}/`)
+                    : navigate("/"),
               },
+              !isLoggedIn && {
+                title: "Iniciar Sesión",
+                icon: {
+                  name: (
+                    <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
+                  ),
+                  expand: true,
+                },
+                animation: false,
+                onClick: () =>
+                  nameEcommerce
+                    ? navigate(`/${nameEcommerce}/login/`)
+                    : navigate("/login"),
+              },
+              !isLoggedIn && {
+                title: "Crear cuenta",
+                icon: {
+                  name: (
+                    <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />
+                  ),
+                  expand: true,
+                },
+                animation: false,
+                onClick: () =>
+                  nameEcommerce
+                    ? navigate(`/${nameEcommerce}/register/`)
+                    : navigate("/register"),
+              },
+              isLoggedIn &&
+                userType && {
+                  title:
+                    userType === "ecommerce" ||
+                    userType === "admin" ||
+                    userType === "vendedor_particular"
+                      ? "Panel de control"
+                      : "Carrito",
+                  icon: {
+                    name:
+                      userType === "admin" ? (
+                        <PiCrownSimpleFill className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />
+                      ) : userType === "ecommerce" ||
+                        userType === "vendedor_particular" ? (
+                        <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />
+                      ) : (
+                        <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />
+                      ),
+                    expand: true,
+                  },
+                  animation: false,
+                  onClick: () => {
+                    if (userType === "ecommerce")
+                      nameEcommerce
+                        ? navigate(`/${nameEcommerce}/ecommerce_dashboard/`)
+                        : navigate("/ecommerce_dashboard/");
+                    else if (userType === "cliente")
+                      nameEcommerce
+                        ? navigate(`/${nameEcommerce}/shopping_cart/`)
+                        : navigate("/shopping_cart/");
+                    else if (userType === "admin")
+                      navigate("admin_panel")
+                    else
+                      nameEcommerce
+                        ? navigate(`/${nameEcommerce}/seller_dashboard/`)
+                        : navigate("/seller_dashboard/");
+                  },
+                },
               isLoggedIn && {
-                title: '',
-                icon: { name: <BiLogOut className={`${!goodContrast ? "text-white" : "text-red-400"} text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />, expand: true },
+                title: "",
+                icon: {
+                  name: (
+                    <BiLogOut
+                      className={`${
+                        !goodContrast ? "text-white" : "text-red-400"
+                      } text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`}
+                    />
+                  ),
+                  expand: true,
+                },
                 animation: false,
                 onClick: () => {
                   localStorage.removeItem("token");
                   localStorage.removeItem("token_expiration");
                   logout();
-                  nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate('/');
+                  nameEcommerce
+                    ? navigate(`/${nameEcommerce}/`)
+                    : navigate("/");
                 },
               },
               isLoggedIn && {
                 title: "",
-                icon: { name: <IoSettings className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300" />, expand: false },
+                icon: {
+                  name: (
+                    <IoSettings className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300" />
+                  ),
+                  expand: false,
+                },
                 animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/settings/`) : navigate('/settings/'),
+                onClick: () =>
+                  nameEcommerce
+                    ? navigate(`/${nameEcommerce}/settings/`)
+                    : navigate("/settings/"),
               },
             ].filter(Boolean)}
           />
