@@ -699,7 +699,7 @@ VALUES (
         5,
         'color_5_68d374b144366.png'
     ),
-    (
+    (   
         17,
         5,
         'color_5_68d374b1484cf.png'

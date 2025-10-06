@@ -104,7 +104,7 @@ export default function EcommerceDashboard() {
     return (
         <SellerDashboard>
             <section className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
-                <Card className={`w-full !shadow !rounded max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
+                <Card className={`w-full border-none! m-auto shadow-none! !rounded max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
                     <h2 className="text-3xl font-quicksand font-bold  
         mb-2">Tu rango actual</h2>
                     <h3 className={`text-3xl font-quicksand font-semibold ${colorsCurrentRange[currentRange] || 'text-gray-700'}`}>
@@ -129,10 +129,10 @@ export default function EcommerceDashboard() {
                     <h3 className={`text-3xl font-quicksand  font-semibold ${colorsCurrentRange[nextRange] || 'text-gray-700'}`}>{nextRange ? nextRange[0].toUpperCase() + nextRange.slice(1) : null}</h3>
                     <h4 className='mb-3 font-quicksand font-medium text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[nextRange]}`}> {nextPercentage}%</span></h4>
                 </Card>
-                <section className='w-full'>
+                {/* <section className='w-full'>
                     <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
                     <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
-                </section>
+                </section> */}
 
             </section>
         </SellerDashboard>

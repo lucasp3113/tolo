@@ -88,11 +88,10 @@ export default function SellerDashboard({ children }) {
               />
               <h2>San José, Uruguay</h2>
             </div>
-            {children}
           </div>
         </div>
 
-        <div className="col-span-3 grid grid-rows-2 gap-4 p-4">
+        {/* <div className="col-span-3 grid grid-rows-2 h-2/3 gap-4 p-4">
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
               <h1 className="text-3xl font-bold">221</h1>
@@ -159,6 +158,7 @@ export default function SellerDashboard({ children }) {
                   <span className="text-green-600">$10000</span>
                 </li>
               </ul>
+              {children}
             </div>
 
             <div className="bg-white shadow rounded p-4">
@@ -183,7 +183,19 @@ export default function SellerDashboard({ children }) {
               </ul>
             </div>
           </div>
+        </div> */}
+
+        <div className="w-full">
+
         </div>
+{/* 
+        <div className="flex ml-2 h-2/3 gap-3">
+          <div className="bg-white w-50 p-3 rounded-md">Ventas Totales</div>
+          <div className="bg-white w-20 p-3 rounded-md">Ingresos de este mes</div>
+          <div className="bg-white w-20 p-3 rounded-md">Calificación</div>
+          <div className="bg-white w-20 p-3 rounded-md">Pedidos activos</div>
+        </div> */}
+
       </div>
 
       <div className="md:hidden flex flex-col min-h-screen">
