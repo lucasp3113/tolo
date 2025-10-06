@@ -83,11 +83,12 @@ if ($data_base->connect_error) {
 
         if ($trueSize) {
             $query = $data_base->prepare(
-                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.envio_gratis, p.fecha_publicacion, c.nombre, c.id_color, t.talle, t.stock, car.caracteristica
+                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.envio_gratis, p.fecha_publicacion, c.nombre, c.id_color, t.talle, t.stock, car.caracteristica, e.nombre_ecommerce
                 FROM productos p
                 JOIN colores_producto c ON c.id_producto = p.id_producto
                 JOIN talles_color_producto t ON t.id_color = c.id_color
                 JOIN caracteristicas_producto car ON car.id_producto = p.id_producto
+                JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
                 WHERE p.id_producto = ?"
             );
             $query->bind_param("i", $id_product);
@@ -100,12 +101,13 @@ if ($data_base->connect_error) {
                     "precio" => $result[0]["precio"],
                     "envio_gratis" => $result[0]["envio_gratis"],
                     "fecha_publicacion" => $result[0]["fecha_publicacion"],
+                    "nombre_ecommerce" => $result[0]["nombre_ecommerce"],
                     "colores" => [],
                     "caracteristicas" => []
                 ];
-                
+
                 $coloresProcessed = [];
-                
+
                 foreach ($result as $row) {
                     $color = $row["nombre"];
                     $colorId = $row["id_color"];
@@ -118,7 +120,7 @@ if ($data_base->connect_error) {
                             "imagenes" => []
                         ];
                     }
-                    
+
                     if (!in_array($feature, $data["caracteristicas"])) {
                         $data["caracteristicas"][] = $feature;
                     }
@@ -137,10 +139,10 @@ if ($data_base->connect_error) {
                             "stock" => $row["stock"]
                         ];
                     }
-                    
+
                     if (!in_array($colorId, $coloresProcessed)) {
                         $coloresProcessed[] = $colorId;
-                        
+
                         $queryImg = $data_base->prepare(
                             "SELECT i.ruta_imagen
                             FROM imagenes_color_producto i
@@ -165,10 +167,11 @@ if ($data_base->connect_error) {
             }
         } elseif ($trueColor) {
             $query = $data_base->prepare(
-                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.envio_gratis, p.fecha_publicacion, c.id_color, c.nombre, c.stock, car.caracteristica
+                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.envio_gratis, p.fecha_publicacion, c.id_color, c.nombre, c.stock, car.caracteristica, e.nombre_ecommerce
                 FROM productos p
                 JOIN colores_producto c ON c.id_producto = p.id_producto
                 JOIN caracteristicas_producto car ON car.id_producto = p.id_producto
+                JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
                 WHERE p.id_producto = ?"
             );
             $query->bind_param("i", $id_product);
@@ -181,12 +184,13 @@ if ($data_base->connect_error) {
                     "precio" => $result[0]["precio"],
                     "envio_gratis" => $result[0]["envio_gratis"],
                     "fecha_publicacion" => $result[0]["fecha_publicacion"],
+                    "nombre_ecommerce" => $result[0]["nombre_ecommerce"],
                     "colores" => [],
                     "caracteristicas" => []
                 ];
-                
+
                 $coloresProcessed = [];
-                
+
                 foreach ($result as $row) {
                     $color = $row["nombre"];
                     $colorId = $row["id_color"];
@@ -206,7 +210,7 @@ if ($data_base->connect_error) {
                             "stock" => $row["stock"],
                             "imagenes" => []
                         ];
-                        
+
                         $queryImg = $data_base->prepare(
                             "SELECT i.ruta_imagen
                             FROM imagenes_color_producto i
@@ -236,9 +240,10 @@ if ($data_base->connect_error) {
             }
         } else {
             $query = $data_base->prepare(
-                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.stock, p.envio_gratis, p.fecha_publicacion, car.caracteristica
+                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.stock, p.envio_gratis, p.fecha_publicacion, car.caracteristica, e.nombre_ecommerce
                 FROM productos p
                 JOIN caracteristicas_producto car ON car.id_producto = p.id_producto
+                JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
                 WHERE p.id_producto = ?"
             );
             $query->bind_param("i", $id_product);
@@ -252,17 +257,18 @@ if ($data_base->connect_error) {
                     "stock" => $result[0]["stock"],
                     "envio_gratis" => $result[0]["envio_gratis"],
                     "fecha_publicacion" => $result[0]["fecha_publicacion"],
+                    "nombre_ecommerce" => $result[0]["nombre_ecommerce"],
                     "caracteristicas" => [],
                     "imagenes" => []
                 ];
-                
+
                 foreach ($result as $row) {
                     $feature = $row["caracteristica"];
                     if (!in_array($feature, $data["caracteristicas"])) {
                         $data["caracteristicas"][] = $feature;
                     }
                 }
-                
+
                 $queryImg = $data_base->prepare(
                     "SELECT i.ruta_imagen
                     FROM imagenes_productos i

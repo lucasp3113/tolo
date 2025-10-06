@@ -7,8 +7,8 @@ import Filters from './Filters';
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 
-export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null }) {
-  const {ecommerce} = useParams()
+export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null }) {
+  const { ecommerce } = useParams()
   const [headerColor, setHeaderColor] = useState(null);
   const [mainColor, setMainColor] = useState(null);
   const [footerColor, setFooterColor] = useState(null);
@@ -19,7 +19,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
   }, [colors])
 
   useEffect(() => {
-    axios.post("/api/show_custom_store.php", {
+    ecommerce && axios.post("/api/show_custom_store.php", {
       ecommerce: ecommerce
     })
       .then((res) => {
@@ -29,7 +29,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
         setFooterColor(res.data.data.footer_color)
       })
       .catch((res) => console.log(res))
-  }, [])
+  }, [ecommerce, change])
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [panelFilter, setPanelFilter] = useState(false);
@@ -53,9 +53,9 @@ export default function Layout({ children, search = false, setSearchData, logo =
     <div className="grid min-h-dvh grid-rows-[auto_1fr_auto]">
       <HeaderNav preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} />
       <main className='' style={{ backgroundColor: mainColor || "FFFFFF" }}>{children}</main>
-      {windowWidth < 500 ? <MobileNav color={footerColor} goodContrast={goodContrast}/> : undefined}
+      {windowWidth < 500 ? <MobileNav color={footerColor} goodContrast={goodContrast} /> : undefined}
       {panelFilter ? <Filters setSearchData={setSearchData} word={word} setPanelFilter={setPanelFilter} dataCategories={dataCategories} /> : null}
-      {windowWidth > 500 && !preview ? <Footer color={footerColor}/> : undefined}
+      {windowWidth > 500 && !preview ? <Footer color={footerColor} /> : undefined}
     </div>
   )
 }

@@ -1,3 +1,5 @@
+Contraseña de base de datos: brbrpatacona
+
 ## Motor de Búsqueda – MeiliSearch (Solo Desarrollo)
 - Si no se activa, el buscador no va a funcionar
 - Debido a que el ejecutable pesa ~120 MB, **no se sube directamente al repositorio**, sino que se incluye comprimido en un archivo `meilisearch.zip`.

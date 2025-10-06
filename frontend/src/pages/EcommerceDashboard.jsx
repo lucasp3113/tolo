@@ -15,28 +15,52 @@ export default function EcommerceDashboard() {
 
     //chatbot
     useEffect(() => {
-    // Inicializar variables de Tawk
-    window.Tawk_API = window.Tawk_API || {};
-    window.Tawk_LoadStart = new Date();
+        window.Tawk_API = window.Tawk_API || {};
+        window.Tawk_LoadStart = new Date();
 
-    // Crear el script
-    const s1 = document.createElement("script");
-    s1.async = true;
-    s1.src = "https://embed.tawk.to/68dc4ed9e69f4b194f45aee1/1j6e9813o";
-    s1.charset = "UTF-8";
-    s1.setAttribute("crossorigin", "*");
+        const s1 = document.createElement("script");
+        s1.async = true;
+        s1.src = "https://embed.tawk.to/68dc4ed9e69f4b194f45aee1/1j6e9813o";
+        s1.charset = "UTF-8";
+        s1.setAttribute("crossorigin", "*");
 
-    // Insertar el script en el DOM
-    const s0 = document.getElementsByTagName("script")[0];
-    s0.parentNode.insertBefore(s1, s0);
+        document.body.appendChild(s1);
 
-    // Limpiar al desmontar el componente
-    return () => {
-        if (s1.parentNode) {
-            s1.parentNode.removeChild(s1);
-        }
-    };
-}, []);
+        const fixIframePosition = () => {
+            const iframe = document.querySelector("iframe");
+            if (iframe) {
+                if (window.innerWidth < 500) {
+                    // Pantallas pequeñas → arriba
+                    iframe.style.setProperty("top", "4px", "important");
+                    iframe.style.setProperty("bottom", "auto", "important");
+                    iframe.style.setProperty("right", "20px", "important");
+                    iframe.style.setProperty("left", "auto", "important");
+                    iframe.style.setProperty("position", "fixed", "important");
+                } else {
+                    // Pantallas grandes → restaurar abajo a la derecha
+                    iframe.style.setProperty("top", "auto", "important");
+                    iframe.style.setProperty("bottom", "10px", "important");
+                    iframe.style.setProperty("right", "20px", "important");
+                    iframe.style.setProperty("left", "auto", "important");
+                    iframe.style.setProperty("position", "fixed", "important");
+                }
+            } else {
+                requestAnimationFrame(fixIframePosition);
+            }
+        };
+
+        // Ejecutamos al inicio
+        fixIframePosition();
+
+        // También reaccionamos al resize
+        const handleResize = () => fixIframePosition();
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            if (s1.parentNode) s1.parentNode.removeChild(s1);
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
 
 
@@ -104,7 +128,7 @@ export default function EcommerceDashboard() {
     return (
         <SellerDashboard>
             <section className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
-                <Card className={`w-full !shadow !rounded max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
+                <Card className={`w-full !shadow !rounded-xl max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
                     <h2 className="text-3xl font-quicksand font-bold  
         mb-2">Tu rango actual</h2>
                     <h3 className={`text-3xl font-quicksand font-semibold ${colorsCurrentRange[currentRange] || 'text-gray-700'}`}>
@@ -129,10 +153,13 @@ export default function EcommerceDashboard() {
                     <h3 className={`text-3xl font-quicksand  font-semibold ${colorsCurrentRange[nextRange] || 'text-gray-700'}`}>{nextRange ? nextRange[0].toUpperCase() + nextRange.slice(1) : null}</h3>
                     <h4 className='mb-3 font-quicksand font-medium text-sm flex items-center justify-center'>Comisión por venta:<span className={`text-lg ml-0.5 ${colorsCurrentRange[nextRange]}`}> {nextPercentage}%</span></h4>
                 </Card>
-                <section className='w-full'>
+                {/* <section className='w-full'>
                     <Button className={"mt-5 mb-5"} text={"Añadir publicación"} color={"blue"} size={"lg"} onClick={() => navigate("/create_product/")} />
                     <Button className={"mt-5 mb-5"} text={"Ver y modificar publicaciones"} color={"blue"} size={"lg"} onClick={() => navigate("/product_crud/")} />
-                </section>
+                </section> */}
+                <div className="fixed bg-red-500 top-4 right-4">
+                    <div id="tawk-container"></div>
+                </div>
 
             </section>
         </SellerDashboard>

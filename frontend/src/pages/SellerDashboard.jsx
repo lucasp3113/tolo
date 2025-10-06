@@ -1,30 +1,208 @@
-import React, { useState, useEffect } from "react";
-import Dropdown from "../components/Dropdown";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { FaLocationDot } from "react-icons/fa6";
-import { FaRegClock } from "react-icons/fa6";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const RatingMeter = memo(({ progress, getColor }) => {
+  const radius = 40;
+  const circumference = Math.PI * radius;
+  const offset = circumference - (progress / 5) * circumference;
+
+  return (
+    <div className="mb-6 flex flex-col items-center">
+      <svg width="100" height="60" viewBox="0 0 100 50">
+        <path
+          d="M 10 50 A 40 40 0 0 1 90 50"
+          fill="transparent"
+          stroke="#e5e7eb"
+          strokeWidth="10"
+        />
+        <path
+          d="M 10 50 A 40 40 0 0 1 90 50"
+          fill="transparent"
+          stroke={getColor(progress)}
+          strokeWidth="10"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset 0.1s linear" }}
+        />
+        <text
+          x="50"
+          y="45"
+          textAnchor="middle"
+          fontSize="16"
+          fontWeight="bold"
+          fill="#374151"
+        >
+          {progress.toFixed(1)}
+        </text>
+      </svg>
+      <p className="text-gray-600 text-sm mt-2 font-quicksand font-medium">Calificación</p>
+    </div>
+  );
+});
+
+const Chart = memo(({ chartData, chartType }) => {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={chartData}>
+        <defs>
+          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+            <stop 
+              offset="5%" 
+              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'} 
+              stopOpacity={0.3}
+            />
+            <stop 
+              offset="95%" 
+              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'} 
+              stopOpacity={0}
+            />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+        <XAxis 
+          dataKey="name" 
+          tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'Quicksand' }}
+          axisLine={{ stroke: '#e2e8f0' }}
+          tickLine={false}
+        />
+        <YAxis 
+          tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'Quicksand' }}
+          axisLine={false}
+          tickLine={false}
+        />
+        <Tooltip 
+          contentStyle={{ 
+            backgroundColor: '#1e293b',
+            borderRadius: '8px', 
+            border: 'none', 
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            fontFamily: 'Quicksand',
+            color: '#fff'
+          }}
+          labelStyle={{ color: '#94a3b8' }}
+        />
+        <Line 
+          type="monotone" 
+          dataKey={chartType === 'ventas' ? 'ventas' : 'ganancias'} 
+          stroke={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'} 
+          strokeWidth={3}
+          dot={false}
+          activeDot={{ r: 6, fill: chartType === 'ventas' ? '#0ea5e9' : '#22c55e' }}
+          fill="url(#colorValue)"
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+});
+
+const RatingMeterMobile = memo(({ progress, getColor }) => {
+  const radius = 40;
+  const circumference = Math.PI * radius;
+  const offset = circumference - (progress / 5) * circumference;
+
+  return (
+    <svg width="60" height="40" viewBox="0 0 100 50" className="flex-shrink-0">
+      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="transparent" stroke="#e5e7eb" strokeWidth="10" />
+      <path 
+        d="M 10 50 A 40 40 0 0 1 90 50" 
+        fill="transparent" 
+        stroke={getColor(progress)} 
+        strokeWidth="10" 
+        strokeDasharray={circumference} 
+        strokeDashoffset={offset} 
+        strokeLinecap="round" 
+        style={{ transition: "stroke-dashoffset 0.1s linear" }} 
+      />
+      <text x="50" y="45" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#374151">
+        {progress.toFixed(1)}
+      </text>
+    </svg>
+  );
+});
+
+const ChartMobile = memo(({ chartData, chartType }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={chartData}>
+        <defs>
+          <linearGradient id="colorValueMobile" x1="0" y1="0" x2="0" y2="1">
+            <stop 
+              offset="5%" 
+              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'} 
+              stopOpacity={0.3}
+            />
+            <stop 
+              offset="95%" 
+              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'} 
+              stopOpacity={0}
+            />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+        <XAxis 
+          dataKey="name" 
+          tick={{ fill: '#94a3b8', fontSize: 10, fontFamily: 'Quicksand' }}
+          axisLine={{ stroke: '#e2e8f0' }}
+          tickLine={false}
+        />
+        <YAxis 
+          tick={{ fill: '#94a3b8', fontSize: 10, fontFamily: 'Quicksand' }}
+          axisLine={false}
+          tickLine={false}
+        />
+        <Tooltip 
+          contentStyle={{ 
+            backgroundColor: '#1e293b',
+            borderRadius: '8px', 
+            border: 'none',
+            fontFamily: 'Quicksand', 
+            fontSize: '12px',
+            color: '#fff'
+          }}
+          labelStyle={{ color: '#94a3b8' }}
+        />
+        <Line 
+          type="monotone" 
+          dataKey={chartType === 'ventas' ? 'ventas' : 'ganancias'} 
+          stroke={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'} 
+          strokeWidth={2.5}
+          dot={false}
+          activeDot={{ r: 5, fill: chartType === 'ventas' ? '#0ea5e9' : '#22c55e' }}
+          fill="url(#colorValueMobile)"
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+});
 
 export default function SellerDashboard({ children }) {
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
-  const [logo, setLogo] = useState(null)
+  const [logo, setLogo] = useState(null);
   const rating = 4;
   const [progress, setProgress] = useState(0);
+  const [timeRange, setTimeRange] = useState('1semana');
+  const [chartData, setChartData] = useState([]);
+  const [chartType, setChartType] = useState('ventas');
 
   let user = null;
   const token = localStorage.getItem("token");
   if (token) {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    user = payload.user
+    user = payload.user;
   }
 
   useEffect(() => {
     axios.post("/api/show_profile_picture.php", { user })
       .then((res) => {
-        setLogo(`/api/${res.data.logo.logo}`)
-        console.log(res)
+        setLogo(`/api/${res.data.logo.logo}`);
       })
-      .catch((err) => console.log(err))
-  }, [])
+      .catch((err) => console.log(err));
+  }, []);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -36,291 +214,281 @@ export default function SellerDashboard({ children }) {
   }, []);
 
   useEffect(() => {
-    let start = 0;
+    let startTime = performance.now();
     const duration = 1000;
-    const step = 10;
-    const increment = rating / (duration / step);
+    let animationFrameId;
 
-    const interval = setInterval(() => {
-      start += increment;
-      if (start >= rating) {
-        start = rating;
-        clearInterval(interval);
+    const animate = (time) => {
+      const elapsed = time - startTime;
+      const t = Math.min(elapsed / duration, 1);
+
+      const eased = 1 - Math.pow(1 - t, 3);
+      setProgress(rating * eased);
+
+      if (t < 1) {
+        animationFrameId = requestAnimationFrame(animate);
       }
-      setProgress(start);
-    }, step);
+    };
 
-    return () => clearInterval(interval);
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
   }, [rating]);
 
-  const getColor = (value) => {
+  const generateDummyData = useCallback(() => {
+    switch(timeRange) {
+      case '1dia':
+        return Array.from({length: 24}, (_, i) => ({
+          name: `${i}:00`,
+          ventas: Math.floor(Math.random() * 10),
+          ganancias: Math.floor(Math.random() * 500)
+        }));
+      case '1semana':
+        return ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => ({
+          name: day,
+          ventas: Math.floor(Math.random() * 50),
+          ganancias: Math.floor(Math.random() * 3000)
+        }));
+      case '1mes':
+        return Array.from({length: 30}, (_, i) => ({
+          name: `${i + 1}`,
+          ventas: Math.floor(Math.random() * 20),
+          ganancias: Math.floor(Math.random() * 1500)
+        }));
+      case '5meses':
+        return ['Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5'].map(mes => ({
+          name: mes,
+          ventas: Math.floor(Math.random() * 200),
+          ganancias: Math.floor(Math.random() * 15000)
+        }));
+      case '1año':
+        return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'].map(mes => ({
+          name: mes,
+          ventas: Math.floor(Math.random() * 150),
+          ganancias: Math.floor(Math.random() * 10000)
+        }));
+      default:
+        return [];
+    }
+  }, [timeRange]);
+
+  useEffect(() => {
+    setChartData(generateDummyData());
+  }, [generateDummyData]);
+
+  const getColor = useCallback((value) => {
     if (value < 2.5) return "red";
     if (value < 4) return "orange";
     return "green";
-  };
-
-  const radiusDesktop = 40;
-  const circumferenceDesktop = Math.PI * radiusDesktop;
-  const offsetDesktop = circumferenceDesktop - (progress / 5) * circumferenceDesktop;
-
-  const radiusMobile = 32;
-  const circumferenceMobile = Math.PI * radiusMobile;
-  const offsetMobile = circumferenceMobile - (progress / 5) * circumferenceMobile;
+  }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gray-100">
-      <div className="hidden md:grid md:grid-cols-4 h-screen w-screen overflow-x-hidden">
-        <div className="col-span-1 bg-white shadow-lg flex flex-col items-center p-6">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="hidden md:flex h-screen w-screen overflow-hidden">
+        <div className="w-80 flex-shrink-0 bg-white shadow-xl flex flex-col items-center p-6 overflow-y-auto border-r border-gray-200">
           <img
             src={logo}
             alt="Logo Comercio"
-            className="w-36 h-36 mb-4 border-4 border-sky-800 rounded-full object-contain bg-white p-2"
+            className="w-36 h-36 mb-4 border-4 border-sky-600 rounded-full object-contain bg-white p-2 shadow-lg"
           />
-          <h1 className="text-2xl font-bold mb-2">Artec</h1>
-          <p className="text-center text-gray-600 mb-8">
-            Vendemos electrónicos, componentes de PC, gadgets y más.
-          </p>
-            {children}
+          <h1 className="text-3xl font-bold mb-2 font-quicksand text-gray-800">Artec</h1>
+          
+          <RatingMeter progress={progress} getColor={getColor} />
+          
+          <div className="flex items-center justify-center mb-8 text-gray-700 font-quicksand">
+            <FaLocationDot className="text-sky-600 mr-2" size={18} />
+            <span className="font-medium">San José, Uruguay</span>
+          </div>
+
+          <div className="w-full flex flex-col gap-3 mt-auto">
+            <button
+              onClick={() => navigate("/create_product/")}
+              className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center gap-2"
+            >
+              <span className="text-xl">+</span>
+              Añadir Producto
+            </button>
+            <button
+              onClick={() => navigate("/product_crud/")}
+              className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center gap-2"
+            >
+              <span className="text-xl"></span>
+              Ver Mis Productos
+            </button>
+          </div>
         </div>
 
-        <div className="col-span-3 grid grid-rows-2 gap-4 p-4">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold">221</h1>
-              <p className="text-gray-600">Ventas totales</p>
-            </div>
-            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold">$3000</h1>
-              <p className="text-gray-600">Ingresos de este mes</p>
-            </div>
-            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
-              <svg width="100" height="60" viewBox="0 0 100 50">
-                <path
-                  d="M 10 50 A 40 40 0 0 1 90 50"
-                  fill="transparent"
-                  stroke="#e5e7eb"
-                  strokeWidth="10"
-                />
-                <path
-                  d="M 10 50 A 40 40 0 0 1 90 50"
-                  fill="transparent"
-                  stroke={getColor(progress)}
-                  strokeWidth="10"
-                  strokeDasharray={circumferenceDesktop}
-                  strokeDashoffset={offsetDesktop}
-                  strokeLinecap="round"
-                  style={{ transition: "stroke-dashoffset 0.1s linear" }}
-                />
-                <text
-                  x="50"
-                  y="45"
-                  textAnchor="middle"
-                  fontSize="14"
-                  fontWeight="bold"
-                >
-                  {progress.toFixed(1)}
-                </text>
-              </svg>
-              <p className="text-gray-600 mt-1">Calificación</p>
+        <div className="flex-1 flex flex-col p-6 overflow-y-auto gap-6">
+          <div className="flex-1 flex gap-6">
+            <div className="w-96 flex-shrink-0">
+              {children}
             </div>
 
-            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold">15</h1>
-              <p className="text-gray-600">Pedidos activos</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white shadow rounded p-4">
-              <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>
-              <ul className="space-y-2">
-                <li className="flex justify-between border-b border-gray-300 pb-1">
-                  <span>Teclado mecánico</span>
-                  <span className="text-green-600">$2000</span>
-                </li>
-                <li className="flex justify-between border-b border-gray-300 pb-1">
-                  <span>Mouse gamer</span>
-                  <span className="text-green-600">$1200</span>
-                </li>
-                <li className="flex justify-between border-b border-gray-300 pb-1">
-                  <span>Placa de video RTX 3060</span>
-                  <span className="text-green-600">$16000</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Monitor 27" 144Hz</span>
-                  <span className="text-green-600">$10000</span>
-                </li>
-              </ul>
-            </div>
+            <div className="flex-1 bg-white shadow rounded-xl p-6 hover:shadow-lg duration-200 flex flex-col">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-800 font-quicksand flex items-center gap-2">
+                  {chartType === 'ventas' ? (
+                    <>
+                      <span className="text-sky-600"></span>
+                      Ventas
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-green-600"></span>
+                      Ganancias
+                    </>
+                  )}
+                </h2>
+                
+                <div className="flex gap-2 bg-gray-50 p-1 rounded-lg">
+                  <button
+                    onClick={() => setChartType('ventas')}
+                    className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                      chartType === 'ventas'
+                        ? 'bg-sky-600 text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    Ventas
+                  </button>
+                  <button
+                    onClick={() => setChartType('ganancias')}
+                    className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                      chartType === 'ganancias'
+                        ? 'bg-green-600 text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    Ganancias
+                  </button>
+                </div>
+              </div>
 
-            <div className="bg-white shadow rounded p-4">
-              <h2 className="text-lg font-bold mb-3">Productos más vendidos</h2>
-              <ul className="space-y-2">
-                <li className="flex justify-between border-b border-gray-300 pb-1">
-                  <span>Mouse gamer</span>
-                  <span className="text-blue-600">80 u.</span>
-                </li>
-                <li className="flex justify-between border-b border-gray-300 pb-1">
-                  <span>Teclado mecánico</span>
-                  <span className="text-blue-600">65 u.</span>
-                </li>
-                <li className="flex justify-between border-b border-gray-300 pb-1">
-                  <span>Auriculares inalámbricos</span>
-                  <span className="text-blue-600">50 u.</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>SSD 1TB</span>
-                  <span className="text-blue-600">40 u.</span>
-                </li>
-              </ul>
+              <div className="flex gap-2 mb-4">
+                {[
+                  { key: '1dia', label: '1D' },
+                  { key: '1semana', label: '1S' },
+                  { key: '1mes', label: '1M' },
+                  { key: '5meses', label: '5M' },
+                  { key: '1año', label: '1A' }
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setTimeRange(key)}
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                      timeRange === key
+                        ? 'bg-gray-800 text-white'
+                        : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex-1">
+                <Chart chartData={chartData} chartType={chartType} />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="md:hidden flex flex-col min-h-screen">
-        <div className="bg-white relative w-full shadow-sm p-4 flex items-center space-x-4">
+        <div className="bg-white relative w-full shadow p-4 flex items-center border-b border-gray-200">
           <img
             src={logo}
             alt="Logo Comercio"
-            className="w-20 h-20 object-contain bg-white border-2 border-sky-800 rounded-full flex-shrink-0 p-1"
+            className="w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
           />
-          <div className="absolute translate-x-1/2 right-1/2">
-            <h1 className="text-2xl mb-1 font-bold truncate font-quicksand">Arctec</h1>
-            <div className="flex mt-1 justify-center items-center text-sm text-gray-600">
-              <FaLocationDot className="mr-1 flex-shrink-0" size={12} />
-              <span className="truncate">San José, Uruguay</span>
+          <div className="flex-1 flex flex-col items-center">
+            <h1 className="text-xl font-bold font-quicksand text-gray-800">Arctec</h1>
+            <div className="flex items-center text-xs text-gray-600 font-quicksand mt-1">
+              <FaLocationDot className="mr-1 text-sky-600" size={10} />
+              <span>San José, Uruguay</span>
             </div>
           </div>
+          <RatingMeterMobile progress={progress} getColor={getColor} />
         </div>
 
-        <div className="flex-1 p-4 space-y-4 pb-6">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
-              <h1 className="text-2xl font-bold">221</h1>
-              <p className="text-gray-600 text-sm text-center">
-                Ventas totales
-              </p>
-            </div>
-            <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
-              <h1 className="text-2xl font-bold">$3000</h1>
-              <p className="text-gray-600 text-sm text-center">
-                Ingresos del mes
-              </p>
-            </div>
-
-            <div className="bg-white shadow rounded p-4 flex flex-col items-center justify-center">
-              <svg width="100" height="60" viewBox="0 0 100 50">
-                <path
-                  d="M 10 50 A 40 40 0 0 1 90 50"
-                  fill="transparent"
-                  stroke="#e5e7eb"
-                  strokeWidth="10"
-                />
-                <path
-                  d="M 10 50 A 40 40 0 0 1 90 50"
-                  fill="transparent"
-                  stroke={getColor(progress)}
-                  strokeWidth="10"
-                  strokeDasharray={circumferenceDesktop}
-                  strokeDashoffset={offsetDesktop}
-                  strokeLinecap="round"
-                  style={{ transition: "stroke-dashoffset 0.1s linear" }}
-                />
-                <text
-                  x="50"
-                  y="45"
-                  textAnchor="middle"
-                  fontSize="14"
-                  fontWeight="bold"
-                >
-                  {progress.toFixed(1)}
-                </text>
-              </svg>
-              <p className="text-gray-600 mt-1">Calificación</p>
-            </div>
-
-            <div className="bg-white shadow rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px]">
-              <h1 className="text-2xl font-bold">15</h1>
-              <p className="text-gray-600 text-sm text-center">
-                Pedidos activos
-              </p>
-            </div>
+        <div className="flex-1 p-4 flex flex-col gap-4 pb-6 overflow-y-auto">
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/create_product/")}
+              className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
+            >
+              + Añadir producto
+            </button>
+            <button
+              onClick={() => navigate("/product_crud/")}
+              className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
+            >
+              Ver mis productos
+            </button>
           </div>
+
           {children}
-          <div className="bg-white shadow rounded-lg p-4">
-            <h2 className="text-lg font-bold mb-3">Ventas recientes</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Teclado mecánico
-                </span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
-                  $2000
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Mouse gamer
-                </span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
-                  $1200
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Placa de video RTX 3060
-                </span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
-                  $16000
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Monitor 27" 144Hz
-                </span>
-                <span className="text-sm font-semibold text-green-600 flex-shrink-0">
-                  $10000
-                </span>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white shadow rounded-lg p-4">
-            <h2 className="text-lg font-bold mb-3">Productos más vendidos</h2>
-            <div className="space-y-3 mb-18">
-              <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Mouse gamer
-                </span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
-                  80 u.
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Teclado mecánico
-                </span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
-                  65 u.
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  Auriculares inalámbricos
-                </span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
-                  50 u.
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-800 truncate pr-2">
-                  SSD 1TB
-                </span>
-                <span className="text-sm font-semibold text-blue-600 flex-shrink-0">
-                  40 u.
-                </span>
+          <div className="bg-white shadow mb-22 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-800 font-quicksand flex items-center gap-2">
+                {chartType === 'ventas' ? (
+                  <>
+                    <span className="text-sky-600"></span>Ventas
+                  </>
+                ) : (
+                  <>
+                    <span className="text-green-600"></span>Ganancias
+                  </>
+                )}
+              </h2>
+              
+              <div className="flex gap-1 bg-gray-50 p-1 rounded-lg">
+                <button
+                  onClick={() => setChartType('ventas')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                    chartType === 'ventas'
+                      ? 'bg-sky-600 text-white'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  Ventas
+                </button>
+                <button
+                  onClick={() => setChartType('ganancias')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                    chartType === 'ganancias'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  Ganancias
+                </button>
               </div>
             </div>
+
+            <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
+              {[
+                { key: '1dia', label: '1D' },
+                { key: '1semana', label: '1S' },
+                { key: '1mes', label: '1M' },
+                { key: '5meses', label: '5M' },
+                { key: '1año', label: '1A' }
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setTimeRange(key)}
+                  className={`px-3 py-1 rounded-md text-xs font-semibold font-quicksand whitespace-nowrap duration-150 ${
+                    timeRange === key
+                      ? 'bg-gray-800 text-white'
+                      : 'text-gray-500 bg-gray-50'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <ChartMobile chartData={chartData} chartType={chartType} />
           </div>
         </div>
       </div>

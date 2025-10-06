@@ -426,14 +426,6 @@ CREATE TABLE custom_shops (
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE
 );
 
-SELECT * FROM productos
-
-SELECT c.header_color, c.main_color, c.footer_color
-FROM custom_shops c
-    JOIN ecommerces e ON e.nombre_ecommerce = 'LaFerre'
-WHERE
-    c.id_ecommerce = e.id_ecommerce
-
 --Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
 INSERT INTO
     usuarios (
