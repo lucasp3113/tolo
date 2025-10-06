@@ -77,19 +77,10 @@ export default function SellerDashboard({ children }) {
             className="w-36 h-36 mb-4 border-4 border-sky-800 rounded-full object-contain bg-white p-2"
           />
           <h1 className="text-2xl font-bold mb-2">Artec</h1>
-          <p className="text-center text-gray-600">
+          <p className="text-center text-gray-600 mb-8">
             Vendemos electrónicos, componentes de PC, gadgets y más.
           </p>
-          <div className="mt-6 w-full pt-4">
-            <div className="flex justify-center">
-              <FaLocationDot
-                title="Localidad"
-                className="text-gray-500 mb-2 mr-2"
-              />
-              <h2>San José, Uruguay</h2>
-            </div>
             {children}
-          </div>
         </div>
 
         <div className="col-span-3 grid grid-rows-2 gap-4 p-4">

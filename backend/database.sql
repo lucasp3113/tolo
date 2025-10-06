@@ -1,4 +1,4 @@
--- Active: 1758104807084@@127.0.0.1@3306@tolo
+-- Active: 1756346382742@@127.0.0.1@3306
 CREATE DATABASE tolo;
 
 USE tolo;
@@ -17,6 +17,8 @@ CREATE TABLE usuarios (
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
 );
+
+SELECT * FROM usuarios;
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
