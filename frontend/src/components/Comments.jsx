@@ -21,7 +21,6 @@ const CommentsSection = ({ productId }) => {
     watch
   } = useForm();
 
-  // Observar el valor del textarea para el contador de caracteres
   const comentarioValue = watch("comentario", "");
 
   let userId = null;
@@ -40,7 +39,7 @@ const CommentsSection = ({ productId }) => {
 
   const loadComments = async () => {
     setLoading(true);
-    setError(null); // Limpiar errores previos
+    setError(null); 
     try {
       const response = await axios.get(`/api/show_comments.php?productId=${productId}`);
       if (response.data.success) {
@@ -55,26 +54,23 @@ const CommentsSection = ({ productId }) => {
   };
 
   const handleSubmitComment = async (data) => {
-    // Validación del rating
     if (!rating || rating === 0) {
       setError("Por favor selecciona una calificación");
       return;
     }
 
-    // Validación del comentario
     if (!data.comentario || data.comentario.trim().length < 5) {
       setError("El comentario debe tener al menos 5 caracteres");
       return;
     }
 
-    // Validación del usuario
     if (!userId) {
       setError("Debes estar logueado para comentar");
       return;
     }
     
     try {
-      setError(null); // Limpiar errores
+      setError(null);
       console.log("Enviando comentario:", {
         productId: productId,
         userId: userId,
@@ -83,9 +79,9 @@ const CommentsSection = ({ productId }) => {
       });
 
       const response = await axios.post("/api/add_comment.php", {
-        productId: parseInt(productId), // Asegurar que sea número
-        userId: parseInt(userId), // Asegurar que sea número
-        rating: parseFloat(rating), // Asegurar que sea decimal
+        productId: parseInt(productId),
+        userId: parseInt(userId),
+        rating: parseFloat(rating),
         comentario: data.comentario.trim()
       }, {
         headers: {
@@ -98,7 +94,7 @@ const CommentsSection = ({ productId }) => {
       if (response.data.success) {
         setRating(0);
         reset();
-        await loadComments(); // Recargar comentarios
+        await loadComments();
         setError(null);
       } else {
         setError(response.data.message || "Error al enviar comentario");
@@ -135,7 +131,6 @@ const CommentsSection = ({ productId }) => {
   const CommentItem = ({ comment }) => {
     const isOwner = currentUser && currentUser.id_usuario === comment.id_usuario;
 
-    // Generar iniciales del nombre
     const getInitials = (name) => {
       return name
         .split(' ')

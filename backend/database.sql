@@ -1,7 +1,10 @@
--- Active: 1756346382742@@127.0.0.1@3306
+-- Active: 1756304004613@@127.0.0.1@3306@tolo
+
 CREATE DATABASE tolo;
 
 USE tolo;
+
+SELECT * FROM usuarios
 
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -18,7 +21,6 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
-SELECT * FROM usuarios;
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

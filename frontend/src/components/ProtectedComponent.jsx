@@ -15,15 +15,12 @@ const ProtectedComponent = ({
     navigate('/login');
   };
 
-  // Si requiere auth y no está logueado
   if (requireAuth && !isLoggedIn) {
     
-    // Interceptamos solo clicks, permitiendo hovers y otros eventos
     const interceptedChildren = React.Children.map(children, child => {
       if (React.isValidElement(child)) {
         const interceptedProps = { ...child.props };
         
-        // Solo interceptamos eventos de "acción" no eventos visuales
         if (child.props.onClick) interceptedProps.onClick = handleLoginRedirect;
         if (child.props.onChange) interceptedProps.onChange = handleLoginRedirect;
         if (child.props.onRatingChange) interceptedProps.onRatingChange = handleLoginRedirect;
@@ -31,7 +28,6 @@ const ProtectedComponent = ({
         if (child.props.onSelect) interceptedProps.onSelect = handleLoginRedirect;
         if (child.props.onToggle) interceptedProps.onToggle = handleLoginRedirect;
         
-        // Para interceptar clicks internos (como en Rating) sin bloquear hovers
         return (
           <div 
             onClickCapture={(e) => {
@@ -39,7 +35,7 @@ const ProtectedComponent = ({
               e.stopPropagation();
               handleLoginRedirect();
             }}
-            style={{ display: 'contents' }} // No afecta el layout
+            style={{ display: 'contents' }}
           >
             {React.cloneElement(child, interceptedProps)}
           </div>
@@ -50,7 +46,6 @@ const ProtectedComponent = ({
 
     return interceptedChildren;
 
-    // Código anterior comentado para referencia:
     /*
     if (fallback) {
       return fallback;
@@ -80,7 +75,6 @@ const ProtectedComponent = ({
     */
   }
 
-  // Si está logueado, renderiza el contenido normalmente
   return children;
 };
 
