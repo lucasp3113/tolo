@@ -64,8 +64,8 @@ export default function Button ({
         text-lg
         text-white
         rounded-xl
-        // hover:scale-105
-        transition-all
+        hover:scale-105
+        transition-transform
         duration-200
         cursor-pointer
         m-2
