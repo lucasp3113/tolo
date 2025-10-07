@@ -141,7 +141,7 @@ function App() {
               <Route
                 path="/admin_panel/"
                 element={
-                  <Layout >
+                  <Layout search="true">
                     <AdminPanel />
                   </Layout>
                 }

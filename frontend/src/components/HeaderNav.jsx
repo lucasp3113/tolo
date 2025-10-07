@@ -127,6 +127,7 @@ export default function HeaderNav({
     axios
       .post("/api/search.php", dataForm)
       .then((res) => {
+        console.log(res)
         setWord(dataForm.search);
         setSearchData(res.data.data);
         const categories = [];
@@ -317,7 +318,7 @@ export default function HeaderNav({
                         ? navigate(`/${nameEcommerce}/shopping_cart/`)
                         : navigate("/shopping_cart/");
                     else if (userType === "admin")
-                      navigate("admin_panel")
+                      navigate("/admin_panel/")
                     else
                       nameEcommerce
                         ? navigate(`/${nameEcommerce}/seller_dashboard/`)
