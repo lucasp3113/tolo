@@ -3,6 +3,8 @@ CREATE DATABASE tolo;
 
 USE tolo;
 
+SELECT * FROM productos
+
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_usuario VARCHAR(15) NOT NULL UNIQUE,
@@ -269,6 +271,16 @@ VALUES (
         'Herramientas disponibles para alquiler'
     );
 
+UPDATE colores_producto u
+SET
+    u.nombre = "PALOMO",
+    u.stock = 100
+WHERE
+    u.id_color = 17
+
+
+SELECT * FROM colores_producto
+
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_vendedor INT UNSIGNED NOT NULL,
@@ -392,6 +404,8 @@ CREATE TABLE colores_producto (
     stock SMALLINT UNSIGNED DEFAULT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
+SELECT * FROM productos
 
 CREATE TABLE imagenes_color_producto (
     id_imagen_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

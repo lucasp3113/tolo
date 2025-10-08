@@ -9,7 +9,7 @@ import axios from 'axios'
 
 export default function Home({ searchData, userType, setSearchData }) {
   const { ecommerce } = useParams();
-
+  
   let user = null;
   const token = localStorage.getItem("token");
   if (token) {
@@ -35,6 +35,7 @@ export default function Home({ searchData, userType, setSearchData }) {
               <ProductCard
                 key={producto.id_producto}
                 name={producto.nombre_producto}
+                rating={producto.rating}
                 price={producto.precio}
                 image={`/api/${producto.ruta_imagen}`}
                 stock={producto.stock}
@@ -96,6 +97,7 @@ export default function Home({ searchData, userType, setSearchData }) {
                 <ProductCard
                   onDelete={() => handleDeleteProduct(i.id_producto)}
                   admin={userType}
+                  rating={i.rating}
                   name={i.nombre_producto}
                   price={i["precio"]}
                   image={`/api/${i["ruta_imagen"]}`}
@@ -115,6 +117,7 @@ export default function Home({ searchData, userType, setSearchData }) {
               <ProductCard
                 key={producto.id_producto}
                 name={producto.nombre_producto}
+                rating={producto.rating}
                 price={producto.precio}
                 image={`/api/${producto.ruta_imagen}`}
                 stock={producto.stock}

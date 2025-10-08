@@ -116,6 +116,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     dataForm["nameEcommerce"] = nameEcommerce || null;
     axios.post("/api/search.php", dataForm)
       .then(res => {
+        console.log(res)
         setWord(dataForm.search);
         setSearchData(res.data.data);
         const categories = [];
@@ -143,7 +144,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               className={`${!logoEcommerce && ""} ml-3 h-[95%] w-full object-contain`}
             />
           ) : (
-            <img src={logoTolo} alt="Logo" className="w-full h-full object-cover" />
+            <img src={logoTolo} alt="Logo" loading='lazy' className="w-full h-full object-cover" />
           )}
         </div>
 

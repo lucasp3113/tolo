@@ -13,10 +13,10 @@ const CommentsSection = ({ productId }) => {
   const [stats, setStats] = useState({ total_comentarios: 0, promedio_rating: 0 });
   const [rating, setRating] = useState(0);
 
-  const { 
-    register, 
-    handleSubmit, 
-    reset, 
+  const {
+    register,
+    handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
     watch
   } = useForm();
@@ -72,7 +72,7 @@ const CommentsSection = ({ productId }) => {
       setError("Debes estar logueado para comentar");
       return;
     }
-    
+
     try {
       setError(null); // Limpiar errores
       console.log("Enviando comentario:", {
@@ -92,9 +92,9 @@ const CommentsSection = ({ productId }) => {
           'Content-Type': 'application/json'
         }
       });
-      
+
       console.log("Respuesta del servidor:", response.data);
-      
+
       if (response.data.success) {
         setRating(0);
         reset();
@@ -115,7 +115,7 @@ const CommentsSection = ({ productId }) => {
         commentId: commentId,
         userId: userId
       });
-      
+
       if (response.data.success) {
         loadComments();
       } else {
@@ -173,9 +173,11 @@ const CommentsSection = ({ productId }) => {
               />
             </div>
 
-            <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-              {comment.comentario}
-            </p>
+            <section className="w-100">
+              <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                {comment.comentario}
+              </p>
+            </section>
           </div>
 
           {isOwner && (
@@ -278,9 +280,8 @@ const CommentsSection = ({ productId }) => {
                 size="md"
                 type="submit"
                 disabled={isSubmitting || !rating || rating === 0}
-                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${
-                  isSubmitting || !rating ? " cursor-not-allowed" : ""
-                }`}
+                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${isSubmitting || !rating ? " cursor-not-allowed" : ""
+                  }`}
               />
             </ProtectedComponent>
           </form>

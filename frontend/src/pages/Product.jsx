@@ -221,7 +221,7 @@ export default function Product(productId) {
     return defaultImages;
   };
 
-  if (loading) return <div className="flex justify-center items-center p-10">Cargando...</div>;
+  if (loading) return <div className="flex justify-center font-quicksand items-center p-10">Cargando...</div>;
   if (error) return <div className="flex justify-center items-center p-10 text-red-500">Error al cargar el producto</div>;
   if (!data) return <div className="flex justify-center items-center p-10">No se encontró el producto</div>;
 
