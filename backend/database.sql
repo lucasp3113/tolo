@@ -794,4 +794,4 @@ VALUES (10, 'Diseño oversize cargo'),
         'Resistente para uso diario'
     );
 
-SELECT * FROM productos
+SELECT * FROM caracteristicas_producto
