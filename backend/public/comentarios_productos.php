@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-$data_base = new mysqli("localhost", "root", "brbrpatacona", "tolo");
+$data_base = new mysqli("localhost", "root", "", "tolo");
 
 if ($data_base->connect_error) {
     http_response_code(500);
