@@ -34,7 +34,8 @@ export default function Login() {
                 const urls = {
                     ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
                     vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
-                    cliente: ecommerce ? `/${ecommerce}/` : "/"
+                    cliente: ecommerce ? `/${ecommerce}/` : "/",
+                    admin: ecommerce ? `/${ecommerce}/admin_panel` : "/admin_panel"
 
                 }
                 navigate(urls[userType])

@@ -139,6 +139,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .then((res) => {
                 setCurrentStep("showCharac")
                 setDataCharac(res.data.data)
+                console.log(productId)
             })
             .catch((err) => console.log(err))
     }

@@ -1,5 +1,4 @@
 <?php
-mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
@@ -29,7 +28,8 @@ for ($i = 0; $i < count($body["data"]); $i++) {
     } else {
         http_response_code(400);
         echo json_encode([
-            "success"=> false
+            "success"=> false,
+
         ]);
         exit;
     }
