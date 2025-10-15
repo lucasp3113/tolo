@@ -6,7 +6,7 @@ import { FaRegClock } from "react-icons/fa";
 import Input from "../components/Input";
 import { IoSearch } from "react-icons/io5";
 import Button from "../components/Button";
-import silvano from "../../src/assets/silvano.jpg";
+import silvano from "../../src/assets/lautaro.jpeg";
 import { FaLocationDot } from "react-icons/fa6";
 import {
   LineChart,
@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useForm } from "react-hook-form";
+import { div } from "three/src/nodes/TSL.js";
 
 const Chart = memo(({ chartData, chartType }) => {
   return (
@@ -99,6 +100,13 @@ export default function AdminPanel() {
   const [timeRange, setTimeRange] = useState("1semana");
   const [chartData, setChartData] = useState([]);
   const [chartType, setChartType] = useState("Visitas");
+
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      setWidth(window.innerWidth);
+    });
+  });
 
   const allOrders = [
     {
@@ -332,141 +340,139 @@ export default function AdminPanel() {
   }, [generateDummyData]);
 
   return (
-    <div className="gap-4 p-4">
-      <section className="flex">
-        {/* === TABLA DE PEDIDOS === */}
-        <section className="w-[61%] bg-white shadow rounded-xl p-4 max-h-[28rem] overflow-y-auto">
-          <table className="w-full">
-            <thead className="top-0 bg-white z-10">
-              <tr className="text-center">
-                <th className="px-4 py-2 font-semibold">Pedido</th>
-                <th className="px-4 py-2 font-semibold">Cliente</th>
-                <th className="px-4 py-2 font-semibold">Fecha</th>
-                <th className="px-4 py-2 font-semibold">Monto</th>
-                <th className="px-4 py-2 font-semibold">Dirección</th>
-                <th className="px-4 py-2 font-semibold">Estado</th>
-              </tr>
-            </thead>
+    <section>
+      {width >= 500 ? (
+        <div className="gap-4 md:p-4 font-quicksand">
+          <section className="flex gap-4">
+            <section className="w-[76%] bg-white shadow rounded-xl p-4 max-h-[28rem] overflow-y-auto">
+              <table className="w-full">
+                <thead className="top-0 bg-white z-10">
+                  <tr className="text-center">
+                    <th className="px-4 py-2 font-semibold">Pedido</th>
+                    <th className="px-4 py-2 font-semibold">Cliente</th>
+                    <th className="px-4 py-2 font-semibold">Fecha</th>
+                    <th className="px-4 py-2 font-semibold">Monto</th>
+                    <th className="px-4 py-2 font-semibold">Dirección</th>
+                    <th className="px-4 py-2 font-semibold">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedOrders.map((order, i) => (
+                    <tr
+                      key={order.id}
+                      className="text-center animate-[fadeSlide_0.5s_ease-out_forwards]"
+                      style={{ animationDelay: `${i * 0.05}s` }}
+                    >
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.id}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.cliente}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.fecha}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.monto}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.direccion}
+                      </td>
+                      <td
+                        className={`px-4 py-2 border border-gray-200 font-bold flex justify-center ${
+                          order.estado === "Enviado"
+                            ? "text-green-600"
+                            : "text-amber-500"
+                        }`}
+                      >
+                        {order.estado}{" "}
+                        {order.estado === "Enviado" ? (
+                          <IoCheckmarkDone className="self-center ml-2 text-xl text-sky-500" />
+                        ) : (
+                          <FaRegClock className="self-center ml-2 text-md" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div ref={tableEndRef} className="h-4" />
+              {!hasMore && displayedOrders.length > 0 && (
+                <div className="text-center py-4 text-gray-500 text-sm">
+                  No hay más pedidos para mostrar
+                </div>
+              )}
+            </section>
 
-            <tbody>
-              {displayedOrders.map((order, i) => (
-                <tr
-                  key={order.id}
-                  className="text-center animate-[fadeSlide_0.5s_ease-out_forwards]"
-                  style={{ animationDelay: `${i * 0.05}s` }}
-                >
-                  <td className="px-4 py-2 border border-gray-200">
-                    {order.id}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {order.cliente}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {order.fecha}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {order.monto}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-200">
-                    {order.direccion}
-                  </td>
-                  <td
-                    className={`px-4 py-2 border border-gray-200 font-bold flex justify-center ${
-                      order.estado === "Enviado"
-                        ? "text-green-600"
-                        : "text-amber-500"
+            <section className="w-[40%] bg-white shadow rounded-xl p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-800 font-quicksand flex items-center gap-2">
+                  {chartType === "Visitas" ? (
+                    <>
+                      <span className="text-sky-600"></span>
+                      Visitas
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-green-600"></span>
+                      Ganancias
+                    </>
+                  )}
+                </h2>
+
+                <div className="flex gap-2 bg-gray-50 p-1 rounded-lg">
+                  <button
+                    onClick={() => setChartType("Visitas")}
+                    className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand transition-all duration-200 hover:cursor-pointer hover:text-white hover:bg-sky-600 ${
+                      chartType === "Visitas"
+                        ? "bg-sky-500 text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
-                    {order.estado}{" "}
-                    {order.estado === "Enviado" ? (
-                      <IoCheckmarkDone className="self-center ml-2 text-xl text-sky-500" />
-                    ) : (
-                      <FaRegClock className="self-center ml-2 text-md" />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    Visitas
+                  </button>
+                  <button
+                    onClick={() => setChartType("ganancias")}
+                    className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand transition-all duration-200 hover:cursor-pointer hover:bg-green-600 hover:text-white ${
+                      chartType === "ganancias"
+                        ? "bg-green-500 text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Ganancias
+                  </button>
+                </div>
+              </div>
 
-          <div ref={tableEndRef} className="h-4" />
-          {!hasMore && displayedOrders.length > 0 && (
-            <div className="text-center py-4 text-gray-500 text-sm">
-              No hay más pedidos para mostrar
-            </div>
-          )}
-        </section>
+              <div className="flex gap-2 mb-4">
+                {[
+                  { key: "1dia", label: "1D" },
+                  { key: "1semana", label: "1S" },
+                  { key: "1mes", label: "1M" },
+                  { key: "5meses", label: "5M" },
+                  { key: "1año", label: "1A" },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setTimeRange(key)}
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand hover:cursor-pointer duration-150 ${
+                      timeRange === key
+                        ? "bg-gray-800 text-white"
+                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
 
-        {/* === GRÁFICO === */}
-        <section className="w-[40%] bg-white shadow rounded-xl p-6 hover:shadow-lg duration-200 flex flex-col">
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 font-quicksand flex items-center gap-2">
-              {chartType === "Visitas" ? (
-                <>
-                  <span className="text-sky-600"></span>
-                  Visitas
-                </>
-              ) : (
-                <>
-                  <span className="text-green-600"></span>
-                  Ganancias
-                </>
-              )}
-            </h2>
+              <div className="flex-1">
+                <Chart chartData={chartData} chartType={chartType} />
+              </div>
+            </section>
+          </section>
 
-            <div className="flex gap-2 bg-gray-50 p-1 rounded-lg">
-              <button
-                onClick={() => setChartType("Visitas")}
-                className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand transition-all duration-200 hover:cursor-pointer hover:text-white hover:bg-sky-600 ${
-                  chartType === "Visitas"
-                    ? "bg-sky-500 text-white shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Visitas
-              </button>
-              <button
-                onClick={() => setChartType("ganancias")}
-                className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand transition-all duration-200 hover:cursor-pointer hover:bg-green-600 hover:text-white ${
-                  chartType === "ganancias"
-                    ? "bg-green-500 text-white shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Ganancias
-              </button>
-            </div>
-          </div>
-
-          <div className="flex gap-2 mb-4">
-            {[
-              { key: "1dia", label: "1D" },
-              { key: "1semana", label: "1S" },
-              { key: "1mes", label: "1M" },
-              { key: "5meses", label: "5M" },
-              { key: "1año", label: "1A" },
-            ].map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setTimeRange(key)}
-                className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand hover:cursor-pointer duration-150 ${
-                  timeRange === key
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex-1">
-            <Chart chartData={chartData} chartType={chartType} />
-          </div>
-        </section>
-      </section>
-
-      <style>{`
+          <style>{`
         @keyframes fadeSlide {
           0% {
             opacity: 0;
@@ -478,40 +484,376 @@ export default function AdminPanel() {
           }
         }
       `}</style>
-      <section className="mt-10">
-        <div className="w-[30%]!">
-          <Input
-            type="text"
-            name="ecommerce"
-            label="Buscar E-Commerce"
-            placeholder="Ej: Nike"
-            register={register}
-            errors={errors}
-            required={true}
-            className=""
-            icon={
-              <Button
-                type="submit"
-                className="bg-transparent translate-y-2 translate-x-2 shadow-none"
-                text={
-                  <IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />
-                }
-              />
-            }
-          />
+          <section className="mt-10 flex flex-col w-full items-center">
+            <div className="w-[100%]">
+              <section className="w-[50%] m-auto!">
+                <Input
+                  type="text"
+                  name="ecommerce"
+                  label="Buscar E-Commerce"
+                  placeholder="Ej: Nike"
+                  register={register}
+                  errors={errors}
+                  required={true}
+                  className=""
+                  icon={
+                    <Button
+                      type="submit"
+                      className="bg-transparent translate-y-2 translate-x-2 shadow-none"
+                      text={
+                        <IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />
+                      }
+                    />
+                  }
+                />
+              </section>
+              <div className="flex flex-wrap justify-center">
+                <div
+                  className="flex ml-4 p-4 w-[30%] hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-30 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col ml-10 justify-justify w-[50%]">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="flex ml-4 p-4 w-[30%] hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-30 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col ml-10 justify-justify w-[50%]">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className="flex ml-4 p-4 w-[30%] hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-30 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col ml-10 justify-justify w-[50%]">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className="flex ml-4 p-4 w-[30%] hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-30 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col ml-10 justify-justify w-[50%]">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className="flex ml-4 p-4 w-[30%] hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-30 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col ml-10 justify-justify w-[50%]">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-        <div className="flex ml-4 py-4 border-y w-[28%] border-gray-300 hover:cursor-pointer hover:border-[#a1a1a1] transition-all duration-100"
-        onClick={() => navigate("/seller_dashboard/")}
-        >
-          <div className="">
-            <img src={silvano} alt="" className="rounded-full h-30 w-30" />
-          </div>
-          <div className="flex flex-col gap-0 p-2 ml-5">
-            <p className="font-semibold">Silvano Berrieludo</p>
-            <p className="text-gray-500 mt-1 flex self-center">Uruguay <FaLocationDot className="text-sky-600 ml-2 translate-y-1" size={18} /></p> 
-          </div>
+      ) : (
+        <div className="gap-4 p-0 font-quicksand">
+          <section className="flex flex-col gap-4 w-[33rem]">
+            <section className="w-[76%] bg-white shadow rounded-xl p-1 max-h-[28rem] overflow-y-auto">
+              <table className="w-full">
+                <thead className="top-0 bg-white z-10">
+                  <tr className="text-center">
+                    <th className="py-2 font-semibold">Pedido</th>
+                    <th className="py-2 font-semibold">Cliente</th>
+                    <th className="py-2 font-semibold">Fecha</th>
+                    <th className="py-2 font-semibold">Monto</th>
+                    <th className="py-2 font-semibold">Dirección</th>
+                    <th className="py-2 font-semibold">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedOrders.map((order, i) => (
+                    <tr
+                      key={order.id}
+                      className="text-center animate-[fadeSlide_0.5s_ease-out_forwards]"
+                      style={{ animationDelay: `${i * 0.05}s` }}
+                    >
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.id}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.cliente}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.fecha}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.monto}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">
+                        {order.direccion}
+                      </td>
+                      <td
+                        className={`px-4 py-2 border border-gray-200 font-bold flex justify-center ${
+                          order.estado === "Enviado"
+                            ? "text-green-600"
+                            : "text-amber-500"
+                        }`}
+                      >
+                        {order.estado}{" "}
+                        {order.estado === "Enviado" ? (
+                          <IoCheckmarkDone className="self-center ml-2 text-xl text-sky-500" />
+                        ) : (
+                          <FaRegClock className="self-center ml-2 text-md" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div ref={tableEndRef} className="h-4" />
+              {!hasMore && displayedOrders.length > 0 && (
+                <div className="text-center py-4 text-gray-500 text-sm">
+                  No hay más pedidos para mostrar
+                </div>
+              )}
+            </section>
+
+            <section className="w-[40%] bg-white shadow rounded-xl p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-800 font-quicksand flex items-center gap-2">
+                  {chartType === "Visitas" ? (
+                    <>
+                      <span className="text-sky-600"></span>
+                      Visitas
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-green-600"></span>
+                      Ganancias
+                    </>
+                  )}
+                </h2>
+
+                <div className="flex gap-2 bg-gray-50 p-1 rounded-lg">
+                  <button
+                    onClick={() => setChartType("Visitas")}
+                    className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand transition-all duration-200 hover:cursor-pointer hover:text-white hover:bg-sky-600 ${
+                      chartType === "Visitas"
+                        ? "bg-sky-500 text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Visitas
+                  </button>
+                  <button
+                    onClick={() => setChartType("ganancias")}
+                    className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand transition-all duration-200 hover:cursor-pointer hover:bg-green-600 hover:text-white ${
+                      chartType === "ganancias"
+                        ? "bg-green-500 text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Ganancias
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mb-4">
+                {[
+                  { key: "1dia", label: "1D" },
+                  { key: "1semana", label: "1S" },
+                  { key: "1mes", label: "1M" },
+                  { key: "5meses", label: "5M" },
+                  { key: "1año", label: "1A" },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setTimeRange(key)}
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand hover:cursor-pointer duration-150 ${
+                      timeRange === key
+                        ? "bg-gray-800 text-white"
+                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex-1">
+                <Chart chartData={chartData} chartType={chartType} />
+              </div>
+            </section>
+          </section>
+
+          <style>{`
+        @keyframes fadeSlide {
+          0% {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+          <section className="mt-10 flex flex-col w-full items-center mb-[6rem] ">
+            <div className="w-[100%]">
+              <section className="mx-auto flex justify-center -translate-x-13">
+                <Input
+                  type="text"
+                  name="ecommerce"
+                  label="Buscar E-Commerce"
+                  placeholder="Ej: Nike"
+                  register={register}
+                  errors={errors}
+                  required={true}
+                  className=""
+                  icon={
+                    <Button
+                      type="submit"
+                      className="bg-transparent translate-y-2 translate-x-2 shadow-none"
+                      text={
+                        <IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />
+                      }
+                    />
+                  }
+                />
+              </section>
+              <div className="flex flex-col justify-center">
+                <div
+                  className="flex p-4 w-full hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-25 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-justify w-full">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="flex ml-0 p-4 w-full hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100"
+                  onClick={() => navigate("/seller_dashboard/")}
+                >
+                  <div>
+                    <img
+                      src={silvano}
+                      alt="Imagen de E-Commerce"
+                      className="rounded-full h-30 w-30"
+                    />
+                  </div>
+                  <div className="flex flex-col w-full">
+                    <p className="font-semibold break-words mt-5">
+                      Bruno Camilo
+                    </p>
+                    <p className="text-gray-500 flex self-center">
+                      Uruguay{" "}
+                      <FaLocationDot
+                        className="text-sky-600 ml-2 translate-y-1"
+                        size={18}
+                      />
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
-    </div>
+      )}
+    </section>
   );
 }
