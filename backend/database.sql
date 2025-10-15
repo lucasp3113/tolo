@@ -1,4 +1,4 @@
--- Active: 1756346382742@@127.0.0.1@3306@tolo
+-- Active: 1756304004613@@127.0.0.1@3306@tolo
 -- ============================================================
 -- CREACIÓN DE BASE DE DATOS
 -- ============================================================
@@ -550,3 +550,5 @@ VALUES (10, 'Diseño oversize cargo'),
 SELECT * FROM caracteristicas_producto
 
 SELECT * FROM usuarios;
+
+SELECT ()

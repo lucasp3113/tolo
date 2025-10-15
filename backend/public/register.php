@@ -4,18 +4,22 @@ header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
 require '../vendor/autoload.php';
+
+use MeiliSearch\Client;
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+
 $secret_key = "LA_CACHIMBA_AMA";
 $issued_at = time();
 $expiration_time = $issued_at + 8000;
 
 $config = require __DIR__ . '/../config.php';
 $data_base = new mysqli(
-    $config['host'],
-    $config['user'],
-    $config['password'],
-    $config['database']
+   $config['host'],
+   $config['user'],
+   $config['password'],
+   $config['database']
 );
 
 if ($data_base) {
@@ -45,10 +49,10 @@ if ($data_base) {
          ]);
          exit;
       }
-      
+
       // Obtenemos el ID del usuario recién creado
       $user_id = $data_base->insert_id;
-      
+
       if ($user_type == "ecommerce") {
          $ecommerce_name = $body["nameEcommerce"];
          $query = $data_base->prepare("INSERT INTO ecommerces(id_usuario, nombre_ecommerce) VALUES(?, ?)");
@@ -63,9 +67,17 @@ if ($data_base) {
                "user" => $username,
                "user_type" => $user_type
             ];
-            
+
             $jwt = JWT::encode($payload, $secret_key, 'HS256');
-            
+
+            $client = new Client('http://127.0.0.1:7700');
+            $index = $client->getIndex('E-Commerce');
+            $producto_index = [
+               'id' => trim($user_id),
+               'name' => $ecommerce_name
+            ];
+            $index->addDocuments([$producto_index]);
+
             http_response_code(200);
             echo json_encode([
                "success" => true,
@@ -90,21 +102,21 @@ if ($data_base) {
             "iss" => "http://tu-dominio.com",
             "iat" => $issued_at,
             "exp" => $expiration_time,
-            "id_usuario" => $user_id,   
+            "id_usuario" => $user_id,
             "user" => $username,
-            "user_type" => $user_type      
+            "user_type" => $user_type
          ];
-         
+
          $jwt = JWT::encode($payload, $secret_key, 'HS256');
-         
+
          http_response_code(200);
          echo json_encode([
             "success" => true,
             "message" => 'Cuenta creada con éxito',
             "token" => $jwt,
-            "expiration" => $expiration_time,   
-            "user_type" => $user_type,           
-            "id_usuario" => $user_id            
+            "expiration" => $expiration_time,
+            "user_type" => $user_type,
+            "id_usuario" => $user_id
          ]);
       }
       $query->close();
@@ -127,5 +139,3 @@ if ($data_base) {
    ]);
    exit;
 }
-
-?>
