@@ -127,7 +127,7 @@ export default function HeaderNav({
     axios
       .post("/api/search.php", dataForm)
       .then((res) => {
-        console.log(res)
+        console.log(res);
         setWord(dataForm.search);
         setSearchData(res.data.data);
         const categories = [];
@@ -317,14 +317,27 @@ export default function HeaderNav({
                       nameEcommerce
                         ? navigate(`/${nameEcommerce}/shopping_cart/`)
                         : navigate("/shopping_cart/");
-                    else if (userType === "admin")
-                      navigate("/admin_panel/")
+                    else if (userType === "admin") navigate("/admin_panel/");
                     else
                       nameEcommerce
                         ? navigate(`/${nameEcommerce}/seller_dashboard/`)
                         : navigate("/seller_dashboard/");
                   },
                 },
+              isLoggedIn && {
+                title: "",
+                icon: {
+                  name: (
+                    <IoSettings className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300" />
+                  ),
+                  expand: false,
+                },
+                animation: false,
+                onClick: () =>
+                  nameEcommerce
+                    ? navigate(`/${nameEcommerce}/settings/`)
+                    : navigate("/settings/"),
+              },
               isLoggedIn && {
                 title: "",
                 icon: {
@@ -346,20 +359,6 @@ export default function HeaderNav({
                     ? navigate(`/${nameEcommerce}/`)
                     : navigate("/");
                 },
-              },
-              isLoggedIn && {
-                title: "",
-                icon: {
-                  name: (
-                    <IoSettings className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300" />
-                  ),
-                  expand: false,
-                },
-                animation: false,
-                onClick: () =>
-                  nameEcommerce
-                    ? navigate(`/${nameEcommerce}/settings/`)
-                    : navigate("/settings/"),
               },
             ].filter(Boolean)}
           />

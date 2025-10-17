@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { FaRegClock } from "react-icons/fa";
+import { FaCircleUser } from "react-icons/fa6";
 import Input from "../components/Input";
 import { IoSearch } from "react-icons/io5";
 import Button from "../components/Button";
@@ -168,11 +169,11 @@ export default function AdminPanel() {
   }, [searchData]);
 
   const colorsCurrentRange = {
-    junior: "text-sky-400",
-    amateur: "text-green-500",
-    semi_senior: "text-blue-500",
-    senior: "text-red-500",
-    elite: "text-amber-500",
+    junior: "text-sky-400 border-sky-400",
+    amateur: "text-green-500 border-green-500",
+    semi_senior: "text-blue-500 border-blue-500",
+    senior: "text-red-500 border-red-500",
+    elite: "text-amber-500 border-amber-500",
   };
 
   const {
@@ -635,16 +636,28 @@ export default function AdminPanel() {
                   {searchData.slice(0, ecommerceCount).map((ecommerce, i) => (
                     <div
                       key={ecommerce.id}
-                      className="flex ml-4 p-4 w-[30%] hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100 animate-[fadeSlide_0.5s_ease-out_forwards]"
+                      className="flex ml-4 p-4 w-[30%] bg-white hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100 animate-[fadeSlide_0.5s_ease-out_forwards]"
                       style={{ animationDelay: `${i * 0.03}s` }}
-                      onClick={() => navigate(`/seller_dashboard/${ecommerce.id_usuario}`)}
+                      onClick={() =>
+                        navigate(`/seller_dashboard/${ecommerce.id_usuario}`)
+                      }
                     >
                       <div>
-                        <img
-                          src={`/api/${ecommerce.logo}`}
-                          alt="Imagen de E-Commerce"
-                          className="rounded-full h-30 w-30"
-                        />
+                        {ecommerce.logo ? (
+                          <img
+                            src={`/api/${ecommerce.logo}`}
+                            alt="Imagen de E-Commerce"
+                            className={`${
+                              colorsCurrentRange[ecommerce.nombre_rango]
+                            } h-30 w-30 rounded-full border-4`}
+                          />
+                        ) : (
+                          <FaCircleUser
+                            className={`${
+                              colorsCurrentRange[ecommerce.nombre_rango]
+                            } text-8xl m-auto text-gray-500! h-30 w-30 rounded-full border-4`}
+                          />
+                        )}
                       </div>
                       <div className="flex flex-col ml-10 justify-justify w-[50%]">
                         <p className="font-semibold break-words mt-5">
@@ -835,7 +848,10 @@ export default function AdminPanel() {
 
           <section className="mt-2 flex flex-col w-full items-center mb-[6rem] ">
             <div className="w-full">
-              <section className="flex justify-center border-b border-gray-200">
+              <form
+                onSubmit={handleSubmit(search)}
+                className="flex justify-center border-b border-gray-200"
+              >
                 <Input
                   type="text"
                   name="ecommerce"
@@ -855,7 +871,7 @@ export default function AdminPanel() {
                     />
                   }
                 />
-              </section>
+              </form>
 
               <div className="max-h-[400px] overflow-y-auto">
                 <div className="flex flex-col justify-center">
@@ -864,23 +880,31 @@ export default function AdminPanel() {
                       key={ecommerce.id}
                       className="flex bg-white p-4 w-full hover:cursor-pointer rounded-md border-b border-gray-200 transition-all duration-100 animate-[fadeSlide_0.5s_ease-out_forwards]"
                       style={{ animationDelay: `${i * 0.03}s` }}
-                      onClick={() => navigate("/seller_dashboard/")}
+                      onClick={() =>
+                        navigate(`/seller_dashboard/${ecommerce.id_usuario}`)
+                      }
                     >
                       <div>
                         <img
-                          src={silvano}
+                          src={`/api/${ecommerce.logo}`}
                           alt="Imagen de E-Commerce"
-                          className="rounded-full h-25 w-30"
+                          className={`${
+                            colorsCurrentRange[ecommerce.nombre_rango]
+                          } rounded-full h-25 w-30 border-4`}
                         />
                       </div>
-                      <div className="flex flex-col justify-justify w-full">
+                      <div className="flex flex-col ml-10 w-[50%]">
                         <p className="font-semibold break-words mt-5">
-                          {ecommerce.nombre}
+                          {ecommerce.nombre_ecommerce}
                         </p>
-                        <p className="text-gray-500 flex self-center">
-                          {ecommerce.pais}{" "}
+                        <p
+                          className={`${
+                            colorsCurrentRange[ecommerce.nombre_rango]
+                          } flex self-center`}
+                        >
+                          {capitalize(ecommerce.nombre_rango)}
                           <MdOutlineBarChart
-                            className="text-sky-600 ml-2 translate-y-1"
+                            className="text-sky-700 ml-2 translate-y-1"
                             size={18}
                           />
                         </p>
