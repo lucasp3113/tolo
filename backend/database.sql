@@ -5,7 +5,7 @@
 
 CREATE DATABASE IF NOT EXISTS tolo;
 USE tolo;
-
++
 -- ============================================================
 -- CREACIÓN DE TABLAS (ordenadas por dependencias)
 -- ============================================================
@@ -102,6 +102,7 @@ CREATE TABLE comentarios_productos (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     activo BOOLEAN DEFAULT TRUE,
+    respuestas VARCHAR(255),
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     UNIQUE KEY unique_user_product (id_usuario, id_producto)
@@ -548,6 +549,8 @@ VALUES (10, 'Diseño oversize cargo'),
     );
 
 SELECT * FROM ecommerces;
+
+SELECT * FROM  productos;
 
 SELECT * FROM usuarios;
 

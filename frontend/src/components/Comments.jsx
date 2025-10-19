@@ -10,15 +10,18 @@ const CommentsSection = ({ productId }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({ total_comentarios: 0, promedio_rating: 0 });
+  const [stats, setStats] = useState({
+    total_comentarios: 0,
+    promedio_rating: 0,
+  });
   const [rating, setRating] = useState(0);
 
-  const { 
-    register, 
-    handleSubmit, 
-    reset, 
+  const {
+    register,
+    handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
-    watch
+    watch,
   } = useForm();
 
   const comentarioValue = watch("comentario", "");
@@ -29,7 +32,7 @@ const CommentsSection = ({ productId }) => {
 
   if (token) {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       userId = payload.id_usuario;
       currentUser = payload;
     } catch (e) {
@@ -39,12 +42,16 @@ const CommentsSection = ({ productId }) => {
 
   const loadComments = async () => {
     setLoading(true);
-    setError(null); 
+    setError(null);
     try {
-      const response = await axios.get(`/api/show_comments.php?productId=${productId}`);
+      const response = await axios.get(
+        `/api/show_comments.php?productId=${productId}`
+      );
       if (response.data.success) {
         setComments(response.data.comments || []);
-        setStats(response.data.stats || { total_comentarios: 0, promedio_rating: 0 });
+        setStats(
+          response.data.stats || { total_comentarios: 0, promedio_rating: 0 }
+        );
       }
     } catch (err) {
       console.error("Error cargando comentarios:", err);
@@ -68,29 +75,33 @@ const CommentsSection = ({ productId }) => {
       setError("Debes estar logueado para comentar");
       return;
     }
-    
+
     try {
       setError(null);
       console.log("Enviando comentario:", {
         productId: productId,
         userId: userId,
         rating: rating,
-        comentario: data.comentario.trim()
+        comentario: data.comentario.trim(),
       });
 
-      const response = await axios.post("/api/add_comment.php", {
-        productId: parseInt(productId),
-        userId: parseInt(userId),
-        rating: parseFloat(rating),
-        comentario: data.comentario.trim()
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        "/api/add_comment.php",
+        {
+          productId: parseInt(productId),
+          userId: parseInt(userId),
+          rating: parseFloat(rating),
+          comentario: data.comentario.trim(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
-      
+      );
+
       console.log("Respuesta del servidor:", response.data);
-      
+
       if (response.data.success) {
         setRating(0);
         reset();
@@ -109,9 +120,9 @@ const CommentsSection = ({ productId }) => {
     try {
       const response = await axios.post("/api/delete_comment.php", {
         commentId: commentId,
-        userId: userId
+        userId: userId,
       });
-      
+
       if (response.data.success) {
         loadComments();
       } else {
@@ -129,64 +140,206 @@ const CommentsSection = ({ productId }) => {
   }, [productId]);
 
   const CommentItem = ({ comment }) => {
-    const isOwner = currentUser && currentUser.id_usuario === comment.id_usuario;
+    const isOwner =
+      currentUser && currentUser.id_usuario === comment.id_usuario;
 
     const getInitials = (name) => {
       return name
-        .split(' ')
+        .split(" ")
         .slice(0, 2)
-        .map(n => n[0])
-        .join('')
+        .map((n) => n[0])
+        .join("")
         .toUpperCase();
     };
 
     return (
       <div className="flex flex-col mb-22 mt-2 md:mt-5 md:mb-12 gap-2 md:gap-4 max-w-full">
-        <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
-          <div className="flex-shrink-0">
-            <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
-              {getInitials(comment.nombre_usuario)}
+        {/* Comentario principal */}
+        <div>
+          <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
+            <div className="flex-shrink-0">
+              <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
+                {getInitials(comment.nombre_usuario)}
+              </div>
             </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                  {comment.nombre_usuario}
+                </h2>
+                <h2 className="text-xs md:text-sm text-gray-500">
+                  {comment.tiempo_transcurrido}
+                </h2>
+              </div>
+
+              <div className="mb-1 md:mb-2">
+                <Rating
+                  id={`comment-rating-${comment.id_comentario}`}
+                  value={parseFloat(comment.rating)}
+                  readonly={true}
+                  showValue={true}
+                  size="md"
+                />
+              </div>
+
+              <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                {comment.comentario}
+              </p>
+            </div>
+
+            {isOwner && (
+              <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                <button
+                  onClick={() => handleDeleteComment(comment.id_comentario)}
+                  className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                  title="Eliminar comentario"
+                >
+                  <ImBin className="scale-155" />
+                </button>
+              </div>
+            )}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
-              <h2 className="font-semibold text-base md:text-xl text-gray-900">
-                {comment.nombre_usuario}
-              </h2>
-              <h2 className="text-xs md:text-sm text-gray-500">
-                {comment.tiempo_transcurrido}
-              </h2>
-            </div>
 
-            <div className="mb-1 md:mb-2">
-              <Rating
-                id={`comment-rating-${comment.id_comentario}`}
-                value={parseFloat(comment.rating)}
-                readonly={true}
-                showValue={true}
-                size="md"
-              />
-            </div>
-
-            <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-              {comment.comentario}
-            </p>
-          </div>
-
-          {isOwner && (
-            <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
-              <button
-                onClick={() => handleDeleteComment(comment.id_comentario)}
-                className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                title="Eliminar comentario"
-              >
-                <ImBin className="scale-155" />
-              </button>
-            </div>
-          )}
+          <div className="border-b border-gray-100"></div>
         </div>
 
-        <div className="border-b border-gray-100"></div>
+        {/* Sección de respuestas con línea vertical estilo YouTube */}
+        <div className="flex gap-3 md:gap-4 ml-3 md:ml-5">
+          {/* Línea vertical conectora */}
+          <div className="relative flex-shrink-0">
+            <div className="w-10 md:w-12 h-full flex flex-col items-center">
+              {/* Línea vertical */}
+              <div className="w-[2px] bg-gray-300 flex-1"></div>
+            </div>
+          </div>
+
+          {/* Contenedor de respuestas */}
+          <div className="flex-1 flex flex-col gap-4">
+            {/* Respuesta 1 */}
+            <div className="relative">
+              {/* Línea horizontal que conecta */}
+              <svg
+                className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
+                viewBox="0 0 40 30"
+                fill="none"
+              >
+                <path
+                  d="M0 0 C3 25, 15 25, 40 25"
+                  stroke="#d1d5db"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-50 rounded-[0.4rem] p-2 md:p-5 relative">
+                <div className="flex-shrink-0">
+                  <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
+                    {getInitials(comment.nombre_usuario)}
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                    <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                      {comment.nombre_usuario}
+                    </h2>
+                    <h2 className="text-xs md:text-sm text-gray-500">
+                      {comment.tiempo_transcurrido}
+                    </h2>
+                  </div>
+
+                  <div className="mb-1 md:mb-2">
+                    <Rating
+                      id={`comment-rating-reply1-${comment.id_comentario}`}
+                      value={parseFloat(comment.rating)}
+                      readonly={true}
+                      showValue={true}
+                      size="md"
+                    />
+                  </div>
+
+                  <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                    Respuesta 1: {comment.comentario}
+                  </p>
+                </div>
+
+                {isOwner && (
+                  <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                    <button
+                      onClick={() => handleDeleteComment(comment.id_comentario)}
+                      className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                      title="Eliminar comentario"
+                    >
+                      <ImBin className="scale-155" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Respuesta 2 */}
+            <div className="relative">
+              {/* Línea horizontal que conecta */}
+              <svg
+                className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
+                viewBox="0 0 40 30"
+                fill="none"
+              >
+                <path
+                  d="M0 0 C3 25, 15 25, 40 25"
+                  stroke="#d1d5db"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-50 rounded-[0.4rem] p-2 md:p-5 relative">
+                <div className="flex-shrink-0">
+                  <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
+                    {getInitials(comment.nombre_usuario)}
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                    <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                      {comment.nombre_usuario}
+                    </h2>
+                    <h2 className="text-xs md:text-sm text-gray-500">
+                      {comment.tiempo_transcurrido}
+                    </h2>
+                  </div>
+
+                  <div className="mb-1 md:mb-2">
+                    <Rating
+                      id={`comment-rating-reply2-${comment.id_comentario}`}
+                      value={parseFloat(comment.rating)}
+                      readonly={true}
+                      showValue={true}
+                      size="md"
+                    />
+                  </div>
+
+                  <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                    Respuesta 2: {comment.comentario}
+                  </p>
+                </div>
+
+                {isOwner && (
+                  <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                    <button
+                      onClick={() => handleDeleteComment(comment.id_comentario)}
+                      className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                      title="Eliminar comentario"
+                    >
+                      <ImBin className="scale-155" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -226,7 +379,10 @@ const CommentsSection = ({ productId }) => {
 
       {currentUser && (
         <div className="p-2 md:p-3 rounded-md mb-4">
-          <form onSubmit={handleSubmit(handleSubmitComment)} className="space-y-2 md:space-y-3">
+          <form
+            onSubmit={handleSubmit(handleSubmitComment)}
+            className="space-y-2 md:space-y-3"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <span className="text-sm md:text-base">Tu calificación:</span>
               <div className="flex items-center gap-2">
@@ -236,7 +392,9 @@ const CommentsSection = ({ productId }) => {
                   onRatingChange={setRating}
                   showValue={true}
                 />
-                <span className="text-xs md:text-sm text-gray-500">({rating}/5)</span>
+                <span className="text-xs md:text-sm text-gray-500">
+                  ({rating}/5)
+                </span>
               </div>
               {rating === 0 && (
                 <span className="text-red-500 text-xs">
@@ -250,7 +408,7 @@ const CommentsSection = ({ productId }) => {
                 {...register("comentario", {
                   required: "El comentario es requerido",
                   minLength: { value: 5, message: "Mínimo 5 caracteres" },
-                  maxLength: { value: 500, message: "Máximo 500 caracteres" }
+                  maxLength: { value: 500, message: "Máximo 500 caracteres" },
                 })}
                 maxLength={1000}
                 placeholder="Comparte tu experiencia con este producto..."
