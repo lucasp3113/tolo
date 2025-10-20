@@ -16,7 +16,7 @@ import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color }) {
+export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading }) {
   const [goodContrast, setGoodContrast] = useState(true);
   function hasGoodContrast(color1, color2, threshold = 1.1) {
     if (!color1 || !color2) return true;
@@ -113,12 +113,17 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   const [dataForm, setDataForm] = useState(null);
   useEffect(() => {
     if (!dataForm) return;
+    setLoading(true)
     dataForm["nameEcommerce"] = nameEcommerce || null;
     axios.post("/api/search.php", dataForm)
       .then(res => {
-        console.log(res)
+        setLoading(false)
         setWord(dataForm.search);
-        setSearchData(res.data.data);
+        if (res.data.data) {
+          setSearchData(res.data.data);
+        } else {
+          setSearchData("error");
+        }
         const categories = [];
         res.data.data?.forEach(e => {
           if (!categories.includes(e.nombre_categoria)) categories.push(e.nombre_categoria);

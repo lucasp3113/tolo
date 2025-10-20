@@ -6,11 +6,10 @@ import { FaPen } from "react-icons/fa";
 import axios from "axios";
 import Rating from './Rating';
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, id_compra = null, admin = false, rating = null }) {
+export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, idItem = null, admin = false, rating = null }) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const navigate = useNavigate()
-  console.log(name + " " + rating)
+  const navigate = useNavigate();
 
   let stockMessage = "";
   let stockColor = "";
@@ -30,10 +29,10 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
 
   function deleteCart() {
     axios.post("/api/delete_to_cart.php", {
-      id_compra: id_compra
+      id_item: idItem
     })
       .then(res => {
-        if (onDelete) onDelete(id_compra);
+        if (onDelete) onDelete(idItem);
       })
       .catch(err => console.log(err))
   }

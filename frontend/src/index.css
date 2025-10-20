@@ -16,6 +16,36 @@
   font-family: 'Quicksand', sans-serif;
 }
 
+.mercado_pago h1{
+  display: none !important;
+}
+
+.button-container-8cRhpK{
+  margin: auto !important; 
+  min-width: 75% !important;
+  transition: transform ease-in-out 0.3s !important;
+}
+
+.button-container-8cRhpK:hover{
+  transform: scale(1.08);
+}
+
+.svelte-11b9rht{
+  color: white !important;
+}
+
+/*boton de google*/
+.nsm7Bb-HzV7m-LgbsSe-BPrWId {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 600 !important;
+  color: rgb(13, 13, 13) !important;
+}
+
+.nsm7Bb-HzV7m-LgbsSe{
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0.75rem !important;
+}
+
 /* DARK MODE CSS COMPLETO - Para todos los componentes EXCEPTO BOTONES Y SPANS */
 
 /* Solo el HTML y BODY para el fondo principal */

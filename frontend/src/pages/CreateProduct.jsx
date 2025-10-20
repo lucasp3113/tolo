@@ -17,16 +17,23 @@ import { FaT } from 'react-icons/fa6'
 import { FaRegTrashCan } from "react-icons/fa6";
 import { FaPen } from "react-icons/fa";
 import { ImFacebook2 } from 'react-icons/im'
-import { data } from 'react-router-dom'
+import Alert from '../components/Alert'
+import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 
 export default function CreateProduct({ edit = false, onCancel, id }) {
+    const {ecommerce} = useParams()
+    const navigate = useNavigate()
     function finish() {
+        sessionStorage.setItem('createProductSuccess', 'success')
         axios.post("/api/create_notifications.php", {
             userId: userId,
             message: edit ? "Producto editado exitosamente" : "Producto creado exitosamente"
         })
+        navigate(ecommerce ? `/${ecommerce}/product_crud/` : "/product_crud/")
     }
+
     const formProduct = useForm();
     const formCharac = useForm();
     const formColor = useForm();
@@ -52,6 +59,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
 
     const [dataColors, setDataColors] = useState(null)
     const [dataCharac, setDataCharac] = useState(null)
+
 
     useEffect(() => {
         if (currentStep === "showColors") {
@@ -607,7 +615,10 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             );
         case "showCharac":
             return (
-                <form onClick={() => finish()} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    finish();
+                }} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
                     <h2 className='font-quicksand m-auto w-full font-black text-3xl mb-2'>Características</h2>
                     {dataCharac && dataCharac.map((c, index) => (
                         <div className='flex items-center w-full m-auto justify-between' key={`size${index}`}>

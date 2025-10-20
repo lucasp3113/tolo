@@ -6,6 +6,8 @@
   "dependencies": {
     "@fontsource/roboto": "^5.2.6",
     "@google/model-viewer": "^4.1.0",
+    "@mercadopago/sdk-react": "^1.0.6",
+    "@react-oauth/google": "^0.12.2",
     "@uiw/react-color": "^2.8.0",
     "@uiw/react-color-sketch": "^2.8.0",
     "axios": "^1.11.0",

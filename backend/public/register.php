@@ -128,4 +128,3 @@ if ($data_base) {
    exit;
 }
 
-?>

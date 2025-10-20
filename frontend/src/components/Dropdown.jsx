@@ -156,6 +156,7 @@ import {
 const Dropdown = ({
   hoverActivation = true,
   border = false,
+  menuClassName,
   direction = "d",
   text = "",
   options = [],
@@ -483,7 +484,7 @@ const Dropdown = ({
       )}
 
       <ul
-        className={`absolute ${styles} z-50 bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out ${
+        className={`absolute ${styles} ${menuClassName} z-50 bg-white text-gray-800 shadow-lg rounded-md overflow-visible transition-all duration-300 ease-in-out ${
           isOpen
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"

@@ -3,7 +3,12 @@
         "firebase/php-jwt": "^6.11",
         "meilisearch/meilisearch-php": "^1.15",
         "guzzlehttp/guzzle": "^7.9",
-        "php-http/guzzle7-adapter": "^1.1"
+        "php-http/guzzle7-adapter": "^1.1",
+        "league/oauth2-google": "^4.0"
+    },
+    "replace": {
+        "google/apiclient": "*",
+        "google/apiclient-services": "*"
     },
     "config": {
         "allow-plugins": {
