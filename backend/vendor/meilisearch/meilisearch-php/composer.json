@@ -13,8 +13,20 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Clementine",
+            "name": "Clémentine Urquizar",
             "email": "clementine@meilisearch.com"
+        },
+        {
+            "name": "Bruno Casali",
+            "email": "bruno@meilisearch.com"
+        },
+        {
+            "name": "Laurent Cazanove",
+            "email": "lau.cazanove@gmail.com"
+        },
+        {
+            "name": "Tomas Norkūnas",
+            "email": "norkunas.tom@gmail.com"
         }
     ],
     "minimum-stability": "stable",
@@ -22,7 +34,8 @@
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
         "php-http/discovery": "^1.7",
-        "psr/http-client": "^1.0"
+        "psr/http-client": "^1.0",
+        "symfony/polyfill-php81": "^1.33"
     },
     "autoload": {
         "psr-4": {
@@ -37,17 +50,18 @@
     },
     "suggest": {
         "guzzlehttp/guzzle": "Use Guzzle ^7 as HTTP client",
-        "http-interop/http-factory-guzzle": "Factory for guzzlehttp/guzzle"
+        "http-interop/http-factory-guzzle": "Factory for guzzlehttp/guzzle",
+        "symfony/http-client": "Use Symfony Http client"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5 || ^10.5",
         "php-cs-fixer/shim": "^3.59.3",
-        "guzzlehttp/guzzle": "^7.8.1",
         "http-interop/http-factory-guzzle": "^1.2.0",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpstan/phpstan-strict-rules": "^2.0"
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "symfony/http-client": "^5.4|^6.0|^7.0"
     },
     "scripts": {
         "lint": [
@@ -57,7 +71,9 @@
             "./vendor/bin/php-cs-fixer fix --verbose --config=.php-cs-fixer.dist.php --using-cache=no  --diff"
         ],
         "phpstan": "./vendor/bin/phpstan",
-        "test": ["sh scripts/tests.sh"]
+        "test": [
+            "sh scripts/tests.sh"
+        ]
     },
     "config": {
         "allow-plugins": {

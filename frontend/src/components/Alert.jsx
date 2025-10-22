@@ -1,61 +1,170 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from 'react';
+import { IoMdClose, IoMdCheckmarkCircle, IoMdCloseCircle, IoMdWarning, IoMdInformationCircle } from 'react-icons/io';
 
 const Alert = ({
-  isOpen = true,
+  type = 'toast',
+  variant = 'info',
   title,
   message,
-  variant = "info",
-  type = "modal",
-  className = "",
+  duration = 3000,
   onClose,
-  showCancelButton = false,
-  cancelText = "Cancelar",
+  onAccept,
   onCancel,
+  show = true
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(show);
+  const [progress, setProgress] = useState(100);
 
   useEffect(() => {
-    if (type === "toast" && isOpen) {
-      setVisible(true);
+    setVisible(show);
+    setProgress(100);
+  }, [show]);
+
+  useEffect(() => {
+    if (type === 'toast' && visible) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          const newProgress = prev - (100 / (duration / 50));
+          return newProgress <= 0 ? 0 : newProgress;
+        });
+      }, 50);
+
       const timer = setTimeout(() => {
-        setVisible(false); // inicia animación (AURA)
-        setTimeout(onClose, 300); // espera la animación antes de cerrar la alert
-      }, 3000);
-      return () => clearTimeout(timer);
+        handleClose();
+      }, duration);
+
+      return () => {
+        clearTimeout(timer);
+        clearInterval(interval);
+      };
     }
-  }, [isOpen, type, onClose]);
+  }, [visible, type, duration]);
 
-  if (!isOpen && !visible) return null;
-
-  const baseStyles = {
-    info: "bg-blue-100 border-blue-500 text-blue-800",
-    success: "bg-green-100 border-green-500 text-green-800",
-    warning: "bg-yellow-100 border-yellow-500 text-yellow-800",
-    danger: "bg-red-100 border-red-500 text-red-800",
+  const handleClose = () => {
+    setVisible(false);
+    if (onClose) onClose();
   };
 
-  const variantClass = baseStyles[variant] || baseStyles.info;
+  const handleAccept = () => {
+    if (onAccept) onAccept();
+    handleClose();
+  };
 
-  if (type === "modal") {
+  const handleCancel = () => {
+    if (onCancel) onCancel();
+    handleClose();
+  };
+
+  if (!visible) return null;
+
+  const variants = {
+    success: {
+      bg: 'bg-green-50',
+      border: 'border-green-200',
+      text: 'text-green-800',
+      progressBg: 'bg-green-500',
+      icon: <IoMdCheckmarkCircle className="w-6 h-6 text-green-600" />,
+    },
+    error: {
+      bg: 'bg-red-50',
+      border: 'border-red-200',
+      text: 'text-red-800',
+      progressBg: 'bg-red-500',
+      icon: <IoMdCloseCircle className="w-6 h-6 text-red-600" />,
+    },
+    warning: {
+      bg: 'bg-yellow-50',
+      border: 'border-yellow-200',
+      text: 'text-yellow-800',
+      progressBg: 'bg-yellow-500',
+      icon: <IoMdWarning className="w-6 h-6 text-yellow-600" />,
+    },
+    info: {
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
+      text: 'text-blue-800',
+      progressBg: 'bg-blue-500',
+      icon: <IoMdInformationCircle className="w-6 h-6 text-blue-600" />,
+    },
+  };
+
+  const currentVariant = variants[variant];
+
+  if (type === 'toast') {
     return (
-      <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-        <div className={`p-6 rounded-lg border shadow-md max-w-sm w-full ${variantClass} ${className}`}>
-          <h2 className="text-lg font-bold mb-2">{title}</h2>
-          <p className="mb-4">{message}</p>
-          <div className="flex justify-end gap-2">
-            {showCancelButton && (
+      <div className="fixed bottom-22 left-0 right-0 md:top-auto md:bottom-4 md:left-4 md:right-auto md:w-auto z-50 animate-in slide-in-from-bottom md:slide-in-from-left duration-300 font-quicksand md:px-0">
+        <div className={`${currentVariant.bg} ${currentVariant.border} border md:rounded-lg shadow-lg md:min-w-100 md:max-w-md overflow-hidden`}>
+          <div className="p-3 md:p-4">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex-shrink-0">
+                {currentVariant.icon}
+              </div>
+              <div className="flex-1">
+                {title && (
+                  <h3 className={`font-semibold ${currentVariant.text} mb-1 text-sm md:text-base`}>
+                    {title}
+                  </h3>
+                )}
+                <p className={`text-xs md:text-sm ${currentVariant.text}`}>
+                  {message}
+                </p>
+              </div>
               <button
-                className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
-                onClick={onCancel}
+                onClick={handleClose}
+                className={`flex-shrink-0 ${currentVariant.text} hover:opacity-70 transition-opacity flex items-center justify-center`}
               >
-                {cancelText}
+                <IoMdClose className="w-4 h-4 md:w-5 md:h-5" />
               </button>
-            )}
+            </div>
+          </div>
+          <div className="h-1 bg-gray-200">
+            <div
+              className={`h-full ${currentVariant.progressBg} transition-all duration-50 ease-linear`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === 'modal') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 font-quicksand">
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={handleCancel}
+        />
+        <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full animate-in zoom-in-95 duration-200">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                {currentVariant.icon}
+              </div>
+              <div className="flex-1">
+                {title && (
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {title}
+                  </h3>
+                )}
+                <p className="text-sm text-gray-600">
+                  {message}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end gap-3">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-              onClick={onClose}
+              onClick={handleCancel}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
             >
-              Confirmar
+              Cancelar
+            </button>
+            <button
+              onClick={handleAccept}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Aceptar
             </button>
           </div>
         </div>
@@ -63,20 +172,7 @@ const Alert = ({
     );
   }
 
-  // TOAST
-  return (
-    <div
-      className={`
-        fixed bottom-4 right-4 z-50 p-4 rounded-lg border shadow-lg
-        ${variantClass} ${className}
-        transform transition-all duration-300
-        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}
-      `}
-    >
-      <h2 className="font-semibold">{title}</h2>
-      <p>{message}</p>
-    </div>
-  );
+  return null;
 };
 
 export default Alert;

@@ -2,7 +2,6 @@
 
 $config = require __DIR__ . '/../config.php';
 
-// Crear conexión
 $conn = new mysqli(
     $config['host'],
     $config['user'],

@@ -1,0 +1,9 @@
+1)para imagenes webp
+sudo apt install php-gd
+sudo systemctl restart apache2
+
+
+cloude da dominios gratis cloude dsn
+
+
+composer require google/apiclient:"^2.0"

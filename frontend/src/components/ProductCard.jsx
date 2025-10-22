@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { ImBin } from "react-icons/im";
 import { FaPen } from "react-icons/fa";
 import axios from "axios";
+import Rating from './Rating';
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, id_compra = null, admin = false }) {
+export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, idItem = null, admin = false, rating = null }) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   let stockMessage = "";
   let stockColor = "";
@@ -28,10 +29,10 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
 
   function deleteCart() {
     axios.post("/api/delete_to_cart.php", {
-      id_compra: id_compra
+      id_item: idItem
     })
       .then(res => {
-        if (onDelete) onDelete(id_compra);
+        if (onDelete) onDelete(idItem);
       })
       .catch(err => console.log(err))
   }
@@ -103,12 +104,24 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   if (phone) {
     return (
       <div onClick={onClick} className={`cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
-        <img
-          loading="lazy"
-          src={image}
-          alt={name}
-          className={`${cart ? "w-36" : "w-44"} h-full sm:h-full md:h-full object-cover`}
-        />
+        <section className="flex flex-col items-center justify-center">
+          {rating > 0 && (
+            <Rating
+              id="product-average"
+              value={rating}
+              readonly={true}
+              showValue={true}
+              size="sm"
+              text="text-sm!"
+            />
+          )}
+          <img
+            loading="lazy"
+            src={image}
+            alt={name}
+            className={`${cart ? "w-36" : "w-44"} h-full sm:h-full md:h-full object-cover`}
+          />
+        </section>
         <div className="p-5 flex flex-col w-full justify-center space-y-2">
           {cart && (
             <div className="flex w-full justify-end -mb-2">
@@ -117,7 +130,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           )}
 
           <section className={`${cart ? "justify-start" : "justify-center"} w-full flex items-center `}>
-            <h2 className={`${cart ? "text-xl -translate-y-8 font-semibold" : "text-lg font-medium"}  text-gray-900 line-clamp-2 leading-tight`}>{name}</h2>
+            <h2 className={`${cart ? "-translate-y-8 font-semibold" : "text-xl font-medium"}  text-gray-900 line-clamp-2 leading-tight font-semibold font-quicksand`}>{name}</h2>
           </section>
 
           <section className={`flex ${cart ? "translate-y-6 justify-between" : "justify-center"}`}>
@@ -156,7 +169,18 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // compu
   return (
     <div onClick={onClick} className={`cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center ${client ? "h-100" : "h-104"} w-56 flex-col m-5 hover:shadow-lg transition-shadow`}>
-      <div className={`w-full h-48 ${client ? "mt-8" : "mt-0"}`}>
+      {rating > 0 && (
+        <Rating
+          className="absolute top-3 left-2"
+          id="product-average"
+          value={rating}
+          readonly={true}
+          showValue={true}
+          size="sm"
+          text="text-sm!"
+        />
+      )}
+      <div className={`w-full h-48 ${client ? "mt-9" : "mt-0"}`}>
         <img
           loading="lazy"
           src={image}

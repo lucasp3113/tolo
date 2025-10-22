@@ -6,7 +6,7 @@ import { IoSearch } from 'react-icons/io5';
 import { MdSpaceDashboard } from 'react-icons/md';
 import axios from 'axios';
 import { IoSettings } from "react-icons/io5";
-import logoTolo from "../assets/logoTolo.png";
+import logoTolo from "../assets/logoTolo.webp";
 import Menu from './Menu';
 import Input from './Input';
 import Form from './Form';
@@ -16,7 +16,42 @@ import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin }) {
+export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading }) {
+  const [goodContrast, setGoodContrast] = useState(true);
+  function hasGoodContrast(color1, color2, threshold = 1.1) {
+    if (!color1 || !color2) return true;
+
+    const getLuminance = (hex) => {
+      if (!hex || !hex.startsWith('#')) return 0;
+
+      const rgb = parseInt(hex.slice(1), 16);
+      const r = (rgb >> 16) & 0xff;
+      const g = (rgb >> 8) & 0xff;
+      const b = (rgb >> 0) & 0xff;
+
+      const [rs, gs, bs] = [r, g, b].map(c => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    };
+
+    const lum1 = getLuminance(color1);
+    const lum2 = getLuminance(color2);
+    const brightest = Math.max(lum1, lum2);
+    const darkest = Math.min(lum1, lum2);
+    const contrast = (brightest + 0.05) / (darkest + 0.05);
+
+    return contrast >= threshold;
+  }
+
+  useEffect(() => {
+    if (color) {
+      setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
+    }
+  }, [color]);
+
   const { isLoggedIn, logout } = useContext(AuthContext);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [userType, setUserType] = useState(null);
@@ -60,8 +95,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     if (!nameEcommerce) return;
     axios.post("/api/show_profile_picture.php", { nameEcommerce })
       .then(res => {
-        setLogoEcommerce(res.data.logo);
-        console.log(res)
+        setLogoEcommerce(res.data.logo.logo);
       })
       .catch(err => console.error(err));
   }, [nameEcommerce]);
@@ -79,12 +113,17 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   const [dataForm, setDataForm] = useState(null);
   useEffect(() => {
     if (!dataForm) return;
+    setLoading(true)
     dataForm["nameEcommerce"] = nameEcommerce || null;
     axios.post("/api/search.php", dataForm)
       .then(res => {
+        setLoading(false)
         setWord(dataForm.search);
-        setSearchData(res.data.data);
-        console.log(res)
+        if (res.data.data) {
+          setSearchData(res.data.data);
+        } else {
+          setSearchData("error");
+        }
         const categories = [];
         res.data.data?.forEach(e => {
           if (!categories.includes(e.nombre_categoria)) categories.push(e.nombre_categoria);
@@ -96,10 +135,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   }, [dataForm]);
 
   return (
-    <header className="bg-sky-800 relative h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between">
+    <header style={{ backgroundColor: color || "#075985" }} className={"bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between"}>
       {logo ? (
         <div
-          className="flex items-center justify-center w-24 h-12 sm:w-32 sm:h-16 md:w-25 lg:w-25 md:h-20 cursor-pointer"
+          className="flex items-center justify-center w-22 h-full cursor-pointer"
           onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")}
         >
           {logoLoaded ? (
@@ -107,10 +146,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo}
               alt="Logo"
               loading="lazy"
-              className={`${windowWidth < 500 && "scale-105"} ml-2 w-full h-auto object-contain`}
+              className={`${!logoEcommerce && ""} ml-3 h-[95%] w-full object-contain`}
             />
           ) : (
-            <img src={logoTolo} alt="Logo" className="w-full h-auto object-contain" />
+            <img src={logoTolo} alt="Logo" loading='lazy' className="w-full h-full object-cover" />
           )}
         </div>
 
@@ -196,7 +235,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               },
               isLoggedIn && {
                 title: '',
-                icon: { name: <BiLogOut className="text-red-400 text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125" />, expand: true },
+                icon: { name: <BiLogOut className={`${!goodContrast ? "text-white" : "text-red-400"} text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />, expand: true },
                 animation: false,
                 onClick: () => {
                   localStorage.removeItem("token");

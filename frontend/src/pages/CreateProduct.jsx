@@ -15,17 +15,25 @@ import { FiMinus } from "react-icons/fi";
 import { FaTag } from "react-icons/fa";
 import { FaT } from 'react-icons/fa6'
 import { FaRegTrashCan } from "react-icons/fa6";
+import { FaPen } from "react-icons/fa";
 import { ImFacebook2 } from 'react-icons/im'
-import { data } from 'react-router-dom'
+import Alert from '../components/Alert'
+import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 
 export default function CreateProduct({ edit = false, onCancel, id }) {
+    const {ecommerce} = useParams()
+    const navigate = useNavigate()
     function finish() {
+        sessionStorage.setItem('createProductSuccess', 'success')
         axios.post("/api/create_notifications.php", {
             userId: userId,
-            message: "Producto creado exitosamente"
+            message: edit ? "Producto editado exitosamente" : "Producto creado exitosamente"
         })
+        navigate(ecommerce ? `/${ecommerce}/product_crud/` : "/product_crud/")
     }
+
     const formProduct = useForm();
     const formCharac = useForm();
     const formColor = useForm();
@@ -47,10 +55,11 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
     const [numCharac, setNumCharac] = useState(1)
     const [visibleCharac, setVisibleCharac] = useState([true])
 
-    const [productId, setProductId] = useState(1);
+    const [productId, setProductId] = useState(edit ? id : null);
 
     const [dataColors, setDataColors] = useState(null)
     const [dataCharac, setDataCharac] = useState(null)
+
 
     useEffect(() => {
         if (currentStep === "showColors") {
@@ -73,6 +82,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
         }
     }, [currentStep])
 
+    const [colorEdit, setColorEdit] = useState(null)
+
 
     function colorSave(formValues) {
         for (let i = 1; i <= numColor; i++) {
@@ -94,6 +105,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                 idProducto: productId,
                 nameColor: colorName,
                 nameSizes: arrSizes,
+                idColor: edit ? colorEdit : null,
                 nameStocks: arrStocks,
                 nameStockColor: formValues["nameStockColor"]
             };
@@ -102,7 +114,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             console.log(payload)
             const files = formColor.watch(`imagesColor${i}`) || [];
             Array.from(files).forEach(file => fd.append('images[]', file));
-            axios.post('/api/add_color.php', fd, {
+            axios.post(!edit ? '/api/add_color.php' : '/api/update_color.php', fd, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
                 .then(res => {
@@ -124,6 +136,16 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             })
             .catch((err) => console.log(err))
     }
+
+    // //tenes q usar esta funcion pero tipo, poner currentStep en addColor pero de alguna forma actualizar en vez de crear
+
+    // function colorUpdate(idColor) {
+    //     axios.post("/api/update_color.php", {
+    //         idColor: idColor
+    //     })
+    //         .then(res => console.log(res))
+    //         .catch(res => console.log(res))
+    // }
 
     function createCharac(dataForm) {
         const data = [];
@@ -395,8 +417,6 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
     }, []);
 
     function addProduct(data) {
-        console.log(data);
-
         const { shipping, ...restData } = data;
 
         const filteredArray = [];
@@ -433,8 +453,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .then(res => {
                 console.log(res)
                 setProductId(res.data.product_id);
-                color ? setCurrentStep("addColor") : sizes ? setCurrentStep("addSizes") : setCurrentStep("addCharac")
-
+                color ? setCurrentStep("addColor") : setCurrentStep("addCharac")
             })
             .catch(err => console.log(err));
     }
@@ -477,10 +496,13 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
 
         axios.post("/api/update_product.php", formData)
             .then(res => {
-                axios.post("/api/create_notifications.php", {
-                    userId: userId,
-                    message: "Producto eliminado exitosamente"
-                })
+                console.log(res)
+                setProductId(res.data.product_id);
+                if (color) {
+                    setCurrentStep("showColors")
+                } else {
+                    setCurrentStep("showCharac")
+                }
             })
             .catch(err => console.log(err));
     }
@@ -558,29 +580,26 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                 <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
                     <h2 className='font-quicksand m-auto w-full font-black mb-2 text-3xl'>Colores</h2>
                     {dataColors && dataColors.map((c, index) => (
-                        <div className='flex items-center w-45 m-auto justify-between mb-1 mt-1' key={`color${index}`}>
-                            <img className={`w-10`} src={`/api/uploads/products/${c.ruta_imagen}`} loading='lazy' alt="" />
-                            <span className='font-quicksand text-2xl font-semibold'>{c.nombre}</span>
+                        <div className='flex relative items-center w-full m-auto justify-between mt-1 mb-4 z-50' key={`color${index}`}>
+                            <section className='w-full flex ml-22'>
+                                <img className={`w-10`} src={`/api/uploads/products/${c.ruta_imagen}`} loading='lazy' alt="" />
+                                <span className='font-quicksand text-2xl font-semibold'>{c.nombre}</span>
+                            </section>
                             {dataColors.length > 1 && (
-                                <FaRegTrashCan onClick={() => colorDelete(c.id_color)} className='text-red-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120' />
+                                <section className='flex mr-3 justify-end w-full'>
+                                    <FaRegTrashCan onClick={() => colorDelete(c.id_color)} className='text-red-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120 mr-1' />
+                                    <FaPen onClick={() => {
+                                        setCurrentStep("addColor")
+                                        setColorEdit(c.id_color)
+                                    }} className='text-blue-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120 ml-1' />
+                                </section>
                             )}
                         </div>
                     ))}
                     <section className='flex mt-2 items-center justify-between'>
                         <Button onClick={() => setCurrentStep("addColor")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir color"} />
-                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
+                        <Button onClick={() => setCurrentStep(edit ? "showCharac" : "addCharac")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
                     </section>
-                </form>
-            );
-        case "addSizes":
-            return (
-                <form onSubmit={formSize.handleSubmit(createSize)} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
-                    <h2 className='font-quicksand m-auto w-full font-semibold text-2xl'>Talles</h2>
-                    {jsxSize}
-                    <section className='w-full flex items-center justify-end'>
-                        <FiPlus onClick={addSize} className='text-black text-3xl mt-2 mr-3 transition-transform duration-300 ease-in-out hover:scale-125' />
-                    </section>
-                    <Button className={"w-50"} color={"blue"} size={"md"} text={"Guardar"} />
                 </form>
             );
         case "addCharac":
@@ -596,7 +615,10 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             );
         case "showCharac":
             return (
-                <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    finish();
+                }} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
                     <h2 className='font-quicksand m-auto w-full font-black text-3xl mb-2'>Características</h2>
                     {dataCharac && dataCharac.map((c, index) => (
                         <div className='flex items-center w-full m-auto justify-between' key={`size${index}`}>
@@ -605,8 +627,8 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         </div>
                     ))}
                     <section className='flex mt-2 items-center justify-between'>
-                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir caracteristica"} />
-                        <Button onClick={() => finish()} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
+                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} type='button' color={"blue"} size={"md"} text={"Añadir caracteristica"} />
+                        <Button className={"w-50"} color={"green"} size={"md"} text={"Finalizar"} />
                     </section>
                 </form>
             )
@@ -663,7 +685,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                             register={formProduct.register}
                             errors={formProduct.formState.errors}
                             multiple={true}
-                            required={true}
+                            required={!edit}
                         />
                     )}
                     {selectedFiles.length > 0 && (
@@ -718,7 +740,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     />
                     {edit ? (
                         <section className='flex items-center justify-center'>
-                            <Button className={"w-50"} color={"green"} size={"md"} text={"Editar producto"} />
+                            <Button className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
                             <Button className={"w-50"} color={"blue"} size={"md"} type='button' text={"Cancelar"} onClick={() => onCancel()} />
                         </section>
                     ) : (<Button className={"w-50"} color={"blue"} size={"md"} text={"Siguiente"} />)}

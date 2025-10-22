@@ -6,8 +6,10 @@ import { CiSliderHorizontal } from "react-icons/ci";
 import Button from '../components/Button';
 import { useParams } from 'react-router-dom';
 import axios from 'axios'
+import ClipLoader from "react-spinners/ClipLoader";
+import { LuSearchX } from "react-icons/lu";
 
-export default function Home({ searchData, userType, setSearchData }) {
+export default function Home({ searchData, userType, setSearchData, loading = false }) {
   const { ecommerce } = useParams();
 
   let user = null;
@@ -19,9 +21,12 @@ export default function Home({ searchData, userType, setSearchData }) {
 
   const navigate = useNavigate();
 
-  const uniqueProducts = searchData
+  const uniqueProducts = searchData && Array.isArray(searchData)
     ? Array.from(new Map(searchData.map(item => [item.id_producto, item])).values())
     : [];
+
+  // Verificar si hay error o array vacío (búsqueda sin resultados)
+  const noResults = searchData === "error" || (Array.isArray(searchData) && searchData.length === 0);
 
   function showProducts(data) {
     const jsx = [];
@@ -35,6 +40,7 @@ export default function Home({ searchData, userType, setSearchData }) {
               <ProductCard
                 key={producto.id_producto}
                 name={producto.nombre_producto}
+                rating={producto.rating}
                 price={producto.precio}
                 image={`/api/${producto.ruta_imagen}`}
                 stock={producto.stock}
@@ -68,6 +74,7 @@ export default function Home({ searchData, userType, setSearchData }) {
   }
 
   useEffect(() => {
+    setSearchData(null)
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -82,50 +89,74 @@ export default function Home({ searchData, userType, setSearchData }) {
     }
   }, [uniqueProducts]);
 
+  const NoResultsMessage = () => (
+    <div className="flex flex-col items-center justify-center py-20 px-4">
+      <div className="text-center">
+        <h3 className="text-2xl font-bold whitespace-nowrap font-quicksand text-gray-800 mb-2">
+          No se encontraron resultados
+        </h3>
+        <p className="text-gray-500 font-semibold font-quicksand">
+          Intenta con otra búsqueda o verifica la ortografía
+        </p>
+        <LuSearchX className='text-gray-500 text-4xl m-auto mt-3'/>
+      </div>
+    </div>
+  );
+
   return (
     <section className='flex items-center flex-col justify-center'>
-      {windowWidth < 500 ? (
-        <section
-          key={JSON.stringify(uniqueProducts)}
-          className={`flex flex-col w-full mb-20 items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}
-        >
-          {uniqueProducts.map(i => {
-            return ((
-              <AnimationScroll key={i.id_producto}>
+      {!loading ? (
+        noResults ? (
+          <NoResultsMessage />
+        ) : windowWidth < 500 ? (
+          <section
+            key={JSON.stringify(uniqueProducts)}
+            className={`flex flex-col w-full mb-20 items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}
+          >
+            {uniqueProducts.map(i => {
+              return ((
+                <AnimationScroll key={i.id_producto}>
+                  <ProductCard
+                    onDelete={() => handleDeleteProduct(i.id_producto)}
+                    admin={userType}
+                    rating={i.rating}
+                    name={i.nombre_producto}
+                    price={i["precio"]}
+                    image={`/api/${i["ruta_imagen"]}`}
+                    stock={i["stock"]}
+                    freeShipping={true}
+                    phone={true}
+                    onClick={() => !userType && ecommerce ? navigate(`product/${i["id_producto"]}`) : navigate(`/product/${i["id_producto"]}`)}
+                  />
+                </AnimationScroll>
+              ))
+            })}
+          </section>
+        ) : (
+          <section className={`flex flex-col mb-20 w-full items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}>
+            {uniqueProducts.length > 1 && windowWidth > 500 ? showProducts(uniqueProducts) : uniqueProducts.map((producto) => (
+              <AnimationScroll key={producto.id_producto}>
                 <ProductCard
-                  onDelete={() => handleDeleteProduct(i.id_producto)}
-                  admin={userType}
-                  name={i.nombre_producto}
-                  price={i["precio"]}
-                  image={`/api/${i["ruta_imagen"]}`}
-                  stock={i["stock"]}
+                  key={producto.id_producto}
+                  name={producto.nombre_producto}
+                  rating={producto.rating}
+                  price={producto.precio}
+                  image={`/api/${producto.ruta_imagen}`}
+                  stock={producto.stock}
                   freeShipping={true}
-                  phone={true}
-                  onClick={() => !userType && ecommerce ? navigate(`product/${i["id_producto"]}`) : navigate(`/product/${i["id_producto"]}`)}
+                  phone={windowWidth >= 500 ? false : true}
+                  onDelete={() => handleDeleteProduct(producto.id_producto)}
+                  admin={userType}
+                  onClick={() => ecommerce ? navigate(`product/${producto.id_producto}`) : navigate(`/product/${producto.id_producto}`)}
                 />
               </AnimationScroll>
-            ))
-          })}
-        </section>
+            ))}
+          </section>
+        )
       ) : (
-        <section className={`flex flex-col mb-20 w-full items-center justify-center transition-opacity ease-in-out ${animation ? "opacity-100 duration-1000" : "opacity-0 duration-0"}`}>
-          {uniqueProducts.length > 1 && windowWidth > 500 ? showProducts(uniqueProducts) : uniqueProducts.map((producto) => (
-            <AnimationScroll key={producto.id_producto}>
-              <ProductCard
-                key={producto.id_producto}
-                name={producto.nombre_producto}
-                price={producto.precio}
-                image={`/api/${producto.ruta_imagen}`}
-                stock={producto.stock}
-                freeShipping={true}
-                phone={windowWidth >= 500 ? false : true}
-                onDelete={() => handleDeleteProduct(producto.id_producto)}
-                admin={userType}
-                onClick={() => ecommerce ? navigate(`product/${producto.id_producto}`) : navigate(`/product/${producto.id_producto}`)}
-              />
-            </AnimationScroll>
-          ))}
-        </section>
+        <div className="fixed bottom-1/2 left-0 right-0 z-50 flex justify-center items-center h-20">
+          <ClipLoader size={60} color="#808080" />
+        </div>
       )}
     </section>
   );

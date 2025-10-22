@@ -11,37 +11,7 @@ $data_base = new mysqli(
     $config['database']
 );
 
-if ($data_base) {
-    $body = json_decode(file_get_contents("php://input"), true);
-    $query = $data_base->prepare("INSERT INTO compras(id_cliente) VALUES(?)");
-    $query->bind_param("i", $body["id_client"]);
-    if ($query->execute()) {
-        $id_compra = $data_base->insert_id;
-        $query = $data_base->prepare("INSERT INTO detalles_compras(id_compra, id_producto, cantidad, precio_unitario) VALUES(?, ?, ?, ?)");
-        $query->bind_param("iiii", $id_compra, $body["id_product"], $body["amount"], $body["price"]);
-        if ($query->execute()) {
-            echo json_encode([
-                "success" => true,
-                "data" => "GOOOOD"
-            ]);
-        } else {
-            http_response_code(400);
-            echo json_encode([
-                "success" => false,
-                "message" => "Error al crear los detalles de la compra"
-            ]);
-            exit;
-        }
-    } else {
-        http_response_code(400);
-        echo json_encode([
-            "success" => false,
-            "message" => "Error",
-            "data"=> $body
-        ]);
-        exit;
-    }
-} else {
+if ($data_base->connect_error) {
     http_response_code(500);
     echo json_encode([
         "success" => false,
@@ -49,4 +19,70 @@ if ($data_base) {
     ]);
     exit;
 }
-?>
+
+$body = json_decode(file_get_contents("php://input"), true);
+
+$data_base->begin_transaction();
+
+try {
+    $query = $data_base->prepare("SELECT id_ecommerce FROM productos WHERE id_producto = ?");
+    $query->bind_param("i", $body["id_product"]);
+    $query->execute();
+    $result = $query->get_result();
+    $producto = $result->fetch_assoc();
+    
+    if (!$producto) {
+        throw new Exception("Producto no encontrado");
+    }
+    
+    $id_ecommerce = $producto['id_ecommerce'];
+    
+    $query = $data_base->prepare("SELECT id_carrito FROM carrito WHERE id_usuario = ? AND id_ecommerce = ?");
+    $query->bind_param("ii", $body["id_client"], $id_ecommerce);
+    $query->execute();
+    $result = $query->get_result();
+    $carrito = $result->fetch_assoc();
+    
+    if ($carrito) {
+        $id_carrito = $carrito['id_carrito'];
+    } else {
+        $query = $data_base->prepare("INSERT INTO carrito(id_usuario, id_ecommerce) VALUES(?, ?)");
+        $query->bind_param("ii", $body["id_client"], $id_ecommerce);
+        $query->execute();
+        $id_carrito = $data_base->insert_id;
+    }
+    
+    $query = $data_base->prepare("SELECT id_item, cantidad FROM items_carrito WHERE id_carrito = ? AND id_producto = ?");
+    $query->bind_param("ii", $id_carrito, $body["id_product"]);
+    $query->execute();
+    $result = $query->get_result();
+    $item_existente = $result->fetch_assoc();
+    
+    if ($item_existente) {
+        $nueva_cantidad = $item_existente['cantidad'] + $body["amount"];
+        $query = $data_base->prepare("UPDATE items_carrito SET cantidad = ? WHERE id_item = ?");
+        $query->bind_param("ii", $nueva_cantidad, $item_existente['id_item']);
+        $query->execute();
+    } else {
+        $query = $data_base->prepare("INSERT INTO items_carrito(id_carrito, id_producto, cantidad, precio_unitario) VALUES(?, ?, ?, ?)");
+        $query->bind_param("iiid", $id_carrito, $body["id_product"], $body["amount"], $body["price"]);
+        $query->execute();
+    }
+    
+    $data_base->commit();
+    
+    echo json_encode([
+        "success" => true,
+        "message" => "Producto agregado al carrito"
+    ]);
+    
+} catch (Exception $e) {
+    $data_base->rollback();
+    http_response_code(400);
+    echo json_encode([
+        "success" => false,
+        "message" => $e->getMessage()
+    ]);
+}
+
+$data_base->close();

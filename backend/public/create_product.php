@@ -114,6 +114,43 @@ if ($data_base) {
         $is_clothing = !empty(array_intersect($category_list, $clothing_categories));
         $skip_images = !empty(array_intersect($category_list, $no_image_categories));
 
+        function convertToWebP($source_path, $destination_path) {
+            $image_info = getimagesize($source_path);
+            if (!$image_info) {
+                return false;
+            }
+            
+            $mime_type = $image_info['mime'];
+            
+            switch ($mime_type) {
+                case 'image/jpeg':
+                case 'image/jpg':
+                    $source_image = imagecreatefromjpeg($source_path);
+                    break;
+                case 'image/png':
+                    $source_image = imagecreatefrompng($source_path);
+                    break;
+                case 'image/gif':
+                    $source_image = imagecreatefromgif($source_path);
+                    break;
+                case 'image/webp':
+                    $source_image = imagecreatefromwebp($source_path);
+                    break;
+                default:
+                    return false;
+            }
+            
+            if (!$source_image) {
+                return false;
+            }
+            
+            $result = imagewebp($source_image, $destination_path, 85);
+            
+            imagedestroy($source_image);
+            
+            return $result;
+        }
+
         function saveImages($product_id, $data_base)
         {
             if (!isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
@@ -139,16 +176,20 @@ if ($data_base) {
 
                 if ($file_error !== UPLOAD_ERR_OK)
                     continue;
-                if (!in_array($file_type, $allowed_types))
+                
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $actual_mime = finfo_file($finfo, $file_tmp);
+                finfo_close($finfo);
+                
+                if (!in_array($actual_mime, $allowed_types))
                     continue;
                 if ($file_size > $max_size)
                     continue;
 
-                $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-                $unique_name = uniqid() . '_' . time() . '.' . $file_extension;
+                $unique_name = uniqid() . '_' . time() . '.webp';
                 $file_path = $upload_dir . $unique_name;
 
-                if (move_uploaded_file($file_tmp, $file_path)) {
+                if (convertToWebP($file_tmp, $file_path)) {
                     $relative_path = "uploads/products/" . $unique_name;
                     $query = $data_base->prepare("INSERT INTO imagenes_productos (id_producto, ruta_imagen) VALUES (?, ?)");
                     $query->bind_param("is", $product_id, $relative_path);
