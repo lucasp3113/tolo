@@ -183,10 +183,13 @@ function formatDate(dateStr, timeRange) {
 
 export default function AdminPanel() {
   const allEcommerces = [];
+  const allOrders = [];
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
   function search(data) {
     setLoading(true);
+    setSearched(true);
     axios
       .post("/api/search_ecommerce.php", {
         search: data["ecommerce"],
@@ -206,7 +209,7 @@ export default function AdminPanel() {
     axios
       .post("/api/get_views.php", { timeRange })
       .then((res) => {
-        console.log("Respuesta completa:", res.data); // AGREGÁ ESTO
+        console.log("Respuesta completa:", res.data);
         if (res.data.success && res.data.data) {
           const formattedData = res.data.data.map((item) => ({
             name: formatDate(item.date, timeRange),
@@ -222,7 +225,50 @@ export default function AdminPanel() {
       });
   }
 
+  function getEarnings(timeRange) {
+    axios
+      .post("/api/get_earnings.php", { timeRange })
+      .then((res) => {
+        console.log("Respuesta completa:", res.data);
+        if (res.data.success && res.data.data) {
+          const formattedData = res.data.data.map((item) => ({
+            name: formatDate(item.date, timeRange),
+            ganancias: parseInt(item.total || item.amount || item.count, 10), // Minúscula y con fallbacks
+          }));
+          setChartData(formattedData);
+        } else {
+          console.error("Respuesta sin éxito:", res.data);
+        }
+      })
+      .catch((err) => {
+        console.log("Error al obtener ganancias:", err);
+      });
+  }
+
+function table() {
+  axios
+    .post("/api/orders.php")
+    .then((res) => {
+      if (res.data.success && Array.isArray(res.data.data)) {
+        const formatted = res.data.data.map((order) => ({
+          id: order.id_compra,
+          cliente: order.cliente,
+          fecha: order.fecha_compra,
+          monto: order.total,
+          direccion: order.direccion || "Sin dirección",
+          estado: order.estado,
+        }));
+        setOrdersTable(formatted); // ✅ solo guardamos todo acá
+        setDisplayedOrders([]);    // ✅ vaciamos el mostrado inicial
+        setPage(0);                // ✅ reiniciamos el contador
+        setHasMore(true);          // ✅ habilitamos más carga
+      }
+    })
+    .catch((err) => console.error("❌ Error en la llamada:", err));
+}
+
   const [searchData, setSearchData] = useState(allEcommerces);
+  const [ordersTable, setOrdersTable] = useState([]);
   const [visitData, setVisitData] = useState([]);
   const [timeRange, setTimeRange] = useState("1semana");
   const [chartData, setChartData] = useState([]);
@@ -233,8 +279,12 @@ export default function AdminPanel() {
   }, [searchData]);
 
   useEffect(() => {
-    getVisits(timeRange);
-  }, [timeRange]);
+    if (chartType === "Visitas") {
+      getVisits(timeRange);
+    } else {
+      getEarnings(timeRange);
+    }
+  }, [timeRange, chartType]);
 
   const [productCrud, setProductCrud] = useState(false);
   const [selectedEcommerce, setSelectedEcommerce] = useState(null);
@@ -255,13 +305,11 @@ export default function AdminPanel() {
   } = useForm();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [displayedOrders, setDisplayedOrders] = useState([]);
+  const [displayedOrders, setDisplayedOrders] = useState([allOrders]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const tableEndRef = useRef(null);
   const ITEMS_PER_PAGE = 10;
-
-  // const [timeRange, setTimeRange] = useState("1semana");
 
   const [ecommerceCount, setEcommerceCount] = useState(8);
   const ecommerceEndRef = useRef(null);
@@ -293,128 +341,128 @@ export default function AdminPanel() {
     });
   });
 
-  const allOrders = [
-    {
-      id: 1,
-      cliente: "Juan Camilo",
-      fecha: "08/10/2025",
-      monto: "$5000",
-      direccion: "Pelossi 653",
-      estado: "Enviado",
-    },
-    {
-      id: 2,
-      cliente: "Bruno Camilo",
-      fecha: "08/10/2025",
-      monto: "$3500",
-      direccion: "Rocha 489",
-      estado: "Enviado",
-    },
-    {
-      id: 3,
-      cliente: "Beto Torreta",
-      fecha: "08/10/2025",
-      monto: "$2300",
-      direccion: "Nicolás Guerra 101",
-      estado: "En proceso",
-    },
-    {
-      id: 4,
-      cliente: "Juan Maderagni",
-      fecha: "07/10/2025",
-      monto: "$4200",
-      direccion: "F. Figueroa 443",
-      estado: "Enviado",
-    },
-    {
-      id: 5,
-      cliente: "Francisco Luchineludo",
-      fecha: "07/10/2025",
-      monto: "$1800",
-      direccion: "Brasil 1430",
-      estado: "En proceso",
-    },
-    {
-      id: 6,
-      cliente: "Donatella Reyes",
-      fecha: "06/10/2025",
-      monto: "$3100",
-      direccion: "18 de Julio 890",
-      estado: "Enviado",
-    },
-    {
-      id: 7,
-      cliente: "Agustina Rodríguez",
-      fecha: "06/10/2025",
-      monto: "$2900",
-      direccion: "Herrera 305",
-      estado: "En proceso",
-    },
-    {
-      id: 8,
-      cliente: "Laura Fernández",
-      fecha: "05/10/2025",
-      monto: "$5500",
-      direccion: "8 de Octubre 456",
-      estado: "Enviado",
-    },
-    {
-      id: 9,
-      cliente: "Diego Martínez",
-      fecha: "05/10/2025",
-      monto: "$2100",
-      direccion: "Bulevar Artigas 789",
-      estado: "En proceso",
-    },
-    {
-      id: 10,
-      cliente: "Sofía Rodríguez",
-      fecha: "04/10/2025",
-      monto: "$3800",
-      direccion: "Millán 321",
-      estado: "Enviado",
-    },
-    {
-      id: 11,
-      cliente: "Javier Torres",
-      fecha: "04/10/2025",
-      monto: "$4500",
-      direccion: "Constituyente 654",
-      estado: "En proceso",
-    },
-    {
-      id: 12,
-      cliente: "Valentina Pérez",
-      fecha: "03/10/2025",
-      monto: "$2700",
-      direccion: "Agraciada 987",
-      estado: "Enviado",
-    },
-    {
-      id: 13,
-      cliente: "Mateo Silva",
-      fecha: "03/10/2025",
-      monto: "$3300",
-      direccion: "Comercio 147",
-      estado: "En proceso",
-    },
-    {
-      id: 14,
-      cliente: "Camila Gómez",
-      fecha: "02/10/2025",
-      monto: "$4100",
-      direccion: "San José 258",
-      estado: "Enviado",
-    },
-    {
-      id: 15,
-      cliente: "Lucas Díaz",
-      fecha: "02/10/2025",
-      monto: "$1900",
-      direccion: "Yaguarón 369",
-      estado: "En proceso",
-    },
-  ];
+  // const allOrders = [
+  //   {
+  //     id: 1,
+  //     cliente: "Juan Camilo",
+  //     fecha: "08/10/2025",
+  //     monto: "$5000",
+  //     direccion: "Pelossi 653",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 2,
+  //     cliente: "Bruno Camilo",
+  //     fecha: "08/10/2025",
+  //     monto: "$3500",
+  //     direccion: "Rocha 489",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 3,
+  //     cliente: "Beto Torreta",
+  //     fecha: "08/10/2025",
+  //     monto: "$2300",
+  //     direccion: "Nicolás Guerra 101",
+  //     estado: "En proceso",
+  //   },
+  //   {
+  //     id: 4,
+  //     cliente: "Juan Maderagni",
+  //     fecha: "07/10/2025",
+  //     monto: "$4200",
+  //     direccion: "F. Figueroa 443",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 5,
+  //     cliente: "Francisco Luchineludo",
+  //     fecha: "07/10/2025",
+  //     monto: "$1800",
+  //     direccion: "Brasil 1430",
+  //     estado: "En proceso",
+  //   },
+  //   {
+  //     id: 6,
+  //     cliente: "Donatella Reyes",
+  //     fecha: "06/10/2025",
+  //     monto: "$3100",
+  //     direccion: "18 de Julio 890",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 7,
+  //     cliente: "Agustina Rodríguez",
+  //     fecha: "06/10/2025",
+  //     monto: "$2900",
+  //     direccion: "Herrera 305",
+  //     estado: "En proceso",
+  //   },
+  //   {
+  //     id: 8,
+  //     cliente: "Laura Fernández",
+  //     fecha: "05/10/2025",
+  //     monto: "$5500",
+  //     direccion: "8 de Octubre 456",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 9,
+  //     cliente: "Diego Martínez",
+  //     fecha: "05/10/2025",
+  //     monto: "$2100",
+  //     direccion: "Bulevar Artigas 789",
+  //     estado: "En proceso",
+  //   },
+  //   {
+  //     id: 10,
+  //     cliente: "Sofía Rodríguez",
+  //     fecha: "04/10/2025",
+  //     monto: "$3800",
+  //     direccion: "Millán 321",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 11,
+  //     cliente: "Javier Petre",
+  //     fecha: "04/10/2025",
+  //     monto: "$4500",
+  //     direccion: "Constituyente 654",
+  //     estado: "En proceso",
+  //   },
+  //   {
+  //     id: 12,
+  //     cliente: "Valentina Pérez",
+  //     fecha: "03/10/2025",
+  //     monto: "$2700",
+  //     direccion: "Agraciada 987",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 13,
+  //     cliente: "Mateo Silva",
+  //     fecha: "03/10/2025",
+  //     monto: "$3300",
+  //     direccion: "Comercio 147",
+  //     estado: "En proceso",
+  //   },
+  //   {
+  //     id: 14,
+  //     cliente: "Camila Gómez",
+  //     fecha: "02/10/2025",
+  //     monto: "$4100",
+  //     direccion: "San José 258",
+  //     estado: "Enviado",
+  //   },
+  //   {
+  //     id: 15,
+  //     cliente: "Lucas Díaz",
+  //     fecha: "02/10/2025",
+  //     monto: "$1900",
+  //     direccion: "Yaguarón 369",
+  //     estado: "En proceso",
+  //   },
+  // ];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -439,24 +487,28 @@ export default function AdminPanel() {
     loadMoreOrders();
   }, []);
 
-  const loadMoreOrders = () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
+  useEffect(() => {
+    table(); // 👈 carga las órdenes al montar el componente
+  }, []);
 
-    setTimeout(() => {
-      const start = page * ITEMS_PER_PAGE;
-      const end = start + ITEMS_PER_PAGE;
-      const newOrders = allOrders.slice(start, end);
+const loadMoreOrders = () => {
+  if (loading || !hasMore) return;
+  setLoading(true);
 
-      if (newOrders.length > 0) {
-        setDisplayedOrders((prev) => [...prev, ...newOrders]);
-        setPage((prev) => prev + 1);
-      }
+  setTimeout(() => {
+    const start = page * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    const newOrders = ordersTable.slice(start, end); // ✅ usar ordersTable
 
-      if (end >= allOrders.length) setHasMore(false);
-      setLoading(false);
-    }, 0);
-  };
+    if (newOrders.length > 0) {
+      setDisplayedOrders((prev) => [...prev, ...newOrders]);
+      setPage((prev) => prev + 1);
+    }
+
+    if (end >= ordersTable.length) setHasMore(false);
+    setLoading(false);
+  }, 300); // un pequeño delay opcional para suavizar
+};
 
   function capitalize(str) {
     if (!str) return "";
@@ -525,10 +577,6 @@ export default function AdminPanel() {
     }
   }, [timeRange]);
 
-  useEffect(() => {
-    getVisits(timeRange);
-  }, [timeRange]);
-
   return !productCrud ? (
     <section className=" bg-gradient-to-br from-gray-50 to-gray-100">
       {width >= 500 ? (
@@ -570,13 +618,13 @@ export default function AdminPanel() {
                       </td>
                       <td
                         className={`px-4 py-2 border border-gray-200 font-bold flex justify-center ${
-                          order.estado === "Enviado"
+                          order.estado === "enviado"
                             ? "text-green-600"
                             : "text-amber-500"
                         }`}
                       >
                         {order.estado}{" "}
-                        {order.estado === "Enviado" ? (
+                        {order.estado === "enviado" ? (
                           <IoCheckmarkDone className="self-center ml-2 text-xl text-sky-500" />
                         ) : (
                           <FaRegClock className="self-center ml-2 text-md" />
@@ -699,7 +747,11 @@ export default function AdminPanel() {
                 />
                 {loading && (
                   <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center items-center h-20">
-                    <ClipLoader size={40} color="#f0000" />
+                    <ClipLoader
+                      size={40}
+                      color="#f0000"
+                      className="mt-5 mb-5"
+                    />
                   </div>
                 )}
               </form>
@@ -754,6 +806,11 @@ export default function AdminPanel() {
                 </div>
                 <div ref={ecommerceEndRef} className="h-4 w-full" />
               </div>
+              {searched && !loading && searchData.length === 0 && (
+                <p className="text-center text-gray-500 mt-4">
+                  No se encontró ningún e-commerce con ese nombre
+                </p>
+              )}
             </div>
           </section>
         </div>
@@ -858,7 +915,7 @@ export default function AdminPanel() {
                       className="text-center text-[11px] animate-[fadeSlide_0.5s_ease-out_forwards] border-b border-gray-100 hover:bg-gray-50"
                       style={{ animationDelay: `${i * 0.05}s` }}
                     >
-                      <td className="px-0.5 py-1">{order.id}</td>
+                      <td className="px-0.5 py-1">{order.orderId}</td>
                       <td className="px-0.5 py-1 truncate">{order.cliente}</td>
                       <td className="px-0.5 py-1 text-[10px]">{order.fecha}</td>
                       <td className="px-0.5 py-1 font-semibold">
@@ -893,6 +950,7 @@ export default function AdminPanel() {
                   ))}
                 </tbody>
               </table>
+
               <div ref={tableEndRef} className="h-2" />
               {!hasMore && displayedOrders.length > 0 && (
                 <div className="text-center py-2 text-gray-500 text-[10px]">
@@ -994,6 +1052,6 @@ export default function AdminPanel() {
       )}
     </section>
   ) : (
-    <ProductCRUD isAdmin={selectedEcommerce} />
+    <ProductCRUD isAdmin={selectedEcommerce} setProductCrud={setProductCrud} />
   );
 }

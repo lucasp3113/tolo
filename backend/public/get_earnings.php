@@ -19,56 +19,61 @@ if ($data_base) {
 
     switch ($timeRange) {
         case '1dia':
-            $dateCondition = "WHERE DATE(fecha) = CURDATE()";
+            $dateCondition = "WHERE DATE(fecha_compra) = CURDATE()";
             break;
         case '1semana':
-            $dateCondition = "WHERE fecha >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+            $dateCondition = "WHERE fecha_compra >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
             break;
         case '1mes':
-            $dateCondition = "WHERE fecha >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
+            $dateCondition = "WHERE fecha_compra >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
             break;
         case '5meses':
-            $dateCondition = "WHERE fecha >= DATE_SUB(NOW(), INTERVAL 5 MONTH)";
+            $dateCondition = "WHERE fecha_compra >= DATE_SUB(NOW(), INTERVAL 5 MONTH)";
             break;
         case '1año':
-            $dateCondition = "WHERE fecha >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
+            $dateCondition = "WHERE fecha_compra >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
             break;
         default:
-            $dateCondition = "WHERE fecha >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+            $dateCondition = "WHERE fecha_compra >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
     }
 
     $query = $data_base->prepare(
-    "SELECT DATE(fecha) AS date, 
-    COUNT(*) AS count FROM visitas $dateCondition GROUP BY DATE(fecha) ORDER BY date ASC"
+        "SELECT DATE(fecha_compra) AS date, 
+        SUM(comision_plataforma) AS total 
+        FROM compras 
+        $dateCondition 
+        GROUP BY DATE(fecha_compra) 
+        ORDER BY date ASC"
     );
 
     if (!$query->execute()) {
         http_response_code(400);
         echo json_encode([
             'success' => false,
-            "message" => "ERROR al obtener las visitas"
+            'message' => "ERROR al obtener las ganancias"
         ]);
     } else {
         $result = $query->get_result();
-        $visits = [];
+        $earnings = [];
 
         while ($row = $result->fetch_assoc()) {
-            $visits[] = [
+            $earnings[] = [
                 'date' => $row['date'],
-                'count' => (int)$row['count']
+                'total' => (float)$row['total']
             ];
         }
 
         http_response_code(200);
         echo json_encode([
             'success' => true,
-            'data' => $visits
+            'data' => $earnings
         ]);
     }
 } else {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        "message" => "ERROR de conexión"
+        'message' => "ERROR de conexión"
     ]);
 }
+?>

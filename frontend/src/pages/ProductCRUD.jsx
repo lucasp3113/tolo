@@ -4,8 +4,9 @@ import ProductCard from "../components/ProductCard";
 import CreateProduct from "../pages/CreateProduct";
 import AnimationScroll from "../components/AnimationScroll";
 import { IoReturnUpBack } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
-export default function ProductCRUD({ isAdmin }) {
+export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
   function showProducts(data) {
     console.log(data);
     const jsx = [];
@@ -82,6 +83,7 @@ export default function ProductCRUD({ isAdmin }) {
   }, []);
 
   const [productos, setProductos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -102,7 +104,7 @@ export default function ProductCRUD({ isAdmin }) {
         windowWidth >= 500 ? "flex flex-wrap justify-center gap-4" : ""
       }`}
     >
-      <div onClick={setProductCrud(false)} className="flex absolute z-50 cursor-pointer left-6 top-28 justify-start -translate-y-6 -translate-x-6 hover:scale-110 transition-transform duration-300">
+      <div onClick={() => setProductCrud(false)} className="flex absolute z-50 cursor-pointer left-6 top-28 justify-start -translate-y-6 -translate-x-6 hover:scale-110 transition-transform duration-300">
         <IoReturnUpBack className={`w-18 mr-2 text-[40px]`} />
       </div>
       {!update ? (
