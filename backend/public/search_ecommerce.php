@@ -50,10 +50,12 @@ if ($data_base->connect_error) {
     $numero_of_s = str_repeat("s", count($cutes_words));
 
     $query = $data_base->prepare(
-        "SELECT e.id_ecommerce, e.nombre_ecommerce, e.logo, r.nombre_rango 
+        "SELECT e.id_ecommerce, e.nombre_ecommerce, e.logo, r.nombre_rango, u.nombre_usuario
                 FROM ecommerces e
                 JOIN rangos r ON r.id_rango = e.rango_actual
-                WHERE e.nombre_ecommerce IN ($number_of_question_marks);"
+                JOIN usuarios u ON u.id_usuario = e.id_usuario
+                WHERE e.nombre_ecommerce IN ($number_of_question_marks);
+                "
     );
     $query->bind_param($numero_of_s, ...$cutes_words);
     if ($query->execute()) {

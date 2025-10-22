@@ -4,7 +4,9 @@
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS tolo;
+
 USE tolo;
+
 +
 -- ============================================================
 -- CREACIÓN DE TABLAS (ordenadas por dependencias)
@@ -15,14 +17,25 @@ CREATE TABLE usuarios (
     nombre_usuario VARCHAR(15) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
-    tipo_usuario ENUM('cliente','vendedor_particular','ecommerce','admin') NOT NULL,
+    tipo_usuario ENUM(
+        'cliente',
+        'vendedor_particular',
+        'ecommerce',
+        'admin'
+    ) NOT NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    nombre_rango ENUM('junior','amateur','semi_senior','senior','elite') NOT NULL DEFAULT 'junior',
+    nombre_rango ENUM(
+        'junior',
+        'amateur',
+        'semi_senior',
+        'senior',
+        'elite'
+    ) NOT NULL DEFAULT 'junior',
     facturacion_minima INT NOT NULL DEFAULT 0,
     porcentaje_comision DECIMAL(4, 2) NOT NULL
 );
@@ -79,7 +92,13 @@ CREATE TABLE compras (
     id_compra INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_cliente INT UNSIGNED NOT NULL,
     fecha_compra DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    estado ENUM('pendiente','pagada','enviado','entregado','cancelada') NOT NULL DEFAULT 'pendiente',
+    estado ENUM(
+        'pendiente',
+        'pagada',
+        'enviado',
+        'entregado',
+        'cancelada'
+    ) NOT NULL DEFAULT 'pendiente',
     FOREIGN KEY (id_cliente) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
 
@@ -97,7 +116,10 @@ CREATE TABLE comentarios_productos (
     id_comentario INT PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     id_usuario INT UNSIGNED NOT NULL,
-    rating DECIMAL(2, 1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
+    rating DECIMAL(2, 1) NOT NULL CHECK (
+        rating >= 0
+        AND rating <= 5
+    ),
     comentario TEXT NOT NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -117,7 +139,12 @@ CREATE TABLE pagos (
     id_pago INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_compra INT UNSIGNED NOT NULL,
     id_metodo_pago INT UNSIGNED NOT NULL,
-    estado_pago ENUM('pendiente','completado','fallido','cancelado') NOT NULL DEFAULT 'pendiente',
+    estado_pago ENUM(
+        'pendiente',
+        'completado',
+        'fallido',
+        'cancelado'
+    ) NOT NULL DEFAULT 'pendiente',
     referencia_transaccion VARCHAR(255),
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     FOREIGN KEY (id_metodo_pago) REFERENCES metodos_pagos (id_metodo_pago) ON DELETE RESTRICT
@@ -128,7 +155,12 @@ CREATE TABLE envios (
     id_compra INT UNSIGNED NOT NULL,
     metodo_envio VARCHAR(255),
     direccion_entrega TEXT NOT NULL,
-    estado_envio ENUM('pendiente','enviado','entregado','devuelto') NOT NULL DEFAULT 'pendiente',
+    estado_envio ENUM(
+        'pendiente',
+        'enviado',
+        'entregado',
+        'devuelto'
+    ) NOT NULL DEFAULT 'pendiente',
     tracking VARCHAR(255),
     fecha_estimada_entrega DATE,
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE
@@ -180,6 +212,11 @@ CREATE TABLE custom_shops (
     main_color VARCHAR(100) NOT NULL,
     footer_color VARCHAR(100) NOT NULL,
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE
+);
+
+CREATE TABLE visitas (
+    id_visita INT PRIMARY KEY AUTO_INCREMENT,
+    fecha DATETIME
 );
 
 --Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
@@ -550,8 +587,10 @@ VALUES (10, 'Diseño oversize cargo'),
 
 SELECT * FROM ecommerces;
 
-SELECT * FROM  productos;
+SELECT * FROM productos;
 
 SELECT * FROM usuarios;
 
-SELECT ()
+SELECT * FROM visitas;
+
+DELETE FROM visitas;

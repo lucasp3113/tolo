@@ -9,6 +9,8 @@ import { IoSearch } from "react-icons/io5";
 import Button from "../components/Button";
 import silvano from "../../src/assets/lautaro.jpeg";
 import { MdOutlineBarChart } from "react-icons/md";
+import ProductCRUD from "./ProductCRUD";
+import ClipLoader from "react-spinners/ClipLoader";
 
 import {
   LineChart,
@@ -146,27 +148,96 @@ const ChartMobile = memo(({ chartData, chartType }) => {
   );
 });
 
+function formatDate(dateStr, timeRange) {
+  const date = new Date(dateStr);
+
+  switch (timeRange) {
+    case "1dia":
+      return `${date.getHours()}:00`;
+    case "1semana":
+      const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+      return days[date.getDay()];
+    case "1mes":
+      return `${date.getDate()}`;
+    case "5meses":
+    case "1año":
+      const months = [
+        "Ene",
+        "Feb",
+        "Mar",
+        "Abr",
+        "May",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dic",
+      ];
+      return months[date.getMonth()];
+    default:
+      return dateStr;
+  }
+}
+
 export default function AdminPanel() {
+  const allEcommerces = [];
+  const [loading, setLoading] = useState(false);
+
   function search(data) {
+    setLoading(true);
     axios
       .post("/api/search_ecommerce.php", {
         search: data["ecommerce"],
       })
       .then((res) => {
+        setLoading(false);
         setSearchData(res.data.data);
         setEcommerceCount(8);
+        console.log(res);
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
-  const allEcommerces = [];
+  function getVisits(timeRange) {
+    axios
+      .post("/api/get_views.php", { timeRange })
+      .then((res) => {
+        console.log("Respuesta completa:", res.data); // AGREGÁ ESTO
+        if (res.data.success && res.data.data) {
+          const formattedData = res.data.data.map((item) => ({
+            name: formatDate(item.date, timeRange),
+            Visitas: parseInt(item.count, 10),
+          }));
+          setChartData(formattedData);
+        } else {
+          console.error("Respuesta sin éxito:", res.data);
+        }
+      })
+      .catch((err) => {
+        console.log("Error al obtener visitas:", err);
+      });
+  }
 
   const [searchData, setSearchData] = useState(allEcommerces);
+  const [visitData, setVisitData] = useState([]);
+  const [timeRange, setTimeRange] = useState("1semana");
+  const [chartData, setChartData] = useState([]);
+  const [chartType, setChartType] = useState("Visitas");
+
   useEffect(() => {
     console.log(searchData);
   }, [searchData]);
+
+  useEffect(() => {
+    getVisits(timeRange);
+  }, [timeRange]);
+
+  const [productCrud, setProductCrud] = useState(false);
+  const [selectedEcommerce, setSelectedEcommerce] = useState(null);
 
   const colorsCurrentRange = {
     junior: "text-sky-400 border-sky-400",
@@ -183,7 +254,6 @@ export default function AdminPanel() {
     watch,
   } = useForm();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [displayedOrders, setDisplayedOrders] = useState([]);
   const [page, setPage] = useState(0);
@@ -191,9 +261,7 @@ export default function AdminPanel() {
   const tableEndRef = useRef(null);
   const ITEMS_PER_PAGE = 10;
 
-  const [timeRange, setTimeRange] = useState("1semana");
-  const [chartData, setChartData] = useState([]);
-  const [chartType, setChartType] = useState("Visitas");
+  // const [timeRange, setTimeRange] = useState("1semana");
 
   const [ecommerceCount, setEcommerceCount] = useState(8);
   const ecommerceEndRef = useRef(null);
@@ -458,10 +526,10 @@ export default function AdminPanel() {
   }, [timeRange]);
 
   useEffect(() => {
-    setChartData(generateDummyData());
-  }, [generateDummyData]);
+    getVisits(timeRange);
+  }, [timeRange]);
 
-  return (
+  return !productCrud ? (
     <section className=" bg-gradient-to-br from-gray-50 to-gray-100">
       {width >= 500 ? (
         <div className="gap-4 md:p-4 font-quicksand">
@@ -618,7 +686,7 @@ export default function AdminPanel() {
                   register={register}
                   errors={errors}
                   required={true}
-                  className=""
+                  className="bg-white!"
                   icon={
                     <Button
                       type="submit"
@@ -629,6 +697,11 @@ export default function AdminPanel() {
                     />
                   }
                 />
+                {loading && (
+                  <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center items-center h-20">
+                    <ClipLoader size={40} color="#f0000" />
+                  </div>
+                )}
               </form>
 
               <div className="max-h-[600px] overflow-y-auto">
@@ -638,9 +711,10 @@ export default function AdminPanel() {
                       key={ecommerce.id}
                       className="flex ml-4 p-4 w-[30%] bg-white hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100 animate-[fadeSlide_0.5s_ease-out_forwards]"
                       style={{ animationDelay: `${i * 0.03}s` }}
-                      onClick={() =>
-                        navigate(`/seller_dashboard/${ecommerce.id_usuario}`)
-                      }
+                      onClick={() => {
+                        setProductCrud(true);
+                        setSelectedEcommerce(ecommerce.nombre_usuario);
+                      }}
                     >
                       <div>
                         {ecommerce.logo ? (
@@ -679,11 +753,6 @@ export default function AdminPanel() {
                   ))}
                 </div>
                 <div ref={ecommerceEndRef} className="h-4 w-full" />
-                {ecommerceCount >= searchData.length && (
-                  <div className="text-center py-4 text-gray-500 text-sm w-full">
-                    No hay más e-commerce para mostrar
-                  </div>
-                )}
               </div>
             </div>
           </section>
@@ -924,5 +993,7 @@ export default function AdminPanel() {
         </div>
       )}
     </section>
+  ) : (
+    <ProductCRUD isAdmin={selectedEcommerce} />
   );
 }

@@ -5,7 +5,7 @@ import { ImBin } from "react-icons/im";
 import { FaPen } from "react-icons/fa";
 import axios from "axios";
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, id_compra = null, admin = false }) {
+export default function ProductCard({ isAdmin, name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, id_compra = null, admin = false }) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate()
@@ -90,7 +90,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           )}
           {!client && (
             <div className="flex gap-2 pt-4 absolute bottom-0">
-              <Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />
+              {!isAdmin && (<Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />)}
               <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
             </div>
           )}
@@ -144,7 +144,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
 
           {!client && (
             <div className="flex gap-2 pt-4 absolute bottom-0">
-              <Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />
+              {!isAdmin && (<Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />)}
               <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
             </div>
           )}
@@ -195,10 +195,10 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           <ImBin onClick={() => onDelete()} className="text-3xl text-red-600" />
         )}
         {!client && (
-          <div className="flex gap-2 pt-4 absolute bottom-0">
-            <Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />
-            <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
-          </div>
+            <div className="flex gap-2 pt-4 absolute bottom-0">
+              {!isAdmin && (<Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />)}
+              <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
+            </div>
         )}
       </div>
     </div>
