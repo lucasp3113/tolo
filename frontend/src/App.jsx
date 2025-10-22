@@ -22,6 +22,7 @@ import ChangeEcommerce from './pages/ChangeEcommerce';
 import ProfilePicture from './pages/ProfilePicture';
 import Notifications from './pages/Notifications';
 import CustomizeStore from './pages/CustomizeStore';
+import Favorites from './pages/Favorites';
 
 
 function App() {
@@ -170,8 +171,13 @@ function App() {
                   <Layout colors={colors} isCustomizeStore={true} change={change}>
                     <CustomizeStore setChange={setChange} change={change} setColorsForLayaut={setColors}/>
                   </Layout>
-                }
-              />
+                }/>
+              <Route path='/:ecommerce?/favorites' element={
+                <Layout>
+                  <Favorites />
+                </Layout>
+              }
+           />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

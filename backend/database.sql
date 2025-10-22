@@ -427,6 +427,16 @@ CREATE TABLE custom_shops (
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE
 );
 
+CREATE TABLE favoritos (
+    id_favorito INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT UNSIGNED NOT NULL,
+    id_producto INT UNSIGNED NOT NULL,
+    fecha_agregado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE
+);
+
+
 --Datos de prueba(se utiliza contraseña en texto plano por simplicidad, solo desarrolo: 12345678P_)
 INSERT INTO
     usuarios (
@@ -799,3 +809,10 @@ ADD COLUMN tolo_coins INT DEFAULT 0;
 UPDATE usuarios
 SET tolo_coins = 0
 WHERE tolo_coins IS NULL;
+
+
+
+SELECT *  FROM productos
+
+
+SELECT * FROM favoritos

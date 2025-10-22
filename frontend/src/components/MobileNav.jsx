@@ -4,7 +4,7 @@ import { FaHome, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import Menu from './Menu';
 import { MdSpaceDashboard } from 'react-icons/md';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from "../components/AuthProvider.jsx";
 import { IoSettings } from "react-icons/io5";
 import axios from 'axios';
 import Dropdown from './Dropdown';

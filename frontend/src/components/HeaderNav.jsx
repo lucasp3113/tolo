@@ -10,7 +10,7 @@ import logoTolo from "../assets/logoTolo.webp";
 import Menu from "./Menu";
 import Input from "./Input";
 import Form from "./Form";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../components/AuthProvider.jsx";
 import Button from "../components/Button";
 import { CiSliderHorizontal } from "react-icons/ci";
 import { TiShoppingCart } from "react-icons/ti";

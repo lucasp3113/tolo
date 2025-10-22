@@ -1,6 +1,6 @@
 import React from 'react'
 import { useContext } from 'react'
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from "../components/AuthProvider.jsx";
 import { useForm } from 'react-hook-form'
 import Input from '../components/Input'
 import Button from '../components/Button'

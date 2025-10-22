@@ -4,8 +4,11 @@ import AnimationScroll from '../components/AnimationScroll';
 import { useNavigate } from 'react-router-dom';
 import { CiSliderHorizontal } from "react-icons/ci";
 import Button from '../components/Button';
+import { useContext } from "react";
+import { AuthContext } from "../components/AuthProvider.jsx";
 import { useParams } from 'react-router-dom';
 import axios from 'axios'
+
 
 export default function Home({ searchData, userType, setSearchData }) {
   const { ecommerce } = useParams();
@@ -43,6 +46,8 @@ export default function Home({ searchData, userType, setSearchData }) {
                 onDelete={() => handleDeleteProduct(producto.id_producto)}
                 admin={userType}
                 onClick={() => ecommerce ? navigate(`product/${producto.id_producto}`) : navigate(`/product/${producto.id_producto}`)}
+                id_producto={i.id_producto}   
+                idUsuario={user.id_usuario}           
               />
             ))}
           </section>
@@ -103,6 +108,8 @@ export default function Home({ searchData, userType, setSearchData }) {
                   freeShipping={true}
                   phone={true}
                   onClick={() => !userType && ecommerce ? navigate(`product/${i["id_producto"]}`) : navigate(`/product/${i["id_producto"]}`)}
+                  id_producto={i.id_producto}   
+                  idUsuario={user.id_usuario}
                 />
               </AnimationScroll>
             ))
@@ -123,6 +130,8 @@ export default function Home({ searchData, userType, setSearchData }) {
                 onDelete={() => handleDeleteProduct(producto.id_producto)}
                 admin={userType}
                 onClick={() => ecommerce ? navigate(`product/${producto.id_producto}`) : navigate(`/product/${producto.id_producto}`)}
+                id_producto={i.id_producto}   
+                idUsuario={user.id_usuario}
               />
             </AnimationScroll>
           ))}

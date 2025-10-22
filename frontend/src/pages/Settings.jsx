@@ -16,6 +16,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { FaOpencart } from "react-icons/fa";
 import { TiShoppingCart } from "react-icons/ti";
 import { IoColorPalette } from "react-icons/io5";
+import { FaStar } from "react-icons/fa";
 import axios from 'axios';
 
 
@@ -135,10 +136,10 @@ export default function Settings() {
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
-                        <li className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                        <li  onClick={() => ecommerce ? navigate(`/${ecommerce}/favorites/`) : navigate("/favorites/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                                <FaRegCreditCard className="text-red-700 mr-2 text-[30px]" />
-                                <h2 className="text-[20px]">Métodos de pago</h2>
+                                <FaStar className="text-yellow-400 mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Favoritos</h2>
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
