@@ -175,9 +175,12 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 key="search"
                 type="text"
                 name="search"
-                className="pr-10 bg-white h-9 mb-3 focus:outline-none"
+                className="pr-10 bg-sky-700 h-9 mb-3 !text-white !font-semibold border-none !rounded-2xl focus:outline-none autofill:!bg-sky-700
+                caret-white autofill:!text-white
+  autofill:shadow-[inset_0_0_0px_1000px_rgb(3,105,161)]
+  [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"
                 icon={
-                  <Button type='submit' className="bg-transparent -translate-y-2 translate-x-2 shadow-none" text={<IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />} />
+                  <Button type='submit' className="bg-transparent -translate-y-2 translate-x-2 shadow-none" text={<IoSearch className="text-2xl text-white -translate-y-[75%]" />} />
                 }
                 placeholder="Buscar"
               />
@@ -207,23 +210,23 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate('/'),
               },
               !isLoggedIn && {
-                title: 'Iniciar Sesión',
-                icon: { name: <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
+                title: '',
+                icon: { name: <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px] transition-transform ease-in-out duration-300 hover:scale-125" />, expand: true },
                 animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/login/`) : navigate('/login'),
+                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/account/`) : navigate('/account'),
               },
-              !isLoggedIn && {
-                title: 'Crear cuenta',
-                icon: { name: <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
-                animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/register/`) : navigate('/register'),
-              },
+              // !isLoggedIn && {
+              //   title: 'Crear cuenta',
+              //   icon: { name: <FaUserPlus className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
+              //   animation: false,
+              //   onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/register/`) : navigate('/register'),
+              // },
               isLoggedIn && userType && {
-                title: userType === 'ecommerce' || userType === 'vendedor_particular' ? 'Panel de control' : "Carrito",
+                title: "",
                 icon: {
                   name: userType === 'ecommerce' || userType === 'vendedor_particular'
-                    ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />
-                    : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />,
+                    ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125" />
+                    : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125" />,
                   expand: true
                 },
                 animation: false,

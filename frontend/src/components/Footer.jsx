@@ -1,9 +1,16 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaFacebookSquare } from "react-icons/fa";
 
-export default function Footer({color}) {
+export default function Footer({ color }) {
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const handleFbClick = () => {
         window.open("https://www.facebook.com", "_blank");
     };
@@ -24,10 +31,10 @@ export default function Footer({color}) {
     };
 
     return (
-        <footer style={{ backgroundColor: color || "#1F2937" }} className="w-full flex flex-col items-center justify-center mt-10 border-t border-gray-300 p-4 
+        <footer className={`w-full bg-sky-800 flex flex-col items-center justify-center mt-0 border-gray-300 p-4 
  text-gray-400 
-  md:bg-gray-800 md:text-white
-    lg:bg-gray-800 lg:text-white">
+  md:bg-sky-800 md:text-white
+    lg:bg-sky-800 lg:text-white`}>
             <p className="text-center text-xl md:text-sm lg-text-sm mb-4 max-w-4xl">
                 ℠ Tolo 2025.
             </p>

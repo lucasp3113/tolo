@@ -12,8 +12,50 @@
   animation: shake 0.8s ease-in-out;
 }
 
-.font-quicksand{
-  font-family: 'Quicksand', sans-serif;
+/* --- Fuentes cargadas desde Google Fonts --- */
+
+/* IBM Plex Sans */
+.font-ibmplex { font-family: "IBM Plex Sans", sans-serif; }
+
+/* Poppins */
+.font-poppins { font-family: "Poppins", sans-serif; }
+
+/* Montserrat */
+.font-montserrat { font-family: "Montserrat", sans-serif; }
+
+/* Nunito */
+.font-nunito { font-family: "Nunito", sans-serif; }
+
+/* Quicksand */
+.font-quicksand { font-family: "Quicksand", sans-serif; }
+
+/* Roboto */
+.font-roboto { font-family: "Roboto", sans-serif; }
+
+/* Lato */
+.font-lato { font-family: "Lato", sans-serif; }
+
+/* Inter */
+.font-inter { font-family: "Inter", sans-serif; }
+
+/* Raleway */
+.font-raleway { font-family: "Raleway", sans-serif; }
+
+/* Oswald */
+.font-oswald { font-family: "Oswald", sans-serif; }
+
+/* Source Sans Pro */
+.font-sourcesans { font-family: "Source Sans Pro", sans-serif; }
+
+
+
+/*chatbot*/
+#tawk-bubble-container {
+  display: none !important;
+}
+
+.tawk-icon-right img{
+  display: none !important;
 }
 
 .mercado_pago h1{

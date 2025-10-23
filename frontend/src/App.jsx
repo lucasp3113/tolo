@@ -2,8 +2,8 @@ import './App.css';
 import Layout from './components/Layout';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './components/Login';
+import Register from './components/Register';
 import SellerDashboard from './pages/SellerDashboard';
 import EcommerceDashboard from './pages/EcommerceDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -24,6 +24,7 @@ import Notifications from './pages/Notifications';
 import CustomizeStore from './pages/CustomizeStore';
 import PaymentsHistory from './pages/PaymentsHistory';
 import Maps from './pages/Maps';
+import Account from './pages/Account';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
@@ -64,6 +65,14 @@ function App() {
                   element={
                     <Layout setUserType={setUserType}>
                       <Login />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/account/"
+                  element={
+                    <Layout setUserType={setUserType}>
+                      <Account />
                     </Layout>
                   }
                 />

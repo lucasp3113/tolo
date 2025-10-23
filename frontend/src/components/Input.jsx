@@ -31,9 +31,8 @@ export default function Input({
     }
   }, [errorActual]);
 
-  // Función para validar archivos de imagen
   const validateImageFiles = (files) => {
-    if (!files || files.length === 0) return true; // Si no hay archivos, pasa la validación
+    if (!files || files.length === 0) return true;
     
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSize = 5 * 1024 * 1024; // 5MB
@@ -44,8 +43,7 @@ export default function Input({
       if (!allowedTypes.includes(file.type)) {
         return `El archivo "${file.name}" no es una imagen válida. Solo se permiten: JPG y PNG`;
       }
-      
-      // Validar tamaño
+
       if (file.size > maxSize) {
         return `El archivo "${file.name}" es demasiado grande. Máximo 5MB`;
       }
@@ -164,7 +162,7 @@ export default function Input({
         </Component>
       )}
 
-      <label htmlFor={name} className="text-sm font-medium text-gray-700">
+      <label htmlFor={name} className="text-sm mb-0.5 font-medium text-gray-700">
         {label}
       </label>
     </div>

@@ -18,7 +18,7 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
-DELETE FROM usuarios WHERE email = 'luuucaspereyra31@gmail.com';
+DELETE FROM usuarios WHERE email = 'tolooficial.uy@gmail.com';
 SELECT * FROM usuarios;
 SELECT * FROM usuarios WHERE nombre_usuario LIKE 'luuucaspereyra%';
 
