@@ -16,6 +16,7 @@ export default function Input({
   placeholder,
   label,
   icon,
+  account,
   options = [],
   className = '',
   multiple = false,
@@ -151,18 +152,18 @@ export default function Input({
               ? "focus:outline-none focus:ring-0 focus:border-transparent"
               : errors?.[name]
                 ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
-                : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+                : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-transparent'
             }
             ${className}
           `}
         >
           {type === "select" ? options.map((option, index) => (
-            <option key={index} value={option}>{option}</option>
+            <option key={index} className='text-black font-quicksand font-semibold' value={option}>{option}</option>
           )) : undefined}
         </Component>
       )}
 
-      <label htmlFor={name} className="text-sm mb-0.5 font-medium text-gray-700">
+      <label htmlFor={name} className={`text-sm mb-0.5 font-medium ${account ? "text-white" :"text-gray-700"}`}>
         {label}
       </label>
     </div>

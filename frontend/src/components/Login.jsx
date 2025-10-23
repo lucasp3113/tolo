@@ -13,7 +13,7 @@ import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google';
 
-export default function Login() {
+export default function Login({pc}) {
     const { ecommerce } = useParams()
     const { login } = useContext(AuthContext);
     const navigate = useNavigate()
@@ -79,7 +79,7 @@ export default function Login() {
     return (
         <form
             onSubmit={handleSubmit(loginRequest)}
-            className="w-85 mb-52 md:mb-0 m-auto mt-16 md:mt-0 bg-white p-3 rounded-xl">
+            className={`${pc ? "bg-transparent" : "bg-white"} w-85 mb-52 md:mb-0 m-auto mt-16 md:mt-0 p-3 rounded-xl`}>
             {/* {!ecommerce && (
                 <img src={logoToloBlue} loading='lazy' className=' translate-x-1 w-18 h-10 object-contain' alt="Logo" />
             )} */}
@@ -96,6 +96,7 @@ export default function Login() {
                 label={"Usuario"}
                 register={register}
                 errors={errors}
+                account={pc}
             />
             <Input
                 icon={
@@ -104,6 +105,7 @@ export default function Login() {
                     </div>
                 }
                 label={"Contraseña"}
+                account={pc}
                 type={showPassword ? "text" : "password"}
                 name={"password"}
                 placeholder={"Contraseña"}

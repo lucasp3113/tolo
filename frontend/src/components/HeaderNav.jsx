@@ -175,7 +175,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 key="search"
                 type="text"
                 name="search"
-                className="pr-10 bg-sky-700 h-9 mb-3 !text-white !font-semibold border-none !rounded-2xl focus:outline-none autofill:!bg-sky-700
+                className="pr-10 !bg-sky-700 h-9 mb-3 !text-white !font-semibold border-none !rounded-2xl focus:outline-none autofill:!bg-sky-700
                 caret-white autofill:!text-white
   autofill:shadow-[inset_0_0_0px_1000px_rgb(3,105,161)]
   [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"

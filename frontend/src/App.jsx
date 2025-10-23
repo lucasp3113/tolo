@@ -71,7 +71,7 @@ function App() {
                 <Route
                   path="/:ecommerce?/account/"
                   element={
-                    <Layout setUserType={setUserType}>
+                    <Layout notHeader={true} setUserType={setUserType}>
                       <Account />
                     </Layout>
                   }
