@@ -59,14 +59,14 @@ export default function Input({
 
       {type === "checkbox" ? undefined : type === "textarea" ? (
         <span className={errors[name]
-          ? "absolute text-2xl -translate-1/3 right-1 bottom-[65px] text-gray-400"
-          : "absolute text-2xl right-3 bottom-[65px] text-gray-400"}>
+          ? "absolute text-2xl -translate-1/3 right-1 bottom-[65px] text-white"
+          : "absolute text-2xl right-3 bottom-[65px] text-white"}>
           {icon}
         </span>
       ) : type === "file" ? undefined : (
         <span className={errors[name]
-          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400"
-          : `absolute text-2xl right-3 top-1/2 text-gray-400 ${moreIcons ? "w-full" : ""}`}>
+          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-white"
+          : `absolute text-2xl right-3 top-1/2 text-white ${moreIcons ? "w-full" : ""}`}>
           {icon}
         </span>
       )}
@@ -147,12 +147,12 @@ export default function Input({
           })}
           className={`
             ${type === "textarea" ? "h-24" : ""}
-            w-full px-3 py-2 rounded-lg
+            w-full px-3 py-2 rounded-lg border-1 md:border-2
             ${type === "checkbox" || type === "radio"
               ? "focus:outline-none focus:ring-0 focus:border-transparent"
               : errors?.[name]
-                ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
-                : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-transparent'
+                ? 'border-2 border-red-600 animation-shake focus:ring-0 placeholder:text-white focus:border-red-600'
+                : `border border-gray-300 focus:ring-2 focus:ring-blue-500  focus:outline-none ${account ? "text-white placeholder:text-white" : "placeholder:text-gray-400"} bg-transparent`
             }
             ${className}
           `}

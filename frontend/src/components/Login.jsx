@@ -13,7 +13,7 @@ import axios from 'axios'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google';
 
-export default function Login({pc}) {
+export default function Login({ pc }) {
     const { ecommerce } = useParams()
     const { login } = useContext(AuthContext);
     const navigate = useNavigate()
@@ -54,26 +54,26 @@ export default function Login({pc}) {
         axios.post("/api/google_login.php", {
             credential: credentialResponse.credential
         })
-        .then((res) => {
-            const token = res.data.token;
-            const expiration = res.data.expiration;
-            const userType = res.data.user_type;
-            login(token, expiration);
-            
-            const urls = {
-                ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
-                vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
-                cliente: ecommerce ? `/${ecommerce}/` : "/"
-            };
-            
-            sessionStorage.setItem('loginSuccess', 'success');
-            navigate(urls[userType]);
-        })
-        .catch((err) => {
-            console.error('Error con Google login:', err);
-            sessionStorage.setItem('loginSuccess', 'error');
-            window.dispatchEvent(new CustomEvent('loginError'));
-        });
+            .then((res) => {
+                const token = res.data.token;
+                const expiration = res.data.expiration;
+                const userType = res.data.user_type;
+                login(token, expiration);
+
+                const urls = {
+                    ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
+                    vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
+                    cliente: ecommerce ? `/${ecommerce}/` : "/"
+                };
+
+                sessionStorage.setItem('loginSuccess', 'success');
+                navigate(urls[userType]);
+            })
+            .catch((err) => {
+                console.error('Error con Google login:', err);
+                sessionStorage.setItem('loginSuccess', 'error');
+                window.dispatchEvent(new CustomEvent('loginError'));
+            });
     }
 
     return (
@@ -84,8 +84,8 @@ export default function Login({pc}) {
                 <img src={logoToloBlue} loading='lazy' className=' translate-x-1 w-18 h-10 object-contain' alt="Logo" />
             )} */}
             <div className="flex flex-col mt-3 ml-3 items-start ">
-                <h2 className=' -translate-y-1 text-3xl font-medium'>Login</h2>
-                <p className="text-sm translate-y-1.5 whitespace-nowrap text-gray-600">Completá el formulario para iniciar sesión.</p>
+                <h2 className={`${pc && "text-white"} -translate-y-1 text-3xl font-medium `}>Login</h2>
+                {/* <p className="text-sm translate-y-1.5 whitespace-nowrap text-gray-600">Completá el formulario para iniciar sesión.</p> */}
             </div>
             <Input
                 icon={<FaUserCircle />}
@@ -113,7 +113,7 @@ export default function Login({pc}) {
                 register={register}
                 errors={errors}
             />
-            <Button className={"w-50"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
+            <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
 
             <div className="flex flex-col font-quicksand font-semibold items-center justify-center mt-3">
                 <GoogleLogin
