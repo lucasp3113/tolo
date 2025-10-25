@@ -5,6 +5,7 @@ import { ImBin } from "react-icons/im";
 import Rating from "../components/Rating";
 import Button from "../components/Button";
 import ProtectedComponent from "../components/ProtectedComponent";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CommentsSection = ({ productId }) => {
   const [comments, setComments] = useState([]);
@@ -15,6 +16,8 @@ const CommentsSection = ({ productId }) => {
     promedio_rating: 0,
   });
   const [rating, setRating] = useState(0);
+  const [activeReplyForm, setActiveReplyForm] = useState(null);
+  const [visibleReplies, setVisibleReplies] = useState({});
 
   const {
     register,
@@ -78,13 +81,6 @@ const CommentsSection = ({ productId }) => {
 
     try {
       setError(null);
-      console.log("Enviando comentario:", {
-        productId: productId,
-        userId: userId,
-        rating: rating,
-        comentario: data.comentario.trim(),
-      });
-
       const response = await axios.post(
         "/api/add_comment.php",
         {
@@ -99,8 +95,6 @@ const CommentsSection = ({ productId }) => {
           },
         }
       );
-
-      console.log("Respuesta del servidor:", response.data);
 
       if (response.data.success) {
         setRating(0);
@@ -133,6 +127,23 @@ const CommentsSection = ({ productId }) => {
     }
   };
 
+  const handleDeleteReply = async (replyId) => {
+    try {
+      const response = await axios.post("/api/delete_reply.php", {
+        replyId: replyId,
+        userId: userId,
+      });
+
+      if (response.data.success) {
+        await loadComments();
+      } else {
+        setError(response.data.message || "Error al eliminar respuesta");
+      }
+    } catch (err) {
+      setError("Error al eliminar respuesta");
+    }
+  };
+
   useEffect(() => {
     if (productId) {
       loadComments();
@@ -142,6 +153,13 @@ const CommentsSection = ({ productId }) => {
   const CommentItem = ({ comment }) => {
     const isOwner =
       currentUser && currentUser.id_usuario === comment.id_usuario;
+    const [charCount, setCharCount] = useState(0);
+
+    const {
+      register: registerReply,
+      handleSubmit: handleSubmitReply,
+      reset: resetReply,
+    } = useForm();
 
     const getInitials = (name) => {
       return name
@@ -152,9 +170,84 @@ const CommentsSection = ({ productId }) => {
         .toUpperCase();
     };
 
+    const handleInputChange = (e) => {
+      setCharCount(e.target.value.length);
+    };
+
+    const toggleReplyForm = () => {
+      if (activeReplyForm === comment.id_comentario) {
+        setActiveReplyForm(null);
+        setCharCount(0);
+        resetReply();
+      } else {
+        setActiveReplyForm(comment.id_comentario);
+        setCharCount(0);
+        resetReply();
+      }
+    };
+
+    const toggleShowReplies = () => {
+      setVisibleReplies((prev) => ({
+        ...prev,
+        [comment.id_comentario]: !prev[comment.id_comentario],
+      }));
+    };
+
+    const onSubmitAnswer = async (data) => {
+      if (!userId) {
+        setError("Debes estar logueado para responder");
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          "/api/add_reply.php",
+          {
+            commentId: comment.id_comentario,
+            userId: parseInt(userId),
+            respuesta: data.answer.trim(),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data.success) {
+          resetReply();
+          setActiveReplyForm(null);
+          setCharCount(0);
+          await loadComments();
+          setVisibleReplies((prev) => ({
+            ...prev,
+            [comment.id_comentario]: true,
+          }));
+        } else {
+          setError(response.data.message || "Error al enviar respuesta");
+        }
+      } catch (err) {
+        console.error("Error enviando respuesta:", err);
+        setError("Error al enviar respuesta");
+      }
+    };
+
+    const getReplyColor = (index) => {
+      const colors = [
+        { from: "from-green-500", to: "to-green-600" },
+        { from: "from-purple-500", to: "to-purple-600" },
+        { from: "from-orange-500", to: "to-orange-600" },
+        { from: "from-pink-500", to: "to-pink-600" },
+        { from: "from-indigo-500", to: "to-indigo-600" },
+      ];
+      return colors[index % colors.length];
+    };
+
+    const replies = comment.respuestas || [];
+    const replyCount = comment.total_respuestas || replies.length;
+
     return (
       <div className="flex flex-col mb-22 mt-2 md:mt-5 md:mb-12 gap-2 md:gap-4 max-w-full">
-        {/* Comentario principal */}
         <div>
           <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
             <div className="flex-shrink-0">
@@ -171,7 +264,6 @@ const CommentsSection = ({ productId }) => {
                   {comment.tiempo_transcurrido}
                 </h2>
               </div>
-
               <div className="mb-1 md:mb-2">
                 <Rating
                   id={`comment-rating-${comment.id_comentario}`}
@@ -185,6 +277,32 @@ const CommentsSection = ({ productId }) => {
               <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
                 {comment.comentario}
               </p>
+              <section className="-translate-x-3">
+                {replyCount > 0 && (
+                  <Button
+                    size="md"
+                    text={
+                      visibleReplies[comment.id_comentario]
+                        ? "Ocultar respuestas"
+                        : `Ver ${replyCount} ${
+                            replyCount === 1 ? "respuesta" : "respuestas"
+                          }`
+                    }
+                    onClick={toggleShowReplies}
+                    className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
+                  />
+                )}
+
+                {!activeReplyForm && (
+                  <Button
+                    size="md"
+                    text="Responder"
+                    onClick={toggleReplyForm}
+                    className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
+                  />
+                )}
+                
+              </section>
             </div>
 
             {isOwner && (
@@ -200,152 +318,151 @@ const CommentsSection = ({ productId }) => {
             )}
           </div>
 
-          <div className="border-b border-gray-100"></div>
+          <AnimatePresence>
+            {activeReplyForm === comment.id_comentario && (
+              <motion.section
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="w-full flex flex-col items-end"
+              >
+                <form
+                  onSubmit={handleSubmitReply(onSubmitAnswer)}
+                  className="w-full flex flex-col items-end"
+                >
+                  <input
+                    type="text"
+                    {...registerReply("answer", {
+                      required: true,
+                      minLength: 1,
+                    })}
+                    onChange={handleInputChange}
+                    placeholder="¿Qué opinas de este comentario?"
+                    className="w-[90%] p-2 md:p-3 mt-2 text-sm md:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                  <section className="w-full flex items-center justify-end mt-3">
+                    <Button
+                      size="md"
+                      text="Cancelar"
+                      type="button"
+                      onClick={toggleReplyForm}
+                      className={
+                        "shadow-none hover:scale-none! -translate-y-3 transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black!"
+                      }
+                    />
+                    <Button
+                      color="sky"
+                      size="md"
+                      text="Responder"
+                      type="submit"
+                      disabled={charCount === 0}
+                      className={`${
+                        charCount > 0
+                          ? "bg-[#3884fc] hover:bg-[#306ccc]"
+                          : "bg-gray-400 cursor-default! opacity-50"
+                      } shadow-none -translate-y-3 hover:scale-100! transition-colors! duration-100`}
+                    />
+                  </section>
+                </form>
+              </motion.section>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Sección de respuestas con línea vertical estilo YouTube */}
-        <div className="flex gap-3 md:gap-4 ml-3 md:ml-5">
-          {/* Línea vertical conectora */}
-          <div className="relative flex-shrink-0">
-            <div className="w-10 md:w-12 h-full flex flex-col items-center">
-              {/* Línea vertical */}
-              <div className="w-[2px] bg-gray-300 flex-1"></div>
-            </div>
-          </div>
-
-          {/* Contenedor de respuestas */}
-          <div className="flex-1 flex flex-col gap-4">
-            {/* Respuesta 1 */}
-            <div className="relative">
-              {/* Línea horizontal que conecta */}
-              <svg
-                className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
-                viewBox="0 0 40 30"
-                fill="none"
+        <AnimatePresence>
+          {visibleReplies[comment.id_comentario] && replies.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex gap-3 md:gap-4 ml-3 md:ml-5"
+            >
+              <div
+                className="flex gap-3 md:gap-4 ml-3 md:ml-5 animate-[slideDown_0.3s_ease-out] overflow-hidden"
+                style={{ animation: "slideDown 0.3s ease-out" }}
               >
-                <path
-                  d="M0 0 C3 25, 15 25, 40 25"
-                  stroke="#d1d5db"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-
-              <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-50 rounded-[0.4rem] p-2 md:p-5 relative">
-                <div className="flex-shrink-0">
-                  <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
-                    {getInitials(comment.nombre_usuario)}
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 md:w-12 h-full flex flex-col items-center">
+                    <div className="w-[2px] bg-gray-300 flex-1"></div>
                   </div>
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
-                    <h2 className="font-semibold text-base md:text-xl text-gray-900">
-                      {comment.nombre_usuario}
-                    </h2>
-                    <h2 className="text-xs md:text-sm text-gray-500">
-                      {comment.tiempo_transcurrido}
-                    </h2>
-                  </div>
+                <div className="flex-1 flex flex-col gap-4">
+                  {replies.map((reply, index) => {
+                    const isReplyOwner =
+                      currentUser &&
+                      currentUser.id_usuario === reply.id_usuario;
+                    const colorScheme = getReplyColor(index);
 
-                  <div className="mb-1 md:mb-2">
-                    <Rating
-                      id={`comment-rating-reply1-${comment.id_comentario}`}
-                      value={parseFloat(comment.rating)}
-                      readonly={true}
-                      showValue={true}
-                      size="md"
-                    />
-                  </div>
+                    return (
+                      <div key={reply.id_respuesta} className="relative bg-gray-50">
+                        <svg
+                          className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
+                          viewBox="0 0 40 30"
+                          fill="none"
+                        >
+                          <path
+                            d="M0 0 C3 25, 15 25, 40 25"
+                            stroke="#d1d5db"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
 
-                  <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-                    Respuesta 1: {comment.comentario}
-                  </p>
+                        <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-50 rounded-[0.4rem] p-2 md:p-5 relative">
+                          <div className="flex-shrink-0">
+                            <div
+                              className={`w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md`}
+                            >
+                              {getInitials(reply.nombre_usuario)}
+                            </div>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                              <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                                {reply.nombre_usuario}
+                              </h2>
+                              <h2 className="text-xs md:text-sm text-gray-500">
+                                {reply.tiempo_transcurrido}
+                              </h2>
+                            </div>
+
+                            <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                              {reply.respuesta}
+                            </p>
+                          </div>
+
+                          {isReplyOwner && (
+                            <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                              <button
+                                onClick={() =>
+                                  handleDeleteReply(reply.id_respuesta)
+                                }
+                                className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                                title="Eliminar respuesta"
+                              >
+                                <ImBin className="scale-155" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                {isOwner && (
-                  <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
-                    <button
-                      onClick={() => handleDeleteComment(comment.id_comentario)}
-                      className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                      title="Eliminar comentario"
-                    >
-                      <ImBin className="scale-155" />
-                    </button>
-                  </div>
-                )}
               </div>
-            </div>
-
-            {/* Respuesta 2 */}
-            <div className="relative">
-              {/* Línea horizontal que conecta */}
-              <svg
-                className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
-                viewBox="0 0 40 30"
-                fill="none"
-              >
-                <path
-                  d="M0 0 C3 25, 15 25, 40 25"
-                  stroke="#d1d5db"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-
-              <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-50 rounded-[0.4rem] p-2 md:p-5 relative">
-                <div className="flex-shrink-0">
-                  <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
-                    {getInitials(comment.nombre_usuario)}
-                  </div>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
-                    <h2 className="font-semibold text-base md:text-xl text-gray-900">
-                      {comment.nombre_usuario}
-                    </h2>
-                    <h2 className="text-xs md:text-sm text-gray-500">
-                      {comment.tiempo_transcurrido}
-                    </h2>
-                  </div>
-
-                  <div className="mb-1 md:mb-2">
-                    <Rating
-                      id={`comment-rating-reply2-${comment.id_comentario}`}
-                      value={parseFloat(comment.rating)}
-                      readonly={true}
-                      showValue={true}
-                      size="md"
-                    />
-                  </div>
-
-                  <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-                    Respuesta 2: {comment.comentario}
-                  </p>
-                </div>
-
-                {isOwner && (
-                  <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
-                    <button
-                      onClick={() => handleDeleteComment(comment.id_comentario)}
-                      className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                      title="Eliminar comentario"
-                    >
-                      <ImBin className="scale-155" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
 
   return (
-    <section className="text-gray-700 p-2 md:p-3 w-full min-w-0 overflow-hidden">
+    <section className="text-gray-700 p-2 md:p-3 w-full min-w-0 overflow-hidden font-quicksand">
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 md:mb-5">
         <h1 className="text-2xl md:text-3xl font-semibold">Comentarios</h1>
         {stats.total_comentarios > 0 && (

@@ -410,8 +410,6 @@ CREATE TABLE compras (
     INDEX idx_ecommerce_fecha (id_ecommerce, fecha_compra)
 );
 
-
-
 CREATE TABLE detalles_compra (
     id_detalle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_compra INT UNSIGNED NOT NULL,
@@ -439,7 +437,7 @@ VALUES (
         '2025-10-20 14:35:00',
         2599.90,
         129.99,
-        'enviado'
+        'pendiente'
     ),
     (
         5,
@@ -479,7 +477,7 @@ VALUES (
         '2025-10-25 09:45:00',
         899.00,
         10.95,
-        'enviado'
+        'pendiente'
     ),
     (
         5,
@@ -487,10 +485,12 @@ VALUES (
         '2025-10-26 09:45:00',
         899.00,
         44.95,
-        'enviado'
+        'pendiente'
     );
 
 SELECT * FROM compras;
+
+DELETE FROM compras;
 
 INSERT INTO
     detalles_compra (
@@ -640,5 +640,30 @@ CREATE TABLE visitas (
     id_visita INT PRIMARY KEY AUTO_INCREMENT,
     fecha DATETIME
 );
+
+CREATE TABLE respuestas_comentario (
+    id_respuesta INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_comentario INT NOT NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    respuesta TEXT NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (id_comentario) REFERENCES comentarios_productos (id_comentario) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
+);
+
+INSERT INTO
+    respuestas_comentario (
+        id_comentario,
+        id_usuario,
+        respuesta
+    )
+VALUES (
+        2,
+        6,
+        'pa sos re puto mano jaja'
+    );
+
+SELECT * FROM usuarios;
 
 SELECT * from detalles_compra;

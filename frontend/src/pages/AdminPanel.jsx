@@ -7,7 +7,6 @@ import { FaCircleUser } from "react-icons/fa6";
 import Input from "../components/Input";
 import { IoSearch } from "react-icons/io5";
 import Button from "../components/Button";
-import silvano from "../../src/assets/lautaro.jpeg";
 import { MdOutlineBarChart } from "react-icons/md";
 import ProductCRUD from "./ProductCRUD";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -22,7 +21,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useForm } from "react-hook-form";
-import { div } from "three/src/nodes/TSL.js";
+
+// --- Componentes Memoizados (Gráficos) ---
 
 const Chart = memo(({ chartData, chartType }) => {
   return (
@@ -148,6 +148,8 @@ const ChartMobile = memo(({ chartData, chartType }) => {
   );
 });
 
+// --- Función de Utilidad ---
+
 function formatDate(dateStr, timeRange) {
   const date = new Date(dateStr);
 
@@ -181,12 +183,72 @@ function formatDate(dateStr, timeRange) {
   }
 }
 
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export default function AdminPanel() {
+  // --- CONSTANTES y Hooks de React ---
+
+  // Constantes de navegación y formulario
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  
+  // Constantes para la paginación de órdenes
+  const ITEMS_PER_PAGE = 10;
+  const tableEndRef = useRef(null);
+  
+  // Constantes para la paginación de E-Commerces
+  const ECOMMERCES_PER_PAGE = 8;
+  const ecommerceEndRef = useRef(null);
+  
+  // Constantes iniciales
   const allEcommerces = [];
   const allOrders = [];
+  
+  // Constante de estilos
+  const colorsCurrentRange = {
+    junior: "text-sky-400 border-sky-400",
+    amateur: "text-green-500 border-green-500",
+    semi_senior: "text-blue-500 border-blue-500",
+    senior: "text-red-500 border-red-500",
+    elite: "text-amber-500 border-amber-500",
+  };
+  
+  // --- HOOKS DE ESTADO (useState) ---
+
+  // Estado de carga y búsqueda
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  
+  // Estado de usuario y CRUD
+  const [user, setUser] = useState(null);
+  const [productCrud,   setProductCrud] = useState(false);
+  const [selectedEcommerce, setSelectedEcommerce] = useState(null);
+  
+  // Estado de datos y configuración del gráfico
+  const [searchData, setSearchData] = useState(allEcommerces);
+  const [timeRange, setTimeRange] = useState("1semana");
+  const [chartData, setChartData] = useState([]);
+  const [chartType, setChartType] = useState("Visitas");
+  const [width, setWidth] = useState(window.innerWidth);
+  
+  // Estado de datos y paginación de órdenes
+  const [ordersTable, setOrdersTable] = useState(allOrders);
+  const [displayedOrders, setDisplayedOrders] = useState([]); 
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  
+  // Estado de paginación de E-Commerces
+  const [ecommerceCount, setEcommerceCount] = useState(ECOMMERCES_PER_PAGE);
 
+  // --- FUNCIONES Y CALLBACKS (AJAX, Lógica, Handlers) ---
+
+  // Función para la búsqueda de e-commerce
   function search(data) {
     setLoading(true);
     setSearched(true);
@@ -197,7 +259,7 @@ export default function AdminPanel() {
       .then((res) => {
         setLoading(false);
         setSearchData(res.data.data);
-        setEcommerceCount(8);
+        setEcommerceCount(ECOMMERCES_PER_PAGE);
         console.log(res);
       })
       .catch((err) => {
@@ -205,6 +267,7 @@ export default function AdminPanel() {
       });
   }
 
+  // Función para obtener las visitas del gráfico
   function getVisits(timeRange) {
     axios
       .post("/api/get_views.php", { timeRange })
@@ -225,6 +288,7 @@ export default function AdminPanel() {
       });
   }
 
+  // Función para obtener las ganancias del gráfico
   function getEarnings(timeRange) {
     axios
       .post("/api/get_earnings.php", { timeRange })
@@ -245,288 +309,50 @@ export default function AdminPanel() {
       });
   }
 
-function table() {
-  axios
-    .post("/api/orders.php")
-    .then((res) => {
-      if (res.data.success && Array.isArray(res.data.data)) {
-        const formatted = res.data.data.map((order) => ({
-          id: order.id_compra,
-          cliente: order.cliente,
-          fecha: order.fecha_compra,
-          monto: order.total,
-          direccion: order.direccion || "Sin dirección",
-          estado: order.estado,
-        }));
-        setOrdersTable(formatted); // ✅ solo guardamos todo acá
-        setDisplayedOrders([]);    // ✅ vaciamos el mostrado inicial
-        setPage(0);                // ✅ reiniciamos el contador
-        setHasMore(true);          // ✅ habilitamos más carga
-      }
-    })
-    .catch((err) => console.error("❌ Error en la llamada:", err));
-}
-
-  const [searchData, setSearchData] = useState(allEcommerces);
-  const [ordersTable, setOrdersTable] = useState([]);
-  const [visitData, setVisitData] = useState([]);
-  const [timeRange, setTimeRange] = useState("1semana");
-  const [chartData, setChartData] = useState([]);
-  const [chartType, setChartType] = useState("Visitas");
-
-  useEffect(() => {
-    console.log(searchData);
-  }, [searchData]);
-
-  useEffect(() => {
-    if (chartType === "Visitas") {
-      getVisits(timeRange);
-    } else {
-      getEarnings(timeRange);
-    }
-  }, [timeRange, chartType]);
-
-  const [productCrud, setProductCrud] = useState(false);
-  const [selectedEcommerce, setSelectedEcommerce] = useState(null);
-
-  const colorsCurrentRange = {
-    junior: "text-sky-400 border-sky-400",
-    amateur: "text-green-500 border-green-500",
-    semi_senior: "text-blue-500 border-blue-500",
-    senior: "text-red-500 border-red-500",
-    elite: "text-amber-500 border-amber-500",
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm();
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [displayedOrders, setDisplayedOrders] = useState([allOrders]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const tableEndRef = useRef(null);
-  const ITEMS_PER_PAGE = 10;
-
-  const [ecommerceCount, setEcommerceCount] = useState(8);
-  const ecommerceEndRef = useRef(null);
-  const ECOMMERCES_PER_PAGE = 8;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          ecommerceCount < allEcommerces.length
-        ) {
-          setEcommerceCount((prev) =>
-            Math.min(prev + ECOMMERCES_PER_PAGE, allEcommerces.length)
-          );
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (ecommerceEndRef.current) observer.observe(ecommerceEndRef.current);
-    return () => observer.disconnect();
-  }, [ecommerceCount]);
-
-  const [width, setWidth] = useState(window.innerWidth);
-  useEffect(() => {
-    window.addEventListener("resize", () => {
-      setWidth(window.innerWidth);
-    });
-  });
-
-  // const allOrders = [
-  //   {
-  //     id: 1,
-  //     cliente: "Juan Camilo",
-  //     fecha: "08/10/2025",
-  //     monto: "$5000",
-  //     direccion: "Pelossi 653",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 2,
-  //     cliente: "Bruno Camilo",
-  //     fecha: "08/10/2025",
-  //     monto: "$3500",
-  //     direccion: "Rocha 489",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 3,
-  //     cliente: "Beto Torreta",
-  //     fecha: "08/10/2025",
-  //     monto: "$2300",
-  //     direccion: "Nicolás Guerra 101",
-  //     estado: "En proceso",
-  //   },
-  //   {
-  //     id: 4,
-  //     cliente: "Juan Maderagni",
-  //     fecha: "07/10/2025",
-  //     monto: "$4200",
-  //     direccion: "F. Figueroa 443",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 5,
-  //     cliente: "Francisco Luchineludo",
-  //     fecha: "07/10/2025",
-  //     monto: "$1800",
-  //     direccion: "Brasil 1430",
-  //     estado: "En proceso",
-  //   },
-  //   {
-  //     id: 6,
-  //     cliente: "Donatella Reyes",
-  //     fecha: "06/10/2025",
-  //     monto: "$3100",
-  //     direccion: "18 de Julio 890",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 7,
-  //     cliente: "Agustina Rodríguez",
-  //     fecha: "06/10/2025",
-  //     monto: "$2900",
-  //     direccion: "Herrera 305",
-  //     estado: "En proceso",
-  //   },
-  //   {
-  //     id: 8,
-  //     cliente: "Laura Fernández",
-  //     fecha: "05/10/2025",
-  //     monto: "$5500",
-  //     direccion: "8 de Octubre 456",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 9,
-  //     cliente: "Diego Martínez",
-  //     fecha: "05/10/2025",
-  //     monto: "$2100",
-  //     direccion: "Bulevar Artigas 789",
-  //     estado: "En proceso",
-  //   },
-  //   {
-  //     id: 10,
-  //     cliente: "Sofía Rodríguez",
-  //     fecha: "04/10/2025",
-  //     monto: "$3800",
-  //     direccion: "Millán 321",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 11,
-  //     cliente: "Javier Petre",
-  //     fecha: "04/10/2025",
-  //     monto: "$4500",
-  //     direccion: "Constituyente 654",
-  //     estado: "En proceso",
-  //   },
-  //   {
-  //     id: 12,
-  //     cliente: "Valentina Pérez",
-  //     fecha: "03/10/2025",
-  //     monto: "$2700",
-  //     direccion: "Agraciada 987",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 13,
-  //     cliente: "Mateo Silva",
-  //     fecha: "03/10/2025",
-  //     monto: "$3300",
-  //     direccion: "Comercio 147",
-  //     estado: "En proceso",
-  //   },
-  //   {
-  //     id: 14,
-  //     cliente: "Camila Gómez",
-  //     fecha: "02/10/2025",
-  //     monto: "$4100",
-  //     direccion: "San José 258",
-  //     estado: "Enviado",
-  //   },
-  //   {
-  //     id: 15,
-  //     cliente: "Lucas Díaz",
-  //     fecha: "02/10/2025",
-  //     monto: "$1900",
-  //     direccion: "Yaguarón 369",
-  //     estado: "En proceso",
-  //   },
-  // ];
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
+  // Función para cargar la tabla de órdenes
+  function table() {
     axios
-      .post("/api/check_admin.php", { token })
+      .post("/api/orders.php")
       .then((res) => {
-        if (!res.data.success) navigate("/login");
-        else {
-          setUser(res.data.user);
-          setLoading(false);
+        if (res.data.success && Array.isArray(res.data.data)) {
+          const formatted = res.data.data.map((order) => ({
+            id: order.id_compra,
+            cliente: order.cliente,
+            fecha: order.fecha_compra,
+            monto: order.total,
+            direccion: order.direccion || "Sin dirección",
+            estado: order.estado,
+          }));
+          setOrdersTable(formatted);
+          setDisplayedOrders([]);
+          setPage(0);
+          setHasMore(true);
         }
       })
-      .catch(() => navigate("/login"));
-  }, [navigate]);
-
-  useEffect(() => {
-    loadMoreOrders();
-  }, []);
-
-  useEffect(() => {
-    table(); // 👈 carga las órdenes al montar el componente
-  }, []);
-
-const loadMoreOrders = () => {
-  if (loading || !hasMore) return;
-  setLoading(true);
-
-  setTimeout(() => {
-    const start = page * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const newOrders = ordersTable.slice(start, end); // ✅ usar ordersTable
-
-    if (newOrders.length > 0) {
-      setDisplayedOrders((prev) => [...prev, ...newOrders]);
-      setPage((prev) => prev + 1);
-    }
-
-    if (end >= ordersTable.length) setHasMore(false);
-    setLoading(false);
-  }, 300); // un pequeño delay opcional para suavizar
-};
-
-  function capitalize(str) {
-    if (!str) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1);
+      .catch((err) => console.error("❌ Error en la llamada:", err));
   }
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) loadMoreOrders();
-      },
-      { threshold: 1.0 }
-    );
+  // Función para cargar más órdenes (para el infinite scroll)
+  const loadMoreOrders = () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
 
-    if (tableEndRef.current) observer.observe(tableEndRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, loading, page]);
+    setTimeout(() => {
+      const start = page * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      const newOrders = ordersTable.slice(start, end);
 
+      if (newOrders.length > 0) {
+        setDisplayedOrders((prev) => [...prev, ...newOrders]);
+        setPage((prev) => prev + 1);
+      }
+
+      if (end >= ordersTable.length) setHasMore(false);
+      setLoading(false);
+    }, 300); // un pequeño delay opcional para suavizar
+  };
+  
+  // Callback para generar datos de prueba si es necesario (no usado actualmente por el código, pero se mantiene la lógica)
   const generateDummyData = useCallback(() => {
     switch (timeRange) {
       case "1dia":
@@ -577,6 +403,98 @@ const loadMoreOrders = () => {
     }
   }, [timeRange]);
 
+
+  // --- HOOKS DE EFECTO (useEffect) ---
+
+  // Efecto 1: Carga inicial de órdenes
+  useEffect(() => {
+    table();
+  }, []);
+
+  // Efecto 2: Carga inicial de más órdenes (se usa para cargar la primera página)
+  useEffect(() => {
+    loadMoreOrders();
+  }, [ordersTable]); // Se dispara cuando ordersTable se llena por primera vez con `table()`
+
+  // Efecto 3: Lógica para la obtención de datos del gráfico al cambiar 'timeRange' o 'chartType'
+  useEffect(() => {
+    if (chartType === "Visitas") {
+      getVisits(timeRange);
+    } else {
+      getEarnings(timeRange);
+    }
+  }, [timeRange, chartType]);
+  
+  // Efecto 4: Verificación de sesión de administrador
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    axios
+      .post("/api/check_admin.php", { token })
+      .then((res) => {
+        if (!res.data.success) navigate("/login");
+        else {
+          setUser(res.data.user);
+          setLoading(false);
+        }
+      })
+      .catch(() => navigate("/login"));
+  }, [navigate]);
+
+  // Efecto 5: Observador de IntersectionObserver para la paginación de E-Commerces (Infinite Scroll)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          ecommerceCount < allEcommerces.length
+        ) {
+          setEcommerceCount((prev) =>
+            Math.min(prev + ECOMMERCES_PER_PAGE, allEcommerces.length)
+          );
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (ecommerceEndRef.current) observer.observe(ecommerceEndRef.current);
+    return () => observer.disconnect();
+  }, [ecommerceCount]); // Dependencias: ecommerceCount
+  
+  // Efecto 6: Observador de IntersectionObserver para la paginación de Órdenes (Infinite Scroll)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) loadMoreOrders();
+      },
+      { threshold: 1.0 }
+    );
+
+    if (tableEndRef.current) observer.observe(tableEndRef.current);
+    // Nota: loadMoreOrders ya no está en las dependencias porque es una función definida dentro
+    // del componente, pero *debería* estar en las dependencias si no fuera por el enfoque de usar `tableEndRef`.
+    return () => observer.disconnect();
+  }, [hasMore, loading, page]);
+
+  // Efecto 7: Listener para el cambio de tamaño de la ventana (responsividad)
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Efecto 8: Log de datos de búsqueda (Debugging/Comprobación)
+  useEffect(() => {
+    console.log(searchData);
+  }, [searchData]);
+
+
+  // --- RENDERIZADO DEL COMPONENTE ---
+
   return !productCrud ? (
     <section className=" bg-gradient-to-br from-gray-50 to-gray-100">
       {width >= 500 ? (
@@ -623,7 +541,7 @@ const loadMoreOrders = () => {
                             : "text-amber-500"
                         }`}
                       >
-                        {order.estado}{" "}
+                        {capitalize(order.estado)}
                         {order.estado === "enviado" ? (
                           <IoCheckmarkDone className="self-center ml-2 text-xl text-sky-500" />
                         ) : (
@@ -815,7 +733,7 @@ const loadMoreOrders = () => {
           </section>
         </div>
       ) : (
-        <div className="font-quicksand">
+        <div className="font-quicksand mb-18">
           <section className="flex flex-col gap-4 p-3">
             <section className="w-full mx-auto bg-white shadow rounded-md p-6 flex flex-col">
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
@@ -915,7 +833,7 @@ const loadMoreOrders = () => {
                       className="text-center text-[11px] animate-[fadeSlide_0.5s_ease-out_forwards] border-b border-gray-100 hover:bg-gray-50"
                       style={{ animationDelay: `${i * 0.05}s` }}
                     >
-                      <td className="px-0.5 py-1">{order.orderId}</td>
+                      <td className="px-0.5 py-1">{order.id}</td>
                       <td className="px-0.5 py-1 truncate">{order.cliente}</td>
                       <td className="px-0.5 py-1 text-[10px]">{order.fecha}</td>
                       <td className="px-0.5 py-1 font-semibold">
@@ -931,127 +849,126 @@ const loadMoreOrders = () => {
                             : "text-amber-500"
                         }`}
                       >
-                        <span className="text-[9px]">
-                          {order.estado === "Enviado" ? (
-                            <p className="flex">
-                              {" "}
-                              Enviado
-                              <IoCheckmarkDone className="self-center ml-2 text-xs text-sky-500" />
-                            </p>
-                          ) : (
-                            <p className="flex">
-                              En Espera
-                              <FaRegClock className="self-center ml-2 text-xs" />
-                            </p>
-                          )}
-                        </span>
+                        {capitalize(order_estado)}
+                        {order.estado === "Enviado" ? (
+                          <IoCheckmarkDone className="self-center ml-0.5 text-sm text-sky-500" />
+                        ) : (
+                          <FaRegClock className="self-center ml-0.5 text-[10px]" />
+                        )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
               <div ref={tableEndRef} className="h-2" />
               {!hasMore && displayedOrders.length > 0 && (
                 <div className="text-center py-2 text-gray-500 text-[10px]">
-                  No hay más pedidos
+                  No hay más pedidos para mostrar
                 </div>
               )}
             </section>
-          </section>
 
-          <style>{`
-      @keyframes fadeSlide {
-        0% {
-          opacity: 0;
-          transform: translateY(12px);
-        }
-        100% {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    `}</style>
-
-          <section className="mt-2 flex flex-col w-full items-center mb-[6rem] ">
-            <div className="w-full">
-              <form
-                onSubmit={handleSubmit(search)}
-                className="flex justify-center border-b border-gray-200"
-              >
-                <Input
-                  type="text"
-                  name="ecommerce"
-                  label="Buscar E-Commerce"
-                  placeholder="Ej: Nike"
-                  register={register}
-                  errors={errors}
-                  required={true}
-                  className="bg-white!"
-                  icon={
-                    <Button
-                      type="submit"
-                      className="bg-transparent translate-y-2 translate-x-2 shadow-none"
-                      text={
-                        <IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />
-                      }
-                    />
-                  }
-                />
-              </form>
-
-              <div className="max-h-[400px] overflow-y-auto">
-                <div className="flex flex-col justify-center">
-                  {searchData.slice(0, ecommerceCount).map((ecommerce, i) => (
-                    <div
-                      key={ecommerce.id}
-                      className="flex bg-white p-4 w-full hover:cursor-pointer rounded-md border-b border-gray-200 transition-all duration-100 animate-[fadeSlide_0.5s_ease-out_forwards]"
-                      style={{ animationDelay: `${i * 0.03}s` }}
-                      onClick={() =>
-                        navigate(`/seller_dashboard/${ecommerce.id_usuario}`)
-                      }
-                    >
-                      <div>
-                        <img
-                          src={`/api/${ecommerce.logo}`}
-                          alt="Imagen de E-Commerce"
-                          className={`${
-                            colorsCurrentRange[ecommerce.nombre_rango]
-                          } rounded-full h-25 w-30 border-4`}
-                        />
-                      </div>
-                      <div className="flex flex-col ml-10 w-[50%]">
-                        <p className="font-semibold break-words mt-5">
-                          {ecommerce.nombre_ecommerce}
-                        </p>
-                        <p
-                          className={`${
-                            colorsCurrentRange[ecommerce.nombre_rango]
-                          } flex self-center`}
-                        >
-                          {capitalize(ecommerce.nombre_rango)}
-                          <MdOutlineBarChart
-                            className="text-sky-700 ml-2 translate-y-1"
-                            size={18}
-                          />
-                        </p>
-                      </div>
+            <section className="mt-4 flex flex-col w-full items-center">
+              <div className="w-[100%]">
+                <form
+                  onSubmit={handleSubmit(search)}
+                  className="w-full mb-4 px-1"
+                >
+                  <Input
+                    type="text"
+                    name="ecommerce"
+                    label="Buscar E-Commerce"
+                    placeholder="Ej: Nike"
+                    register={register}
+                    errors={errors}
+                    required={true}
+                    className="bg-white!"
+                    icon={
+                      <Button
+                        type="submit"
+                        className="bg-transparent translate-y-2 translate-x-2 shadow-none"
+                        text={
+                          <IoSearch className="text-2xl text-gray-600 -translate-y-[75%]" />
+                        }
+                      />
+                    }
+                  />
+                  {loading && (
+                    <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center items-center h-20">
+                      <ClipLoader
+                        size={40}
+                        color="#f0000"
+                        className="mt-5 mb-5"
+                      />
                     </div>
-                  ))}
-                </div>
-                <div ref={ecommerceEndRef} className="h-4" />
-                {ecommerceCount >= searchData.length && (
-                  <div className="text-center py-2 text-gray-500 text-xs">
-                    No hay más e-commerce
+                  )}
+                </form>
+
+                <div className="max-h-[600px] overflow-y-auto">
+                  <div className="flex flex-col gap-4 px-1">
+                    {searchData.slice(0, ecommerceCount).map((ecommerce, i) => (
+                      <div
+                        key={ecommerce.id}
+                        className="flex p-3 bg-white hover:cursor-pointer rounded-md shadow-sm hover:shadow-md transition-all duration-100 animate-[fadeSlide_0.5s_ease-out_forwards]"
+                        style={{ animationDelay: `${i * 0.03}s` }}
+                        onClick={() => {
+                          setProductCrud(true);
+                          setSelectedEcommerce(ecommerce.nombre_usuario);
+                        }}
+                      >
+                        <div>
+                          {ecommerce.logo ? (
+                            <img
+                              src={`/api/${ecommerce.logo}`}
+                              alt="Imagen de E-Commerce"
+                              className={`${
+                                colorsCurrentRange[ecommerce.nombre_rango]
+                              } h-16 w-16 rounded-full border-2`}
+                            />
+                          ) : (
+                            <FaCircleUser
+                              className={`${
+                                colorsCurrentRange[ecommerce.nombre_rango]
+                              } text-5xl m-auto text-gray-500! h-16 w-16 rounded-full border-2`}
+                            />
+                          )}
+                        </div>
+                        <div className="flex flex-col ml-5 justify-center">
+                          <p className="font-semibold break-words">
+                            {ecommerce.nombre_ecommerce}
+                          </p>
+                          <p
+                            className={`${
+                              colorsCurrentRange[ecommerce.nombre_rango]
+                            } flex items-center text-sm`}
+                          >
+                            {capitalize(ecommerce.nombre_rango)}
+                            <MdOutlineBarChart
+                              className="text-sky-700 ml-1"
+                              size={14}
+                            />
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                  <div ref={ecommerceEndRef} className="h-4 w-full" />
+                </div>
+                {searched && !loading && searchData.length === 0 && (
+                  <p className="text-center text-gray-500 mt-4 text-sm">
+                    No se encontró ningún e-commerce con ese nombre
+                  </p>
                 )}
               </div>
-            </div>
+            </section>
           </section>
         </div>
       )}
     </section>
   ) : (
-    <ProductCRUD isAdmin={selectedEcommerce} setProductCrud={setProductCrud} />
+    <ProductCRUD
+      ecommerce={selectedEcommerce}
+      setProductCrud={setProductCrud}
+    />
   );
 }
