@@ -19,6 +19,14 @@ export default function ShoppingCart() {
   const [categories, setCategories] = useState(null);
   const [priceShipping, setPriceShipping] = useState(null);
 
+  let user = null;
+  const token = localStorage.getItem("token");
+  if (token) { 
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    user = payload.user;
+  }
+
+  
   const [proceedToPayment, setProceedToPayment] = useState({});
   useEffect(() => {
     console.log(proceedToPayment)
@@ -36,12 +44,9 @@ export default function ShoppingCart() {
     selectedSeller && calculateShipping(categories[selectedSeller]);
   }, [selectedSeller]);
 
-  let user = null;
-  const token = localStorage.getItem("token");
-  if (token) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    user = payload.user
-  }
+  const [userCoins, setUserCoins] = useState(user?.tolo_coins || 0);
+
+
 
   useEffect(() => {
     axios
@@ -106,6 +111,21 @@ export default function ShoppingCart() {
       calculateShipping(objectCategories[selectedSeller]);
     }
   }, [productos, selectedSeller]);
+  
+
+const totalFinal = (priceShipping || 0) + (totalPrice?.[selectedSeller] || 0);
+
+  const userToloCoins = user?.tolo_coins || 0;
+
+  
+  const discountWithToloCoins = Math.min(userToloCoins, totalFinal || 0);
+
+
+  
+  const totalAfterToloCoins = (totalFinal || 0) - discountWithToloCoins;
+
+
+  const toloCoinsGanados = totalAfterToloCoins * 0.01;
 
 
   function deleteProduct(id_producto) {
@@ -205,6 +225,7 @@ export default function ShoppingCart() {
       );
     }
 
+    
     return jsx;
   }
 
@@ -272,26 +293,45 @@ export default function ShoppingCart() {
               <h2 className='font-quicksand ml-3 font-medium text-xl'>Envio</h2>
               <span className='font-quicksand mr-1 font-medium text-xl'>${priceShipping}</span>
             </section>
-            <section className='flex items-center justify-between w-full mt-4'>
-              <h2 className='font-quicksand ml-3 font-bold text-xl'>Total</h2>
-              <span className='font-quicksand font-bold text-xl'>
-                ${priceShipping + totalPrice[selectedSeller]}
-              </span>
-            </section>
-            <Button
-              onClick={() => setProceedToPayment({
-                idCompra: productos
-                  .filter(producto => producto.vendedor === selectedSeller)[0].id_compra,
-                totalPrice: priceShipping + totalPrice[selectedSeller],
-                metodo_envio: "Esto se realizará en la tercera entrega",
-                direccion_entrega: "Esto se realizará en la tercera entrega",
-                metodo_envio: "Esto se realizará en la tercera entrega"
-              })}
-              color="black"
-              size="lg"
-              text="Finalizar pedido"
-              className={"!w-72 mr-3 mt-4 !rounded-2xl font-quicksand font-semibold"}
-            />
+            <section className='flex items-center justify-between w-full mt-2'>
+            <h2 className='font-quicksand ml-3 font-medium text-xl'>ToloCoins</h2>
+            <span className='font-quicksand text-green-600 mr-1 font-medium text-xl'>
+              - ${discountWithToloCoins.toFixed(2)}
+            </span>
+          </section>
+          <section className='flex items-center justify-between w-full mt-4'>
+            <h2 className='font-quicksand ml-3 font-medium text-xl'>Total</h2>
+            <span className='font-quicksand font-bold text-xl'>
+              ${totalAfterToloCoins.toFixed(2)}
+            </span>
+          </section>
+        <Button
+        onClick={() => {
+          setProceedToPayment({
+            idCompra: productos
+              .filter(producto => producto.vendedor === selectedSeller)[0].id_compra,
+            totalPrice: totalAfterToloCoins,
+            metodo_envio: "Esto se realizará en la tercera entrega",
+            direccion_entrega: "Esto se realizará en la tercera entrega",
+            metodo_envio: "Esto se realizará en la tercera entrega"
+          });
+          
+          axios.post('/api/update_tolo_coins.php', {
+          id_usuario: user.id_usuario,
+          tolo_coins_usados: discountWithToloCoins,       
+          tolo_coins_ganados: totalAfterToloCoins * 0.01   
+        })
+        .then(res => {
+          console.log('ToloCoins actualizados:', res.data.nuevos_tolo_coins);
+          setUserCoins(res.data.nuevos_tolo_coins);
+        })
+        .catch(err => console.log(err));
+        }}
+        color="black"
+        size="lg"
+        text="Finalizar pedido"
+        className={"!w-72 mr-3 mt-4 !rounded-2xl font-quicksand font-semibold"}
+      />
           </Card>
         )}
       </div>

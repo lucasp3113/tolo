@@ -23,6 +23,7 @@ export default function ToloCoin() {
 
     if (!user) return;
 
+ 
     axios
       .get(`/api/coins.php?id=${user}`)
       .then((res) => {
@@ -31,6 +32,23 @@ export default function ToloCoin() {
         }
       })
       .catch((err) => console.error("Error al obtener ToloCoins:", err));
+
+    const totalAfterToloCoins = localStorage.getItem("totalAfterToloCoins"); 
+    if (totalAfterToloCoins) {
+      const tolo_coins_ganados = totalAfterToloCoins * 0.01;
+
+      axios
+        .post("/api/update_tolo_coins.php", {
+          id_usuario: user,
+          tolo_coins_usados: 0, 
+          tolo_coins_ganados: tolo_coins_ganados,
+        })
+        .then((res) => {
+          console.log("ToloCoins actualizados:", res.data.nuevos_tolo_coins);
+          setCoins(res.data.nuevos_tolo_coins);
+        })
+        .catch((err) => console.error("Error al actualizar ToloCoins:", err));
+    }
   }, []);
 
   return (
