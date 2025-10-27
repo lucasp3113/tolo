@@ -60,6 +60,7 @@ const CommentsSection = ({ productId }) => {
   const loadComments = async () => {
     setLoading(true);
     setError(null);
+    setError(null);
     try {
       const response = await axios.get(
         `/api/show_comments.php?productId=${productId}`
@@ -94,6 +95,7 @@ const CommentsSection = ({ productId }) => {
       return;
     }
 
+
     try {
       setError(null);
       const response = await axios.post(
@@ -115,6 +117,7 @@ const CommentsSection = ({ productId }) => {
         setRating(0);
         reset();
         await loadComments();
+        await loadComments();
         setError(null);
       } else {
         setError(response.data.message || "Error al enviar comentario");
@@ -131,6 +134,7 @@ const CommentsSection = ({ productId }) => {
         commentId: commentId,
         userId: userId,
       });
+
 
       if (response.data.success) {
         setActiveReplyForm(null);
@@ -491,7 +495,7 @@ if (response.data.success) {
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 md:mb-5">
         <h1 className="text-2xl md:text-3xl font-semibold">Comentarios</h1>
         {stats.total_comentarios > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Rating
               id="average-rating-display"
               value={stats.promedio_rating}
@@ -499,7 +503,7 @@ if (response.data.success) {
               showValue={true}
               size="md"
             />
-            <span className="text-sm md:text-base text-gray-600">
+            <span className="text-xs sm:text-sm md:text-base text-gray-600">
               ({stats.total_comentarios}{" "}
               {stats.total_comentarios === 1 ? "comentario" : "comentarios"})
             </span>
@@ -508,11 +512,11 @@ if (response.data.success) {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-3 md:px-4 py-2 md:py-3 rounded mb-4 text-sm md:text-base">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded mb-4 text-xs sm:text-sm md:text-base break-words">
           {error}
           <button
             onClick={() => setError(null)}
-            className="float-right font-bold text-lg hover:text-red-900"
+            className="float-right font-bold text-lg hover:text-red-900 ml-2"
           >
             ×
           </button>
@@ -526,13 +530,14 @@ if (response.data.success) {
             className="space-y-2 md:space-y-3"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="text-sm md:text-base">Tu calificación:</span>
-              <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm md:text-base">Tu calificación:</span>
+              <div className="flex items-center gap-2 flex-wrap">
                 <Rating
                   id="new-comment-rating"
                   value={rating}
                   onRatingChange={setRating}
                   showValue={true}
+                  size="md"
                 />
                 <span className="text-xs md:text-sm text-gray-500">
                   ({rating}/5)
@@ -545,7 +550,7 @@ if (response.data.success) {
               )}
             </div>
 
-            <div>
+            <div className="w-full">
               <textarea
                 {...register("comentario", {
                   required: "El comentario es requerido",
@@ -554,10 +559,10 @@ if (response.data.success) {
                 })}
                 maxLength={1000}
                 placeholder="Comparte tu experiencia con este producto..."
-                className="w-full h-24 md:h-32 p-2 md:p-3 text-sm md:text-base border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-20 sm:h-24 md:h-32 p-2 sm:p-3 text-xs sm:text-sm md:text-base border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.comentario && (
-                <span className="text-red-500 text-xs md:text-sm mt-1 block">
+                <span className="text-red-500 text-xs sm:text-sm mt-1 block">
                   {errors.comentario.message}
                 </span>
               )}
@@ -573,9 +578,8 @@ if (response.data.success) {
                 size="md"
                 type="submit"
                 disabled={isSubmitting || !rating || rating === 0}
-                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-5 py-2.5 text-sm md:text-base ${
-                  isSubmitting || !rating ? " cursor-not-allowed" : ""
-                }`}
+                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${isSubmitting || !rating ? " cursor-not-allowed" : ""
+                  }`}
               />
             </ProtectedComponent>
           </form>
@@ -584,21 +588,21 @@ if (response.data.success) {
 
       <div className="w-full max-w-full overflow-hidden">
         {loading && comments.length === 0 ? (
-          <div className="text-center py-6 md:py-8 text-sm md:text-base">
+          <div className="text-center py-6 sm:py-8 text-xs sm:text-sm md:text-base">
             Cargando comentarios...
           </div>
         ) : error && comments.length === 0 ? (
-          <div className="text-center py-6 md:py-8 text-red-500 text-sm md:text-base">
+          <div className="text-center py-6 sm:py-8 text-red-500 text-xs sm:text-sm md:text-base">
             Error al cargar comentarios
             <button
               onClick={() => loadComments()}
-              className="block mx-auto mt-2 text-blue-600 underline text-sm hover:text-blue-800"
+              className="block mx-auto mt-2 text-blue-600 underline text-xs sm:text-sm hover:text-blue-800"
             >
               Reintentar
             </button>
           </div>
         ) : comments.length === 0 ? (
-          <div className="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
+          <div className="text-center py-6 sm:py-8 text-gray-500 text-xs sm:text-sm md:text-base">
             Sé el primero en comentar este producto
           </div>
         ) : (

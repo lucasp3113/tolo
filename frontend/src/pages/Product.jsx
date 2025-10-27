@@ -12,6 +12,8 @@ import CommentsSection from "../components/Comments";
 
 
 export default function Product(productId) {
+  const { ecommerce } = useParams();
+
   const [stats, setStats] = useState(0);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,10 @@ export default function Product(productId) {
       amount: quantity,
       price: data.precio
     })
-      .then((res) => console.log(res))
+      .then((res) => {
+        sessionStorage.setItem('addToCartSuccess', 'success')
+        navigate(ecommerce ? `/${ecommerce}/shopping_cart/` : "/shopping_cart/")
+      })
       .catch((res) => console.log(res))
 
   }
@@ -197,7 +202,7 @@ export default function Product(productId) {
     for (let i = 1; i <= maxQuantity; i++) {
       options.push({
         label: i.toString(),
-        onClick: () => console.log(`Cantidad ${i}`)
+        onClick: () => setQuantity(i)
       });
     }
     return options;
@@ -221,7 +226,7 @@ export default function Product(productId) {
     return defaultImages;
   };
 
-  if (loading) return <div className="flex justify-center items-center p-10">Cargando...</div>;
+  if (loading) return <div className="flex justify-center font-quicksand items-center p-10">Cargando...</div>;
   if (error) return <div className="flex justify-center items-center p-10 text-red-500">Error al cargar el producto</div>;
   if (!data) return <div className="flex justify-center items-center p-10">No se encontró el producto</div>;
 

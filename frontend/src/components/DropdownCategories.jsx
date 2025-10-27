@@ -297,7 +297,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     register={register}
                     watch={watch}
                     errors={errors}
-                    className='!flex-row w-full '
+                    className='!flex-row w-full'
                 />
             </section>
 

@@ -12,8 +12,8 @@ $data_base = new mysqli(
 );
 if ($data_base) {
     $body = json_decode(file_get_contents(("php://input")), true);
-    $query = $data_base->prepare("DELETE FROM compras WHERE id_compra = ?");
-    $query->bind_param("i", $body["id_compra"]);
+    $query = $data_base->prepare("DELETE FROM items_carrito WHERE id_item = ?");
+    $query->bind_param("i", $body["id_item"]);
     if ($query->execute()) {
         http_response_code(200);
         echo json_encode([
@@ -36,4 +36,3 @@ if ($data_base) {
     exit;
 }
 
-?>

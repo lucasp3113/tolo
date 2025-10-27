@@ -271,7 +271,6 @@ if ($data_base) {
                             'name' => $name_product
                         ];
                         $index->addDocuments([$producto_index]);
-
                         http_response_code(200);
                         echo json_encode([
                             "success" => true,

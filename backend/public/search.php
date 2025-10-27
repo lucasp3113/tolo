@@ -78,14 +78,13 @@ if (!$data_base->connect_error) {
     $number_of_question_marks = implode(",", array_fill(0, count($hits), "?"));
 
     $query_text = $ecommerce_name ?
-        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, c.nombre_categoria,
+        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, com.rating, c.nombre_categoria,
     CASE 
         WHEN c.nombre_categoria IN ('" . implode("','", $special_image_categories) . "') THEN
             (SELECT tcp.stock
              FROM imagenes_color_producto icp
              JOIN colores_producto cp ON cp.id_color = icp.id_color
              JOIN talles_color_producto tcp ON tcp.id_color = cp.id_color
-             JOIN comentarios_producto com ON com.id_producto = p.id_producto
              WHERE cp.id_producto = p.id_producto
              ORDER BY cp.id_color ASC, icp.id_imagen_color_producto ASC, tcp.id_talle_color_producto ASC
              LIMIT 1)
@@ -109,11 +108,12 @@ if (!$data_base->connect_error) {
     FROM productos p
     JOIN productos_categorias pc ON pc.id_producto = p.id_producto 
     JOIN categorias c ON c.id_categoria = pc.id_categoria
+    LEFT JOIN comentarios_productos com ON com.id_producto = p.id_producto
     JOIN ecommerces e ON e.nombre_ecommerce = ?
     WHERE nombre_producto IN ($number_of_question_marks) AND p.id_ecommerce = e.id_ecommerce " . ($categorie ?
             "AND c.nombre_categoria = '$categorie'" : "")
         . ($order_by ? ' ORDER BY p.precio ' . $order_by : '') :
-        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, c.nombre_categoria,
+        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, com.rating, c.nombre_categoria,
     CASE 
         WHEN c.nombre_categoria IN ('" . implode("','", $special_image_categories) . "') THEN
             (SELECT tcp.stock
@@ -141,7 +141,8 @@ if (!$data_base->connect_error) {
              LIMIT 1)
     END AS ruta_imagen
     FROM productos p
-    JOIN productos_categorias pc ON pc.id_producto = p.id_producto 
+    JOIN productos_categorias pc ON pc.id_producto = p.id_producto
+    LEFT JOIN comentarios_productos com ON com.id_producto = p.id_producto
     JOIN categorias c ON c.id_categoria = pc.id_categoria
     WHERE nombre_producto IN ($number_of_question_marks) " . ($categorie ? "AND c.nombre_categoria = '$categorie'" : "")
         . ($order_by ? ' ORDER BY p.precio ' . $order_by : '');

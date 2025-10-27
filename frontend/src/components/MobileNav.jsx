@@ -91,19 +91,14 @@ export default function MovileNav({ color }) {
 
   if (loading) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex justify-center items-center h-20">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-sky-900 flex justify-center items-center h-20">
         <ClipLoader size={40} color="#fff" />
       </div>
     );
   }
 
   return (
-    <nav
-      style={{ backgroundColor: color || "#075985" }}
-      className={`${
-        windowWidth < 400 ? "h-16" : "h-22"
-      } fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}
-    >
+    <nav className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
       <Menu
         className="w-full max-w-md flex justify-center"
         model3d={[]}

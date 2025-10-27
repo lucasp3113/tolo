@@ -14,6 +14,7 @@ const ChevronRight = ({ className }) => (
 );
 
 const Carousel = ({
+  home = null,
   images = [],
   className = "",
   draggable = false,
@@ -92,9 +93,9 @@ const Carousel = ({
   }
 
   return (
-    <div className={`relative bg-white overflow-hidden ${className}`}>
+    <div className={`relative ${home ? "bg-transparent" : "bg-white"} overflow-hidden ${className}`}>
       {/* Contenedor principal del carrusel */}
-      <div className="relative rounded-md h-96 overflow-hidden group">
+      <div className={`${home ? "h-66" : "h-96"} relative rounded-md overflow-hidden group`}>
 
         {/* Slides */}
         <div
@@ -107,7 +108,7 @@ const Carousel = ({
           onMouseLeave={handleMouseLeave}
         >
           {slideImages.map((image, index) => (
-            <div key={index} className="w-full flex-shrink-0 relative flex items-center justify-center">
+            <div key={index} className={`${className} w-full flex-shrink-0 relative flex items-center justify-center`}>
               {!imageError[index] ? (
                 <img
                   src={image}
@@ -149,15 +150,12 @@ const Carousel = ({
           </>
         )}
 
-        {/* Contador de imágenes */}
-        <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1 text-white text-sm z-10">
-          {currentSlide + 1} / {slideImages.length}
-        </div>
+        
       </div>
 
       {/* Indicadores de puntos */}
       {slideImages.length > 1 && (
-        <div className="flex justify-center space-x-2 py-4 bg-gray-50">
+        <div className={`flex justify-center space-x-2 py-4 ${home ? "bg-transparent" : "bg-gray-50"}`}>
           {slideImages.map((_, index) => (
             <button
               key={index}

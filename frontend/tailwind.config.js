@@ -21,6 +21,7 @@ export default {
         montserrat: ['Montserrat', 'sans-serif'],
         nunito: ['Nunito', 'sans-serif'],
         quicksand: ['Quicksand', 'sans-serif'],
+        ibmplex: ['"IBM Plex Sans"', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
         lato: ['Lato', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],

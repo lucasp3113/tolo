@@ -64,7 +64,9 @@ export default function Button ({
         text-lg
         text-white
         rounded-xl
-        hover:scale-105
+        font-quicksand
+        font-semibold
+        hover:scale-110
         transition-transform
         duration-200
         cursor-pointer
