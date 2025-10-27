@@ -664,6 +664,26 @@ VALUES (
         'pa sos re puto mano jaja'
     );
 
-SELECT * FROM usuarios;
+DELETE FROM ecommerces WHERE id_ecommerce = 2;
 
-SELECT * from detalles_compra;
+SELECT * from comentarios_productos;
+
+DELETE FROM detalles_compra WHERE id_compra IN (
+  SELECT id_compra FROM compras WHERE id_ecommerce = 3
+);
+
+DELETE FROM pagos WHERE id_compra IN (
+  SELECT id_compra FROM compras WHERE id_ecommerce = 3
+);
+
+DELETE FROM envios WHERE id_compra IN (
+  SELECT id_compra FROM compras WHERE id_ecommerce = 3
+);
+
+DELETE FROM compras WHERE id_ecommerce = 6;
+
+DELETE FROM usuarios WHERE id_usuario = 6;
+
+SELECT * FROM comentarios_productos WHERE id_producto = 4;
+
+SELECT * FROM comentarios_productos WHERE id_producto = 1;

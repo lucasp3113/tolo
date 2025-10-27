@@ -52,7 +52,6 @@ foreach ($comments as &$comment) {
             r.fecha_creacion,
             u.nombre_usuario,
             u.id_usuario,
-            u.avatar_url
             TIMESTAMPDIFF(SECOND, r.fecha_creacion, NOW()) as segundos_transcurridos
         FROM respuestas_comentario r
         JOIN usuarios u ON r.id_usuario = u.id_usuario

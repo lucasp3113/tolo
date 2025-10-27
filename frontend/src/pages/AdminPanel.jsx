@@ -515,7 +515,7 @@ export default function AdminPanel() {
                 <tbody>
                   {displayedOrders.map((order, i) => (
                     <tr
-                      key={order.id}
+                      key={`${order.id}-${i}`}
                       className="text-center animate-[fadeSlide_0.5s_ease-out_forwards]"
                       style={{ animationDelay: `${i * 0.05}s` }}
                     >
