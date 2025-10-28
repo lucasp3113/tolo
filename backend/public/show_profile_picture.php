@@ -45,4 +45,3 @@ if ($data_base) {
         "message" => "Error al conectar con la base de datos"
     ]);
 }
-?>

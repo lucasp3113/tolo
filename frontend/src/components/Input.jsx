@@ -16,6 +16,7 @@ export default function Input({
   placeholder,
   label,
   icon,
+  account,
   options = [],
   className = '',
   multiple = false,
@@ -43,7 +44,7 @@ export default function Input({
       if (!allowedTypes.includes(file.type)) {
         return `El archivo "${file.name}" no es una imagen válida. Solo se permiten: JPG y PNG`;
       }
-      
+
       if (file.size > maxSize) {
         return `El archivo "${file.name}" es demasiado grande. Máximo 5MB`;
       }
@@ -58,13 +59,13 @@ export default function Input({
 
       {type === "checkbox" ? undefined : type === "textarea" ? (
         <span className={errors[name]
-          ? "absolute text-2xl -translate-1/3 right-1 bottom-[65px] text-gray-400"
-          : "absolute text-2xl right-3 bottom-[65px] text-gray-400"}>
+          ? "absolute text-2xl -translate-1/3 right-1 bottom-[65px] text-white"
+          : "absolute text-2xl right-3 bottom-[65px] text-white"}>
           {icon}
         </span>
       ) : type === "file" ? undefined : (
         <span className={errors[name]
-          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400"
+          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-white"
           : `absolute text-2xl right-3 top-1/2 text-gray-400 ${moreIcons ? "w-full" : ""}`}>
           {icon}
         </span>
@@ -146,23 +147,23 @@ export default function Input({
           })}
           className={`
             ${type === "textarea" ? "h-24" : ""}
-            w-full px-3 py-2 rounded-lg
+            w-full px-3 py-2 rounded-lg border-1 md:border-2
             ${type === "checkbox" || type === "radio"
               ? "focus:outline-none focus:ring-0 focus:border-transparent"
               : errors?.[name]
-                ? 'border-2 border-red-600 animation-shake focus:ring-0 focus:border-red-600'
-                : 'border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+                ? 'border-2 border-red-600 animation-shake focus:ring-0 placeholder:text-gray-400 focus:border-red-600'
+                : `border border-gray-300 focus:ring-2 focus:ring-blue-500  focus:outline-none ${account ? " text-gray-700 text-md font-quicksand font-semibold placeholder:text-gray-400" : "placeholder:text-gray-400"} bg-transparent`
             }
             ${className}
           `}
         >
           {type === "select" ? options.map((option, index) => (
-            <option key={index} value={option}>{option}</option>
+            <option key={index} className='text-black font-quicksand font-semibold' value={option}>{option}</option>
           )) : undefined}
         </Component>
       )}
 
-      <label htmlFor={name} className="text-sm font-medium text-gray-700">
+      <label htmlFor={name} className={`text-sm mb-0.5 font-medium ${account ? "text-gray-700 scale-105 font-quicksand !font-bold" :"text-gray-700"}`}>
         {label}
       </label>
     </div>

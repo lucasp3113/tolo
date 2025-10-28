@@ -40,6 +40,7 @@ export default function Settings() {
     };
 
     const [perfil, setPerfil] = useState(false)
+    const [custom, setCustom] = useState(false)
     let user = null;
     const token = localStorage.getItem("token");
     if (token) {
@@ -48,12 +49,22 @@ export default function Settings() {
     }
 
     const [typeUser, setTypeUser] = useState(null)
+    const [isItAGoogleAccount, setIsItAGoogleAccount] = useState(null)
 
     useEffect(() => {
+        axios.post("/api/is_it_a_google_account.php", {
+            usuario: user
+        })
+            .then((res) => {
+                setIsItAGoogleAccount(res.data.is);
+            })
+            .catch((err) => console.log(err))
+
         axios.post("/api/type_user.php", {
             usuario: user
         })
             .then((res) => {
+                console.log(res)
                 setTypeUser(res.data.user_type);
             })
             .catch((err) => console.log(err))
@@ -64,32 +75,49 @@ export default function Settings() {
             <h1 className='text-3xl mb-5 font-quicksand text-gray-900  font-semibold'>
                 Ajustes
             </h1>
-            {perfil && (
-                <div onClick={() => setPerfil(false)} className="flex items-center justify-start -translate-y-6 -translate-x-6 ">
-                    <IoReturnUpBack className={`w-18 mr-2 text-[40px]`} />
+            {(perfil || custom) && (
+                <div
+                    onClick={() => {
+                        if (custom) {
+                            setCustom(false);
+                        } else if (perfil) {
+                            setPerfil(false);
+                        }
+                    }}
+                    className="flex items-center justify-start -translate-y-6 -translate-x-6"
+                >
+                    <IoReturnUpBack className="w-18 mr-2 text-[40px]" />
                 </div>
             )}
+
             <ul className={`${perfil && "-translate-y-5"} mb-22
                  flex flex-col items-start justify-start`}>
                 {perfil ? (
                     <>
-                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_user/`) : navigate("/change_user/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
-                            <div className="flex items-center justify-center ">
-                                <FaUser className="text-green-600 mr-2 text-[30px]" />
-                                <h2 className="text-[20px]">Cambiar nombre de usuario</h2>
-                            </div>
-                            <p><IoIosArrowForward /></p>
-                        </li>
-                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_password/`) : navigate("/change_password/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
-                            <div className="flex items-center justify-center ">
-                                <FaLock className="text-amber-400 mr-2 text-[30px]" />
-                                <h2 className="text-[20px]">Cambiar contraseña</h2>
-                            </div>
-                            <p><IoIosArrowForward /></p>
-                        </li>
+                        {!isItAGoogleAccount && (
+                            <>
+                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_user/`) : navigate("/change_user/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                    <div className="flex items-center justify-center ">
+                                        <FaUser className="text-green-600 mr-2 text-[30px]" />
+                                        <h2 className="text-[20px]">Cambiar nombre de usuario</h2>
+                                    </div>
+                                    <p><IoIosArrowForward /></p>
+                                </li>
+                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_password/`) : navigate("/change_password/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                    <div className="flex items-center justify-center ">
+                                        <FaLock className="text-amber-400 mr-2 text-[30px]" />
+                                        <h2 className="text-[20px]">Cambiar contraseña</h2>
+                                    </div>
+                                    <p><IoIosArrowForward /></p>
+                                </li>
+                            </>
+                        )}
                         {typeUser === 'ecommerce' && (
                             <>
-                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_store/`) : navigate("/customize_store/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                <li onClick={() => {
+                                    setCustom(true)
+                                    setPerfil(false)
+                                }} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                                     <div className="flex items-center justify-center ">
                                         <IoColorPalette className="text-red-600 mr-2 text-[30px]" />
                                         <h2 className="text-[20px]">Personalizar tienda</h2>
@@ -120,15 +148,36 @@ export default function Settings() {
                             </>
                         )}
                     </>
-                ) : (
+                ) : custom ? (
                     <>
-                        <li onClick={() => setPerfil(true)} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_home/`) : navigate("/customize_home/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center ">
-                                <FaUser className="text-amber-400 mr-2 text-[30px]" />
-                                <h2 className="text-[20px]">Perfil</h2>
+                                <FaHome className="text-black mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Personalizar Inicio</h2>
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_store/`) : navigate("/customize_store/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <IoColorPalette className="text-red-600 mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Personalizar colores</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
+                    </>
+                ) : (
+                    <>
+                        {isItAGoogleAccount && typeUser !== 'ecommerce' ? (
+                            null
+                        ) : (
+                            <li onClick={() => setPerfil(true)} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                <div className="flex items-center justify-center ">
+                                    <FaUser className="text-amber-400 mr-2 text-[30px]" />
+                                    <h2 className="text-[20px]">Perfil</h2>
+                                </div>
+                                <p><IoIosArrowForward /></p>
+                            </li>
+                        )}
                         <li onClick={() => ecommerce ? navigate(`/${ecommerce}/shopping_cart/`) : navigate("/shopping_cart/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center ">
                                 <TiShoppingCart className="text-indigo-500 mr-2 text-[30px] scale-130" />

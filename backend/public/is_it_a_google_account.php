@@ -1,0 +1,48 @@
+<?php
+mysqli_report(MYSQLI_REPORT_OFF);
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+
+$config = require __DIR__ . '/../config.php';
+$data_base = new mysqli(
+    $config['host'],
+    $config['user'],
+    $config['password'],
+    $config['database']
+);
+
+if ($data_base) {
+    $user = json_decode(file_get_contents("php://input"), true)["usuario"];
+    $query = $data_base->prepare("SELECT google_id FROM usuarios WHERE nombre_usuario = ?");
+    $query->bind_param("s", $user);
+    if (!$query->execute()) {
+        http_response_code(400);
+        echo json_encode([
+        "succes"=> false,
+        "message"=> "ERROR, vuelve a intentarlo"
+    ]);
+    exit;
+    } else {
+        $data = $query->get_result()->fetch_assoc()["google_id"];
+        if ($data) {
+            $is = true;
+        } else {
+            $is = false;
+        }
+
+        http_response_code(200);
+        echo json_encode([
+            "success"=> true,
+            "is"=> $is
+        ]);
+        exit;
+
+    }
+} else {
+    http_response_code(400);
+    echo json_encode([
+        "succes"=> false,
+        "message"=> "ERROR, vuelve a intentarlo"
+    ]);
+    exit;
+}

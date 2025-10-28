@@ -2,8 +2,8 @@ import './App.css';
 import Layout from './components/Layout';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './components/Login';
+import Register from './components/Register';
 import SellerDashboard from './pages/SellerDashboard';
 import EcommerceDashboard from './pages/EcommerceDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -23,7 +23,9 @@ import ProfilePicture from './pages/ProfilePicture';
 import Notifications from './pages/Notifications';
 import CustomizeStore from './pages/CustomizeStore';
 import PaymentsHistory from './pages/PaymentsHistory';
+import CustomHome from './pages/CustomHouse'
 import Maps from './pages/Maps';
+import Account from './pages/Account';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
@@ -54,7 +56,7 @@ function App() {
                 <Route
                   path="/:ecommerce?"
                   element={
-                    <Layout setLoading={setLoading} search={true} setUserType={setUserType} setSearchData={setSearchData}>
+                    <Layout fixed={true} setLoading={setLoading} search={true} setUserType={setUserType} setSearchData={setSearchData}>
                       <Home loading={loading} searchData={searchData} setSearchData={setSearchData} userType={admin} />
                     </Layout>
                   }
@@ -64,6 +66,14 @@ function App() {
                   element={
                     <Layout setUserType={setUserType}>
                       <Login />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/account/"
+                  element={
+                    <Layout notHeader={true} setUserType={setUserType}>
+                      <Account />
                     </Layout>
                   }
                 />
@@ -132,7 +142,7 @@ function App() {
                 }>
                 </Route>
                 <Route path='/:ecommerce?/product/:id' element={
-                  <Layout>
+                  <Layout fixed={true}>
                     <Product />
                   </Layout>
                 }>
@@ -146,7 +156,7 @@ function App() {
                 }
                 />
                 <Route path='/:ecommerce?/payments_history/' element={
-                  <Layout logo={false} >
+                  <Layout fixed={true} logo={false} >
                     <ProtectedRoute>
                       <PaymentsHistory />
                     </ProtectedRoute>
@@ -177,6 +187,11 @@ function App() {
                 <Route path='/:ecommerce?/profile_picture/' element={
                   <Layout >
                     <ProfilePicture />
+                  </Layout>
+                } />
+                <Route path='/:ecommerce?/customize_home/' element={
+                  <Layout >
+                    <CustomHome />
                   </Layout>
                 } />
                 <Route

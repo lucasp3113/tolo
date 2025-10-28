@@ -9,7 +9,10 @@ import { useParams, useLocation } from 'react-router-dom'
 import Alert from './Alert'
 import { TbNurseFilled } from 'react-icons/tb'
 
-export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null, setLoading = null }) {
+
+export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null, setLoading = null, notHeader = false, fixed = false }) {
+  const location = useLocation()
+
   const { ecommerce } = useParams()
   const [headerColor, setHeaderColor] = useState(null);
   const [mainColor, setMainColor] = useState(null);
@@ -20,18 +23,23 @@ export default function Layout({ children, search = false, setSearchData, logo =
     setFooterColor(colors?.["footer"]);
   }, [colors])
 
+
   useEffect(() => {
+    if (!ecommerce) {
+      setHeaderColor("#075985");
+      setMainColor("#FFFFFF");
+      setFooterColor("#075985");
+    }
     ecommerce && axios.post("/api/show_custom_store.php", {
       ecommerce: ecommerce
     })
       .then((res) => {
-        console.log(res)
         setHeaderColor(res.data.data.header_color)
         setMainColor(res.data.data.main_color)
         setFooterColor(res.data.data.footer_color)
       })
       .catch((res) => console.log(res))
-  }, [ecommerce, change])
+  }, [ecommerce, change, location.pathname])
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [panelFilter, setPanelFilter] = useState(false);
@@ -50,8 +58,6 @@ export default function Layout({ children, search = false, setSearchData, logo =
   const [dataCategories, setDataCategories] = useState(null)
 
   const [word, setWord] = useState(null)
-
-  const location = useLocation()
 
   //alerts
   const [showLoginAlert, setShowLoginAlert] = useState(null)
@@ -98,13 +104,26 @@ export default function Layout({ children, search = false, setSearchData, logo =
     return () => window.removeEventListener('loginError', handleLoginError)
   }, [])
 
+
+
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr_auto]">
-      <HeaderNav setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} />
-      <main className='' style={{ backgroundColor: mainColor || "FFFFFF" }}>{children}</main>
+      {!notHeader && (
+        <HeaderNav setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} fixed={fixed} />
+      )}
+      {/* <main className={`${!notHeader && "mt-20"}`}
+        style={{ backgroundColor: ecommerce ? "#FFFFFF" : mainColor || "#FFFFFF" }}>
+        {children}
+      </main> */}
+      <main className={` ${fixed && "mt-20"}`}
+        style={{ backgroundColor: mainColor || "#FFFFFF" }}>
+        {children}
+      </main>
+
+
       {windowWidth < 500 ? <MobileNav color={footerColor} goodContrast={goodContrast} /> : undefined}
       {panelFilter ? <Filters setSearchData={setSearchData} word={word} setPanelFilter={setPanelFilter} dataCategories={dataCategories} /> : null}
-      {windowWidth > 500 && !preview ? <Footer color={footerColor} /> : undefined}
+      {windowWidth > 500 && !preview ? !notHeader && <Footer color={footerColor} /> : undefined}
       {showCreateProductAlert && (
         <Alert
           type="toast"
@@ -135,7 +154,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
         <Alert
           type="toast"
           variant="success"
-          title="Pago realizado exitosamente"ñ
+          title="Pago realizado exitosamente" ñ
           duration={4000}
           onClose={() => setPaymentAlert(null)}
           show={true}

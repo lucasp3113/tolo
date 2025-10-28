@@ -43,7 +43,7 @@ export default function Filters({ setPanelFilter, dataCategories, word, setSearc
 
     return (
         <div
-            className={`fixed inset-0 w-full h-full flex items-end justify-center bg-black/80 transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}
+            className={`fixed z-50 inset-0 w-full h-full flex items-end justify-center bg-black/80 transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}
         >
             <form onSubmit={handleSubmit(filter)} className="fixed bottom-0 w-full">
                 <section className='flex w-full flex-col items-end'>
