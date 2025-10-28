@@ -5,7 +5,11 @@ import logoTolo from '../assets/logoTolo.webp'
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-export default function Account() {
+export default function Account(contextGoodContrast) {
+    useEffect(() => {
+        console.log(contextGoodContrast)
+    }, [])
+
     const [isLogin, setIsLogin] = useState(true);
     const [isAnimating, setIsAnimating] = useState(false);
     const { ecommerce: nameEcommerce } = useParams();

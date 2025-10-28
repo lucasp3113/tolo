@@ -42,6 +42,7 @@ function App() {
   //esto es para cambiar de color la pagina
   const [colors, setColors] = useState(null)
   const [change, setChange] = useState(0);
+  const [contextGoodContrast, setContextGoodContrast] = useState(null)
 
   //loading
   const [loading, setLoading] = useState(false);
@@ -72,8 +73,8 @@ function App() {
                 <Route
                   path="/:ecommerce?/account/"
                   element={
-                    <Layout notHeader={true} setUserType={setUserType}>
-                      <Account />
+                    <Layout setContextGoodContrast={setContextGoodContrast} notHeader={true} setUserType={setUserType}>
+                      <Account contextGoodContrast={contextGoodContrast}/>
                     </Layout>
                   }
                 />

@@ -16,7 +16,7 @@ import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed }) {
+export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed, setContextGoodContrast }) {
   const [goodContrast, setGoodContrast] = useState(true);
   const [goodContrast2, setGoodContrast2] = useState(true);
   function hasGoodContrast(color1, color2, threshold = 1.1) {
@@ -47,7 +47,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     return contrast >= threshold;
   }
 
+  
+
   useEffect(() => {
+    setContextGoodContrast(hasGoodContrast('#FFFFFF', color, 1.45))
     if (color) {
       setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
       setGoodContrast2(hasGoodContrast('#FFFFFF', color, 1.45));
