@@ -15,6 +15,8 @@ export default function MovileNav({ color }) {
   const navigate = useNavigate();
 
   const [goodContrast, setGoodContrast] = useState(true);
+  const [goodContrast2, setGoodContrast2] = useState(true);
+
   function hasGoodContrast(color1, color2, threshold = 1.1) {
     if (!color1 || !color2) return true;
 
@@ -46,6 +48,7 @@ export default function MovileNav({ color }) {
   useEffect(() => {
     if (color) {
       setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
+      setGoodContrast2(hasGoodContrast('#FFFFFF', color, 1.45));
     }
   }, [color]);
 
@@ -95,7 +98,7 @@ export default function MovileNav({ color }) {
   }
 
   return (
-    <nav className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50 bg-sky-800 flex items-center justify-between w-full px-4`}>
+    <nav style={{ backgroundColor: color || "#075985" }} className={`${windowWidth < 400 ? "h-16" : "h-22"} fixed bottom-0 left-0 right-0 z-50  flex items-center justify-between w-full px-4`}>
       <Menu
         className="w-full max-w-md flex justify-center"
         model3d={[]}
@@ -104,7 +107,7 @@ export default function MovileNav({ color }) {
             title: 'Inicio',
             url: '/',
             icon: {
-              name: <FaHome className="text-white text-[30px] sm:text-[20px] md:text-[25px] lg:text-[30px]" />,
+              name: <FaHome className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[25px] lg:text-[30px]`} />,
               expand: true,
             },
             animation: false,
@@ -114,7 +117,7 @@ export default function MovileNav({ color }) {
             title: 'Iniciar Sesión',
             url: '/login',
             icon: {
-              name: <FaUserCircle className="text-white text-[30px] sm:text-[20px] md:text-[25px] lg:text-[30px]" />,
+              name: <FaUserCircle className={`${goodContrast2 ? "text-white" : "text-gray-500"}  text-[30px] sm:text-[20px] md:text-[25px] lg:text-[30px]`} />,
               expand: true,
             },
             animation: false,
@@ -124,7 +127,7 @@ export default function MovileNav({ color }) {
             title: 'Crear cuenta',
             url: '/register',
             icon: {
-              name: <FaUserPlus className="text-white text-[30px] sm:text-[20px] md:text-[25px] lg:text-[30px]" />,
+              name: <FaUserPlus className={`${goodContrast2 ? "text-white" : "text-gray-500"}  text-[30px] sm:text-[20px] md:text-[25px] lg:text-[30px]`} />,
               expand: true,
             },
             animation: false,
@@ -133,7 +136,7 @@ export default function MovileNav({ color }) {
           isLoggedIn && userType && {
             title: userType === 'ecommerce' || userType === 'vendedor_particular' ? 'Panel de control' : "Carrito",
             icon: {
-              name: userType === 'ecommerce' || userType === 'vendedor_particular' ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" /> : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]" />,
+              name: userType === 'ecommerce' || userType === 'vendedor_particular' ? <MdSpaceDashboard className={`${goodContrast2 ? "text-white" : "text-gray-500"}  text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]`} /> : <TiShoppingCart className={`${goodContrast2 ? "text-white" : "text-gray-500"}  text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px]`} />,
               expand: true,
             },
             animation: false,
@@ -150,7 +153,7 @@ export default function MovileNav({ color }) {
           isLoggedIn && {
             title: 'Ajustes',
             icon: {
-              name: <IoSettings className="text-white text-[30px] sm:text-[20px] md:text-[25px] lg:text-[35px]" />,
+              name: <IoSettings className={`${goodContrast2 ? "text-white" : "text-gray-500"}  text-[30px] sm:text-[20px] md:text-[25px] lg:text-[35px]`} />,
               expand: true,
             },
             animation: false,

@@ -66,7 +66,7 @@ export default function Input({
       ) : type === "file" ? undefined : (
         <span className={errors[name]
           ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-white"
-          : `absolute text-2xl right-3 top-1/2 text-white ${moreIcons ? "w-full" : ""}`}>
+          : `absolute text-2xl right-3 top-1/2 text-gray-400 ${moreIcons ? "w-full" : ""}`}>
           {icon}
         </span>
       )}
@@ -151,8 +151,8 @@ export default function Input({
             ${type === "checkbox" || type === "radio"
               ? "focus:outline-none focus:ring-0 focus:border-transparent"
               : errors?.[name]
-                ? 'border-2 border-red-600 animation-shake focus:ring-0 placeholder:text-white focus:border-red-600'
-                : `border border-gray-300 focus:ring-2 focus:ring-blue-500  focus:outline-none ${account ? "text-white placeholder:text-white" : "placeholder:text-gray-400"} bg-transparent`
+                ? 'border-2 border-red-600 animation-shake focus:ring-0 placeholder:text-gray-400 focus:border-red-600'
+                : `border border-gray-300 focus:ring-2 focus:ring-blue-500  focus:outline-none ${account ? " text-gray-700 text-md font-quicksand font-semibold placeholder:text-gray-400" : "placeholder:text-gray-400"} bg-transparent`
             }
             ${className}
           `}
@@ -163,7 +163,7 @@ export default function Input({
         </Component>
       )}
 
-      <label htmlFor={name} className={`text-sm mb-0.5 font-medium ${account ? "text-white" :"text-gray-700"}`}>
+      <label htmlFor={name} className={`text-sm mb-0.5 font-medium ${account ? "text-gray-700 scale-105 font-quicksand !font-bold" :"text-gray-700"}`}>
         {label}
       </label>
     </div>

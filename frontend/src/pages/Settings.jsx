@@ -40,6 +40,7 @@ export default function Settings() {
     };
 
     const [perfil, setPerfil] = useState(false)
+    const [custom, setCustom] = useState(false)
     let user = null;
     const token = localStorage.getItem("token");
     if (token) {
@@ -74,11 +75,21 @@ export default function Settings() {
             <h1 className='text-3xl mb-5 font-quicksand text-gray-900  font-semibold'>
                 Ajustes
             </h1>
-            {perfil && (
-                <div onClick={() => setPerfil(false)} className="flex items-center justify-start -translate-y-6 -translate-x-6 ">
-                    <IoReturnUpBack className={`w-18 mr-2 text-[40px]`} />
+            {(perfil || custom) && (
+                <div
+                    onClick={() => {
+                        if (custom) {
+                            setCustom(false);
+                        } else if (perfil) {
+                            setPerfil(false);
+                        }
+                    }}
+                    className="flex items-center justify-start -translate-y-6 -translate-x-6"
+                >
+                    <IoReturnUpBack className="w-18 mr-2 text-[40px]" />
                 </div>
             )}
+
             <ul className={`${perfil && "-translate-y-5"} mb-22
                  flex flex-col items-start justify-start`}>
                 {perfil ? (
@@ -103,7 +114,10 @@ export default function Settings() {
                         )}
                         {typeUser === 'ecommerce' && (
                             <>
-                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_store/`) : navigate("/customize_store/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                                <li onClick={() => {
+                                    setCustom(true)
+                                    setPerfil(false)
+                                }} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                                     <div className="flex items-center justify-center ">
                                         <IoColorPalette className="text-red-600 mr-2 text-[30px]" />
                                         <h2 className="text-[20px]">Personalizar tienda</h2>
@@ -133,6 +147,23 @@ export default function Settings() {
                                 </li>
                             </>
                         )}
+                    </>
+                ) : custom ? (
+                    <>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_home/`) : navigate("/customize_home/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <FaHome className="text-black mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Personalizar Inicio</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_store/`) : navigate("/customize_store/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <IoColorPalette className="text-red-600 mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Personalizar colores</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
                     </>
                 ) : (
                     <>

@@ -16,8 +16,9 @@ import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading }) {
+export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed }) {
   const [goodContrast, setGoodContrast] = useState(true);
+  const [goodContrast2, setGoodContrast2] = useState(true);
   function hasGoodContrast(color1, color2, threshold = 1.1) {
     if (!color1 || !color2) return true;
 
@@ -49,6 +50,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   useEffect(() => {
     if (color) {
       setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
+      setGoodContrast2(hasGoodContrast('#FFFFFF', color, 1.45));
     }
   }, [color]);
 
@@ -92,13 +94,23 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   }, [user]);
 
   useEffect(() => {
-    if (!nameEcommerce) return;
+    if (!nameEcommerce) {
+      setLogoEcommerce(null); 
+      setLogoLoaded(false);
+      return;
+    }
+
     axios.post("/api/show_profile_picture.php", { nameEcommerce })
       .then(res => {
         setLogoEcommerce(res.data.logo.logo);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        setLogoEcommerce(null);
+      });
+    return () => setLogoEcommerce(null);
   }, [nameEcommerce]);
+
 
   useEffect(() => {
     if (!logoEcommerce) return;
@@ -135,7 +147,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   }, [dataForm]);
 
   return (
-    <header style={{ backgroundColor: color || "#075985" }} className={"bg-sky-800 relative w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center justify-between"}>
+    <header style={{ backgroundColor: color || "#075985" }} className={`bg-sky-800 w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center ${fixed && "fixed mb-20"} z-50 justify-between`}>
       {logo ? (
         <div
           className="flex items-center justify-center w-22 h-full cursor-pointer"
@@ -155,10 +167,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
 
       ) : (
         <section className={`flex items-center w-full ${windowWidth < 500 ? "justify-center" : "justify-start"}`}>
-          <h1 className={`font-quicksand text-2xl text-white font-black ${windowWidth ? "ml-2" : ""}`}>Tu carrito</h1>
+          <h1 className={`font-quicksand text-2xl ${goodContrast2 ? "text-white" : "text-black"} font-black ${windowWidth ? "ml-2" : ""}`}>Tu carrito</h1>
           <Model3D
             src="/models/carrito.glb"
-            className="w-22 h-16"
+            className={`w-22 h-16 ${!goodContrast2 && "invert"}`}
             cameraOrbit="90deg 90deg 16m"
             autoRotate={true}
             onClick={() => console.log("clic en modelo 3D")}
@@ -175,12 +187,9 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 key="search"
                 type="text"
                 name="search"
-                className="pr-10 !bg-sky-700 h-9 mb-3 !text-white !font-semibold border-none !rounded-2xl focus:outline-none autofill:!bg-sky-700
-                caret-white autofill:!text-white
-  autofill:shadow-[inset_0_0_0px_1000px_rgb(3,105,161)]
-  [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"
+                className={`${goodContrast2 ?  "border-none" : "!bg-gray-200 !rounded-full placeholder:!text-gray-600 !p-5"} ${nameEcommerce ? "bg-white" : "!bg-sky-700 !text-white !rounded-2xl focus:outline-none autofill:!bg-sky-700 placeholder:!text-white caret-white autofill:!text-white autofill:shadow-[inset_0_0_0px_1000px_rgb(3,105,161)]  [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"} pr-10  h-9 mb-3  !font-semibold `}
                 icon={
-                  <Button type='submit' className="bg-transparent -translate-y-2 translate-x-2 shadow-none" text={<IoSearch className="text-2xl text-white -translate-y-[75%]" />} />
+                  <Button type='submit' className="bg-transparent -translate-y-2 translate-x-2 shadow-none" text={<IoSearch className={`${nameEcommerce ? "text-gray-500" : "text-white "} text-2xl -translate-y-[75%]`} />} />
                 }
                 placeholder="Buscar"
               />
@@ -204,14 +213,14 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
             model3d={[]}
             elements={[
               {
-                title: 'Inicio',
-                icon: { name: <FaHome className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]" />, expand: true },
+                title: goodContrast2 ? "Inicio" : <span className='text-gray-600'>Inicio</span>,
+                icon: { name: <FaHome className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px]`} />, expand: true },
                 animation: false,
                 onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate('/'),
               },
               !isLoggedIn && {
                 title: '',
-                icon: { name: <FaUserCircle className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px] transition-transform ease-in-out duration-300 hover:scale-125" />, expand: true },
+                icon: { name: <FaUserCircle className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px] transition-transform ease-in-out duration-300 hover:scale-125`} />, expand: true },
                 animation: false,
                 onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/account/`) : navigate('/account'),
               },
@@ -225,8 +234,8 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 title: "",
                 icon: {
                   name: userType === 'ecommerce' || userType === 'vendedor_particular'
-                    ? <MdSpaceDashboard className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125" />
-                    : <TiShoppingCart className="text-white text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125" />,
+                    ? <MdSpaceDashboard className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />
+                    : <TiShoppingCart className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />,
                   expand: true
                 },
                 animation: false,
@@ -249,7 +258,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               },
               isLoggedIn && {
                 title: "",
-                icon: { name: <IoSettings className="text-white text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300" />, expand: false },
+                icon: { name: <IoSettings className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300`} />, expand: false },
                 animation: false,
                 onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/settings/`) : navigate('/settings/'),
               },

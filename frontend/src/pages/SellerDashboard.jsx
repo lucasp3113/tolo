@@ -243,7 +243,7 @@ export default function SellerDashboard({ children }) {
             <img
               src={logo}
               alt="Logo Comercio"
-              onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")} 
+              onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             />
           ) : (
@@ -267,20 +267,22 @@ export default function SellerDashboard({ children }) {
         <div className="flex-1 p-4 flex flex-col gap-4 pb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => navigate("/create_product/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce}/create_product/`) : navigate("/create_product/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               + Añadir producto
             </button>
             <button
-              onClick={() => navigate("/product_crud/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce}/product_crud/`) : navigate("/product_crud/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Ver mis productos
             </button>
           </div>
 
-          {children}
+          <section className="w-full flex items-center justify-center">
+            {children}
+          </section>
 
           <div className="bg-white shadow-md mb-22 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
@@ -348,7 +350,7 @@ export default function SellerDashboard({ children }) {
           <img
             src={logo}
             alt="Logo Comercio"
-            onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")} 
+            onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="w-36 h-36 cursor-pointer mb-4 border-4 border-sky-600 rounded-full object-contain bg-white p-2 shadow-lg"
           />
         ) : (
@@ -370,14 +372,14 @@ export default function SellerDashboard({ children }) {
 
         <section className="w-full flex flex-col mt-auto">
           <button
-            onClick={() => navigate("/create_product/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce}/create_product/`) : navigate("/create_product/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center"
           >
             <span className="text-xl">+</span>
             Añadir Producto
           </button>
           <button
-            onClick={() => navigate("/product_crud/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce}/product_crud/`) : navigate("/product_crud/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center translate-y-1.5"
           >
             Ver Mis Productos
@@ -411,8 +413,8 @@ export default function SellerDashboard({ children }) {
             <button
               onClick={() => setChartType('ventas')}
               className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ventas'
-                  ? 'bg-sky-600 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
             >
               Ventas
@@ -420,8 +422,8 @@ export default function SellerDashboard({ children }) {
             <button
               onClick={() => setChartType('ganancias')}
               className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ganancias'
-                  ? 'bg-green-600 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-green-600 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
                 }`}
             >
               Ganancias
@@ -441,8 +443,8 @@ export default function SellerDashboard({ children }) {
               key={key}
               onClick={() => setTimeRange(key)}
               className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${timeRange === key
-                  ? 'bg-gray-800 text-white'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                ? 'bg-gray-800 text-white'
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
                 }`}
             >
               {label}

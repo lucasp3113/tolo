@@ -31,7 +31,7 @@ export default function Footer({ color }) {
     };
 
     return (
-        <footer className={`w-full bg-sky-800 flex flex-col items-center justify-center mt-0 border-gray-300 p-4 
+        <footer style={{ backgroundColor: color || "#075985" }} className={`w-full bg-sky-800 flex flex-col items-center justify-center mt-0 border-gray-300 p-4 
  text-gray-400 
   md:bg-sky-800 md:text-white
     lg:bg-sky-800 lg:text-white`}>

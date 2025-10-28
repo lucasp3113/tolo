@@ -84,7 +84,7 @@ export default function Login({ pc }) {
                 <img src={logoToloBlue} loading='lazy' className=' translate-x-1 w-18 h-10 object-contain' alt="Logo" />
             )} */}
             <div className="flex flex-col mt-3 ml-3 items-start ">
-                <h2 className={`${pc && "text-white"} -translate-y-1 text-3xl font-medium `}>Login</h2>
+                <h2 className={`${pc && ""} -translate-y-1 text-3xl font-medium `}>Login</h2>
                 {/* <p className="text-sm translate-y-1.5 whitespace-nowrap text-gray-600">Completá el formulario para iniciar sesión.</p> */}
             </div>
             <Input
@@ -113,7 +113,7 @@ export default function Login({ pc }) {
                 register={register}
                 errors={errors}
             />
-            <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
+            <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 border-3 hover:border-sky-800 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
 
             <div className="flex flex-col font-quicksand font-semibold items-center justify-center mt-3">
                 <GoogleLogin

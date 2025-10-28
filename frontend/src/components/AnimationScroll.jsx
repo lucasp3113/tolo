@@ -58,7 +58,7 @@ const AnimationScroll = ({ children, className = '', threshold = 0.1, ...props }
   return (
     <div
       ref={elementRef}
-      className={`transition-all w-full flex items-center justify-center 
+      className={`transition-all z-40 w-full flex items-center justify-center 
          duration-700 ease-in-out transform ${
         isVisible 
           ? 'opacity-100 translate-y-0' 

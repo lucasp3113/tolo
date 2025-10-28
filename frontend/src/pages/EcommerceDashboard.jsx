@@ -37,7 +37,6 @@ export default function EcommerceDashboard() {
                     iframe.style.setProperty("left", "auto", "important");
                     iframe.style.setProperty("position", "fixed", "important");
                 } else {
-                    // Pantallas grandes → restaurar abajo a la derecha
                     iframe.style.setProperty("top", "auto", "important");
                     iframe.style.setProperty("bottom", "10px", "important");
                     iframe.style.setProperty("right", "20px", "important");
@@ -49,10 +48,8 @@ export default function EcommerceDashboard() {
             }
         };
 
-        // Ejecutamos al inicio
         fixIframePosition();
 
-        // También reaccionamos al resize
         const handleResize = () => fixIframePosition();
         window.addEventListener("resize", handleResize);
 
@@ -90,8 +87,8 @@ export default function EcommerceDashboard() {
         })
             .then((res) => {
                 setEcommerceName(res.data.ecommerce_name);
-                // setCumulativeBilling(res.data.cumulative_billing);
-                setCumulativeBilling(3000);
+                setCumulativeBilling(res.data.cumulative_billing);
+                // setCumulativeBilling(3000);
                 setCurrentRange(res.data.name_range);
                 setMinimumBilling(res.data.minimum_billing);
                 setCommissionPercentage(res.data.commission_percentage);
@@ -127,7 +124,7 @@ export default function EcommerceDashboard() {
 
     return (
         <SellerDashboard>
-            <section className={`w-1/3 ${windowWidth >= 500 ? "flex !w-full" : ""}`}>
+            <section className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
                 <Card className={`w-full !rounded-none !shadow-md max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
                     <h2 className="text-3xl font-quicksand font-bold  
         mb-2">Tu rango actual</h2>

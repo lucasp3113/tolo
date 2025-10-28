@@ -25,6 +25,7 @@ class ComposerStaticInitd10132e7085a733ebfb03b90539c7fd3
         ),
         'M' => 
         array (
+            'MercadoPago\\' => 12,
             'Meilisearch\\' => 12,
             'MeiliSearch\\' => 12,
         ),
@@ -64,6 +65,10 @@ class ComposerStaticInitd10132e7085a733ebfb03b90539c7fd3
         'Psr\\Http\\Client\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
+        ),
+        'MercadoPago\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago',
         ),
         'Meilisearch\\' => 
         array (

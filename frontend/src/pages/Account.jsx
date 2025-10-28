@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from '../components/Login';
 import Register from '../components/Register';
+import logoTolo from '../assets/logoTolo.webp'
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Account() {
     const [isLogin, setIsLogin] = useState(true);
     const [isAnimating, setIsAnimating] = useState(false);
+    const { ecommerce: nameEcommerce } = useParams();
+    const [logoEcommerce, setLogoEcommerce] = useState(null);
+    const [headerColor, setHeaderColor] = useState(null)
 
     const toggleForm = () => {
         if (isAnimating) return;
@@ -14,18 +20,127 @@ export default function Account() {
         setTimeout(() => setIsAnimating(false), 800);
     };
 
+    useEffect(() => {
+        if (!nameEcommerce) {
+            setLogoEcommerce(null);
+            return;
+        }
+
+        axios.post("/api/show_profile_picture.php", { nameEcommerce })
+            .then(res => {
+                setLogoEcommerce(res.data.logo.logo);
+            })
+            .catch(err => {
+                console.error(err);
+                setLogoEcommerce(null);
+            });
+
+        if (!nameEcommerce) {
+            setHeaderColor("#075985");
+            setMainColor("#FFFFFF");
+            setFooterColor("#075985");
+        }
+        nameEcommerce && axios.post("/api/show_custom_store.php", {
+            ecommerce: nameEcommerce
+        })
+            .then((res) => {
+                setHeaderColor(res.data.data.header_color)
+            })
+            .catch((res) => console.log(res))
+        return () => setLogoEcommerce(null);
+    }, [nameEcommerce]);
+
+    function hexToHSL(hex) {
+        hex = hex.replace("#", "");
+        let r = parseInt(hex.substring(0, 2), 16) / 255;
+        let g = parseInt(hex.substring(2, 4), 16) / 255;
+        let b = parseInt(hex.substring(4, 6), 16) / 255;
+
+        let max = Math.max(r, g, b);
+        let min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+
+        return [h * 360, s * 100, l * 100];
+    }
+
+    function hslToHex(h, s, l) {
+        s /= 100;
+        l /= 100;
+
+        let c = (1 - Math.abs(2 * l - 1)) * s;
+        let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        let m = l - c / 2;
+        let r = 0, g = 0, b = 0;
+
+        if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+        else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+        else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+        else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+        else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+        else { r = c; g = 0; b = x; }
+
+        r = Math.round((r + m) * 255);
+        g = Math.round((g + m) * 255);
+        b = Math.round((b + m) * 255);
+
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    function darkenHex(hex, amount = 10) {
+        let [h, s, l] = hexToHSL(hex);
+        l = Math.max(0, l - amount);
+        return hslToHex(h, s, l);
+    }
+
+    const gradientColors = headerColor
+        ? `from-[${headerColor}] via-[${darkenHex(headerColor, 10)}] to-[${darkenHex(headerColor, 20)}]`
+        : "from-gray-600 via-gray-500 to-gray-400";
+
+
+
     return (
-        <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-gray-200 to-sky-900 overflow-hidden">
+        <section
+            className={`h-screen w-screen flex items-center justify-center overflow-hidden ${!headerColor ? "bg-gradient-to-b from-sky-950 via-sky-900 to-sky-800" : ""
+                }`}
+            style={
+                headerColor
+                    ? {
+                        background: `linear-gradient(to bottom, ${headerColor}, ${darkenHex(
+                            headerColor,
+                            10
+                        )}, ${darkenHex(headerColor, 20)})`,
+                    }
+                    : {}
+            }
+        >
+
+
             <div className="w-full h-full relative">
                 <div className="flex h-full relative">
                     <div
                         className={`absolute top-0 w-1/2 h-full flex flex-col justify-center items-center p-8 text-white bg-transparent transition-all duration-[800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] z-20 ${isLogin ? 'left-1/2' : 'left-0'
                             }`}
                     >
-                        <h1 className="text-5xl text-white md:text-6xl font-bold text-center mb-6">
+                        <section className='flex items-center justify-center w-34 h-18 scale-120 cursor-pointer'>
+                            <img src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo} loading='lazy' className={`${logoEcommerce && "mb-12 scale-75"} object-contain`} alt="Logo" />
+                        </section>
+                        {/* <h1 className="text-5xl text-white md:text-6xl font-bold text-center mb-6">
                             {isLogin ? '¡Bienvenido!' : '¡Hola!'}
-                        </h1>
-                        <p className="text-lg text-center mb-8 text-sky-100">
+                        </h1> */}
+                        <p className="text-lg text-center mb-4 text-sky-100">
                             {isLogin
                                 ? '¿No tienes cuenta? Regístrate ahora'
                                 : '¿Ya tienes cuenta? Inicia sesión'}
@@ -40,17 +155,17 @@ export default function Account() {
                     </div>
 
                     <div
-                        className={`absolute top-0 w-1/2 h-full bg-transparent transition-all duration-[800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] z-10 overflow-y-auto ${isLogin ? 'left-0 rounded-l-3xl' : 'left-1/2 rounded-r-3xl'
+                        className={`absolute top-0 w-1/2 h-full bg-transparent transition-all duration-[800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] z-10 overflow-y-auto ${isLogin ? 'left-0 ' : 'left-1/2 '
                             }`}
                     >
-                        <div className={`h-full !overflow-hidden flex items-center justify-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+                        <div className={`h-full !overflow-hidden bg-white flex items-center justify-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
                             <div className="w-full overflow-hidden px-4">
-                                {isLogin ? <Login pc={true}/> : <Register pc={true} />}
+                                {isLogin ? <Login pc={true} /> : <Register pc={true} />}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

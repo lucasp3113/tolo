@@ -4,7 +4,8 @@
         "meilisearch/meilisearch-php": "^1.15",
         "guzzlehttp/guzzle": "^7.9",
         "php-http/guzzle7-adapter": "^1.1",
-        "league/oauth2-google": "^4.0"
+        "league/oauth2-google": "^4.0",
+        "mercadopago/dx-php": "^3.7"
     },
     "replace": {
         "google/apiclient": "*",

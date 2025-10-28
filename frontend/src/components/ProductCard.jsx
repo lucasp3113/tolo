@@ -53,7 +53,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // celu cuando la imagen es grande
   if (phone && useOverlayLayout && imageLoaded) {
     return (
-      <div onClick={onClick} className={`cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
+      <div onClick={onClick} className={`z-50 cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
         <div className="w-44 aspect-square flex-shrink-0 bg-gray-100">
           <img
             loading="lazy"

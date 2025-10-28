@@ -127,7 +127,7 @@ export default function Register({ pc = false }) {
             className={`mb-52 md:mb-0 m-auto mt-8 md:mt-0 p-3 rounded-xl ${pc ? 'w-full max-w-4xl bg-transparent' : 'w-85 bg-white'}`}>
             {!showGoogleForm ? (
                 <>
-                    <div className={`flex flex-col mt-3 ml-3 items-start ${pc && "text-white"}`}>
+                    <div className={`flex flex-col mt-3 ml-3 items-start ${pc && "text-gray-800"}`}>
                         <h2 className='font-quicksand text-3xl font-semibold -translate-x-0.5'>Registro</h2>
                         {/* <p className={`text-sm whitespace-nowrap ${pc ? "text-white" : "text-gray-600"}`}>Completá el formulario para crear tu cuenta.</p> */}
                     </div>
@@ -324,7 +324,7 @@ export default function Register({ pc = false }) {
                         </div>
                     )}
 
-                    <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Crear cuenta"} />
+                    <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 border-3 hover:border-sky-800 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Crear cuenta"} />
 
                     <div className="flex flex-col font-quicksand font-semibold items-center justify-center mt-3">
                         <GoogleLogin
