@@ -6,6 +6,7 @@ import Rating from "../components/Rating";
 import Button from "../components/Button";
 import ProtectedComponent from "../components/ProtectedComponent";
 import { motion, AnimatePresence } from "framer-motion";
+import Alert from "./Alert";
 
 const CommentsSection = ({ productId }) => {
   const [comments, setComments] = useState([]);
@@ -85,6 +86,13 @@ const CommentsSection = ({ productId }) => {
       return;
     }
 
+    if (hasUserReplied) {
+      setErrorMessage(
+        "🚨 Ya has comentado en esta conversación. Solo se permite una respuesta por usuario."
+      );
+      return;
+    }
+
     if (!data.comentario || data.comentario.trim().length < 5) {
       setError("El comentario debe tener al menos 5 caracteres");
       return;
@@ -94,7 +102,6 @@ const CommentsSection = ({ productId }) => {
       setError("Debes estar logueado para comentar");
       return;
     }
-
 
     try {
       setError(null);
@@ -124,7 +131,7 @@ const CommentsSection = ({ productId }) => {
       }
     } catch (err) {
       console.error("Error enviando comentario:", err);
-      setError(err.response?.data?.message || "Error al enviar comentario");
+      setShowErrorMessage(true);
     }
   };
 
@@ -134,7 +141,6 @@ const CommentsSection = ({ productId }) => {
         commentId: commentId,
         userId: userId,
       });
-
 
       if (response.data.success) {
         setActiveReplyForm(null);
@@ -158,10 +164,18 @@ const CommentsSection = ({ productId }) => {
     }
   }, [productId]);
 
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showAlreadyRepliedAlert, setShowAlreadyRepliedAlert] = useState(false);
+  const [showNotLogged, setShowNotLogged] = useState(false);
+
   const CommentItem = ({ comment }) => {
     const isOwner =
       currentUser && currentUser.id_usuario === comment.id_usuario;
+
     const replies = comment.respuestas || [];
+    const hasUserReplied = comments.some(
+      (comment) => comment.id_usuario === currentUser.id_usuario
+    );
     const [charCount, setCharCount] = useState(0);
 
     const {
@@ -202,58 +216,64 @@ const CommentsSection = ({ productId }) => {
       }));
     };
 
-const onSubmitAnswer = async (data) => {
-  if (!userId) {
-    setError("Debes estar logueado para responder");
-    return;
-  }
-
-  try {
-    const response = await axios.post(
-      "/api/respuestas_comentario.php",
-      {
-        commentId: comment.id_comentario,
-        userId: parseInt(userId),
-        respuesta: data.answer.trim(),
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const onSubmitAnswer = async (data) => {
+      if (!userId) {
+        setShowNotLogged(true);
+        return;
       }
-    );
 
-if (response.data.success) {
-    const nuevaRespuesta = response.data.respuesta;
-    
-    // ESTA ES LA CLAVE
-    setComments(prevComments => 
-      prevComments.map(c => 
-        c.id_comentario === comment.id_comentario
-          ? {
-              ...c,
-              respuestas: [...(c.respuestas || []), nuevaRespuesta],
-              total_respuestas: (c.total_respuestas || 0) + 1
-            }
-          : c
-      )
-    );
+      const alreadyReplied = replies.some((r) => r.id_usuario === userId);
+      if (alreadyReplied) {
+        setShowAlreadyRepliedAlert(true);
+        return;
+      }
 
-    resetReply();
-    setActiveReplyForm(null);
-    setCharCount(0);
-    setVisibleReplies((prev) => ({
-      ...prev,
-      [comment.id_comentario]: true,
-    }));
-} else {
-      setError(response.data.message || "Error al enviar respuesta");
-    }
-  } catch (err) {
-    console.error("Error enviando respuesta:", err);
-    setError("Error al enviar respuesta");
-  }
-};
+      try {
+        const response = await axios.post(
+          "/api/respuestas_comentario.php",
+          {
+            commentId: comment.id_comentario,
+            userId: parseInt(userId),
+            respuesta: data.answer.trim(),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data.success) {
+          const nuevaRespuesta = response.data.respuesta;
+
+          // ESTA ES LA CLAVE
+          setComments((prevComments) =>
+            prevComments.map((c) =>
+              c.id_comentario === comment.id_comentario
+                ? {
+                    ...c,
+                    respuestas: [...(c.respuestas || []), nuevaRespuesta],
+                    total_respuestas: (c.total_respuestas || 0) + 1,
+                  }
+                : c
+            )
+          );
+
+          resetReply();
+          setActiveReplyForm(null);
+          setCharCount(0);
+          setVisibleReplies((prev) => ({
+            ...prev,
+            [comment.id_comentario]: true,
+          }));
+        } else {
+          setError(response.data.message || "Error al enviar respuesta");
+        }
+      } catch (err) {
+        console.error("Error enviando respuesta:", err);
+        setError("Error al enviar respuesta");
+      }
+    };
 
     const getReplyColor = (index) => {
       const colors = [
@@ -388,104 +408,96 @@ if (response.data.success) {
             )}
           </AnimatePresence>
         </div>
-<AnimatePresence>
-    {visibleReplies[comment.id_comentario] && replies.length > 0 && (
-        <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            // Ajustamos el margen para que la línea curva salga del comentario principal
-            className="ml-5 md:ml-8 mt-4 relative" 
-        >
-            {/* LÍNEA VERTICAL PRINCIPAL DE CONEXIÓN
-              Se extiende desde la parte superior del primer conector hasta la parte inferior de la penúltima respuesta.
-            */}
-            <div 
-                className="absolute left-4 top-0 w-[2px] bg-gray-300 transform -translate-x-1/2"
-                // El alto debe cubrir todas las respuestas menos la última
-                style={{ height: `${(replies.length - 1) * 100}%` }}
-            ></div>
-            
-            <div className="flex flex-col gap-4">
-                {replies.map((reply, index) => {
-                    const isReplyOwner = currentUser && currentUser.id_usuario === reply.id_usuario;
+
+        <AnimatePresence>
+          {visibleReplies[comment.id_comentario] && replies.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex gap-3 md:gap-4 ml-3 md:ml-5"
+            >
+              <div className="flex gap-3 md:gap-4 ml-3 md:ml-5">
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 md:w-12 h-full flex flex-col items-center">
+                    <div className="w-[2px] bg-gray-300 flex-1"></div>
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col gap-4">
+                  {replies.map((reply, index) => {
+                    const isReplyOwner =
+                      currentUser &&
+                      currentUser.id_usuario === reply.id_usuario;
+
                     const colorScheme = getReplyColor(index);
-                    
-                    // Solo el último elemento debe tener el margen inferior normal
-                    const isLastReply = index === replies.length - 1;
 
                     return (
-                        <div 
-                            key={reply.id_respuesta} 
-                            // Contenedor de cada respuesta: añadimos padding a la izquierda para el conector
-                            className={`relative pl-7 md:pl-10 ${!isLastReply ? 'mb-4' : 'mb-0'}`} 
+                      <div
+                        key={reply.id_respuesta}
+                        className="relative w-[34.57rem]"
+                      >
+                        <svg
+                          className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
+                          viewBox="0 0 40 30"
+                          fill="none"
                         >
-                            {/* EL CONECTOR EN FORMA DE 'L' REDONDEADA (tipo YouTube) */}
-                            {/* Este div crea la línea horizontal y la curva. */}
-                            <div 
-                                className="absolute top-0 left-0 h-full w-[25px] md:w-[30px]"
+                          <path
+                            d="M0 0 C3 25, 15 25, 40 25"
+                            stroke="#d1d5db"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+
+                        <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
+                          <div className="flex-shrink-0">
+                            <div
+                              className={`w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md`}
                             >
-                                {/* La "L" redondeada: 
-                                  - border-l y border-b dibujan el ángulo
-                                  - rounded-bl-lg crea la curva
-                                */}
-                                <div 
-                                    className="absolute top-4 left-4 w-[20px] md:w-[25px] h-6 border-l-[2px] border-b-[2px] border-gray-300"
-                                    style={{ 
-                                        height: '20px', 
-                                        width: '24px', 
-                                        top: '10px', 
-                                        left: '0px', 
-                                        borderRadius: '0 0 0 10px' 
-                                    }}
-                                />
+                              {getInitials(reply.nombre_usuario)}
+                            </div>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                              <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                                {reply.nombre_usuario}
+                              </h2>
+
+                              <h2 className="text-xs md:text-sm text-gray-500">
+                                {reply.tiempo_transcurrido}
+                              </h2>
                             </div>
 
-                            <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-50 rounded-xl p-2 md:p-4 relative">
-                                {/* Contenido de la respuesta */}
-                                <div className="flex-shrink-0">
-                                    <div
-                                        className={`w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md`}
-                                    >
-                                        {getInitials(reply.nombre_usuario)}
-                                    </div>
-                                </div>
+                            <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                              {reply.respuesta}
+                            </p>
+                          </div>
 
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
-                                        <h2 className="font-semibold text-base md:text-lg text-gray-900">
-                                            {reply.nombre_usuario}
-                                        </h2>
-                                        <h2 className="text-xs md:text-sm text-gray-500">
-                                            {reply.tiempo_transcurrido}
-                                        </h2>
-                                    </div>
-                                    <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-                                        {reply.respuesta}
-                                    </p>
-                                </div>
-
-                                {isReplyOwner && (
-                                    <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
-                                        <button
-                                            // No tocamos la lógica, solo ajustamos la llamada si fuera necesario, pero la dejamos como está en tu código original (asumo que `handleDeleteReply` necesita el `commentId` para la actualización local si aplicaste los cambios sugeridos anteriormente)
-                                            onClick={() => handleDeleteReply(reply.id_respuesta)}
-                                            className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                                            title="Eliminar respuesta"
-                                        >
-                                            <ImBin className="scale-155 cursor-pointer" />
-                                        </button>
-                                    </div>
-                                )}
+                          {isReplyOwner && (
+                            <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                              <button
+                                onClick={() =>
+                                  handleDeleteReply(reply.id_respuesta)
+                                }
+                                className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                                title="Eliminar respuesta"
+                              >
+                                <ImBin className="scale-155 cursor-pointer" />
+                              </button>
                             </div>
+                          )}
                         </div>
+                      </div>
                     );
-                })}
-            </div>
-        </motion.div>
-    )}
-</AnimatePresence>
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
@@ -530,7 +542,9 @@ if (response.data.success) {
             className="space-y-2 md:space-y-3"
           >
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="text-xs sm:text-sm md:text-base">Tu calificación:</span>
+              <span className="text-xs sm:text-sm md:text-base">
+                Tu calificación:
+              </span>
               <div className="flex items-center gap-2 flex-wrap">
                 <Rating
                   id="new-comment-rating"
@@ -545,7 +559,7 @@ if (response.data.success) {
               </div>
               {rating === 0 && (
                 <span className="text-red-500 text-xs">
-                  * Selecciona una calificación
+                  Selecciona una calificación
                 </span>
               )}
             </div>
@@ -571,17 +585,16 @@ if (response.data.success) {
               </div>
             </div>
 
-            <ProtectedComponent>
-              <Button
-                color="sky"
-                text={isSubmitting ? "Publicando..." : "Publicar"}
-                size="md"
-                type="submit"
-                disabled={isSubmitting || !rating || rating === 0}
-                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${isSubmitting || !rating ? " cursor-not-allowed" : ""
-                  }`}
-              />
-            </ProtectedComponent>
+            <Button
+              color="sky"
+              text={isSubmitting ? "Publicando..." : "Publicar"}
+              size="md"
+              type="submit"
+              disabled={isSubmitting || !rating || rating === 0}
+              className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${
+                isSubmitting || !rating ? " cursor-not-allowed" : ""
+              }`}
+            />
           </form>
         </div>
       )}
@@ -614,6 +627,36 @@ if (response.data.success) {
           ))
         )}
       </div>
+      {showAlreadyRepliedAlert && (
+        <Alert
+          type="toast"
+          variant="error"
+          title="Ya respondiste a este comentario."
+          duration={4000}
+          onClose={() => setShowAlreadyRepliedAlert(false)}
+          show={true}
+        />
+      )}
+      {showNotLogged && (
+        <Alert
+          type="toast"
+          variant="error"
+          title="Debes tener una sesión iniciada para interactuar con este producto."
+          duration={4000}
+          onClose={() => setShowNotLogged(false)}
+          show={true}
+        />
+      )}
+      {showErrorMessage && (
+        <Alert
+          type="toast"
+          variant="error"
+          title="Error al publicar comentario."
+          duration={4000}
+          onClose={() => setShowErrorMessage(false)}
+          show={true}
+        />
+      )}
     </section>
   );
 };
