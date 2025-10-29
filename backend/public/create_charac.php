@@ -39,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $body = json_decode(file_get_contents("php://input"), true);
-<<<<<<< HEAD
 for ($i = 0; $i < count($body["data"]); $i++) {
     $query = $data_base->prepare("INSERT INTO caracteristicas_producto(id_producto, caracteristica) VALUES(?, ?)");
     $query->bind_param("is", $body["productId"], $body["data"][$i]);
@@ -53,17 +52,6 @@ for ($i = 0; $i < count($body["data"]); $i++) {
         ]);
         exit;
     }
-=======
-
-// Validar datos recibidos
-if (!$body || !isset($body["productId"]) || !isset($body["data"]) || !is_array($body["data"])) {
-    http_response_code(400);
-    echo json_encode([
-        "success" => false,
-        "message" => "Datos inválidos. Se requiere 'productId' y 'data' (array)"
-    ]);
-    exit;
->>>>>>> 53e3237972623bc26a11678d7542bfa3b4730436
 }
 
 // Validar que data no esté vacío
