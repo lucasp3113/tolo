@@ -161,6 +161,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .then((res) => {
                 setCurrentStep("showCharac")
                 setDataCharac(res.data.data)
+                console.log(productId)
             })
             .catch((err) => console.log(err))
     }
@@ -338,7 +339,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                                         {visibleSizesForColor.filter(v => v).length > 1 && (
                                             <span
                                                 onClick={() => removeColorSize(colorIdx, sizeIdx)}
-                                                className='text-red-600 text-sm mr-3 cursor-pointer hover:text-red-800'
+                                                className='text-red-600 text-sm font-quicksand font-semibold mr-3 cursor-pointer hover:text-red-800'
                                             >
                                                 Eliminar talle
                                             </span>
@@ -385,7 +386,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     {visibleCharac.filter(v => v).length > 1 && (
                         <span
                             onClick={() => removeCharac(idx)}
-                            className='text-red-600 text-sm mr-3 cursor-pointer hover:text-red-800'
+                            className='text-red-600 font-quicksand font-semibold text-sm mr-3 cursor-pointer hover:text-red-800'
                         >
                             Eliminar característica
                         </span>

@@ -13,7 +13,7 @@ $data_base = new mysqli(
 
 if ($data_base->connect_error) {
     http_response_code(500);
-    echo json_encode([
+    echo json_encode(value: [
         "success" => false
     ]);
 } else {

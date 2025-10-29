@@ -68,26 +68,21 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
     const carruselRef = useRef(null);
     const [isInView, setIsInView] = useState(true);
 
+    const [carruselEl, setCarruselEl] = useState(null);
+
     useEffect(() => {
+        if (!carruselEl) return;
         const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsInView(entry.isIntersecting);
-            },
-            {
-                root: null,
-                threshold: 0.1,
-                rootMargin: "-120px 0px 0px 0px",
-            }
+            ([entry]) => setIsInView(entry.isIntersecting),
+            { root: null, threshold: 0.1, rootMargin: "-120px 0px 0px 0px" }
         );
 
-        if (carruselRef.current) {
-            observer.observe(carruselRef.current);
-        }
+        observer.observe(carruselEl);
 
-        return () => {
-            if (carruselRef.current) observer.unobserve(carruselRef.current);
-        };
-    }, [ecommerce]);
+        return () => observer.unobserve(carruselEl);
+    }, [carruselEl]);
+
+
 
 
     const [rankingImg, setRankingImg] = useState(null)
@@ -132,6 +127,42 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
         }
         return jsx;
     }
+
+    function showProductsMobile(data) {
+        const jsx = [];
+        for (let i = 0; i < data.length; i += 2) {
+            const chunk = data.slice(i, i + 2);
+
+            jsx.push(
+                <AnimationScroll key={chunk[0].id_producto}>
+                    <section className="flex flex-wrap items-start justify-start w-full">
+                        {chunk.map((producto) => (
+                            <ProductCard
+                                key={producto.id_producto}
+                                phone={true}
+                                name={producto.nombre_producto}
+                                rating={producto.rating}
+                                price={producto.precio}
+                                image={`/api/${producto.ruta_imagen}`}
+                                stock={producto.stock}
+                                freeShipping={true}
+                                onDelete={() => handleDeleteProduct(producto.id_producto)}
+                                admin={userType}
+                                onClick={() =>
+                                    ecommerce
+                                        ? navigate(`product/${producto.id_producto}`)
+                                        : navigate(`/product/${producto.id_producto}`)
+                                }
+                            />
+                        ))}
+                    </section>
+                </AnimationScroll>
+            );
+        }
+        return jsx;
+    }
+
+
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -197,6 +228,16 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
     const [startTranslateX, setStartTranslateX] = useState(0);
     const [translateX, setTranslateX] = useState(0);
     const lastTimeRef = useRef(Date.now());
+    const isPausedRef = useRef(isPaused);
+    const isDraggingRef = useRef(isDragging);
+
+    useEffect(() => {
+        isPausedRef.current = isPaused;
+    }, [isPaused]);
+
+    useEffect(() => {
+        isDraggingRef.current = isDragging;
+    }, [isDragging]);
 
     const categories = useMemo(() => [
         { icon: IoShirt, label: "Ropa" },
@@ -210,7 +251,6 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
         { icon: GiLipstick, label: "Salud y Belleza" },
     ], []);
 
-
     const duplicatedCategories = [...categories, ...categories, ...categories];
 
     useEffect(() => {
@@ -222,7 +262,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
         const totalWidth = categories.length * itemWidth;
 
         const animate = () => {
-            if (!isPaused && !isDragging) {
+            if (!isPausedRef.current && !isDraggingRef.current) {
                 const now = Date.now();
                 const delta = now - lastTimeRef.current;
                 lastTimeRef.current = now;
@@ -242,9 +282,11 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
         animationId = requestAnimationFrame(animate);
 
         return () => {
-            cancelAnimationFrame(animationId);
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
         };
-    }, [isPaused, isDragging, windowWidth, categories]);
+    }, [windowWidth, categories.length]);
 
 
     const handleMouseDown = (e) => {
@@ -326,7 +368,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                             onClick={() => ecommerce ? navigate(`/${ecommerce}/register/`) : navigate("/register/")}
                             className="md:w-46 w-46 mt-18 mb-15 translate-y-4 md:mt-6 md:mb-6 md:p-2 p-3 bg-sky-700 transition-colors hover:bg-white hover:text-sky-700 cursor-pointer text-white font-semibold rounded-3xl duration-500 whitespace-nowrap !shadow-none text-lg font-quicksand flex items-center justify-center"
                         >Comenzar</button>
-                        <section ref={carruselRef} className='w-[90%] flex items-center justify-center'>
+                        <section ref={setCarruselEl} className='w-[90%] flex items-center justify-center'>
                             <Carrusel
                                 multiple={true}
                                 home={true}
@@ -427,7 +469,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                                 </section>
                             </section>
                         </section>
-                        <h3 className={`${!isInView ? "opacity-100" : "opacity-0"} text-gray-900 mt-4 md:mt-0 font-bold text-3xl md:text-4xl lg:text-4xl h-18 translate-y-14 font-quicksand w-3/4 text-center mb-8`}>Ranking de mejores tiendas del mes</h3>
+                        <h3 className={`${!isInView ? "opacity-100" : "opacity-0"} text-gray-900 mt-4 md:mt-0 font-bold text-3xl md:text-4xl lg:text-4xl h-18 translate-y-8 md:translate-y-14 font-quicksand w-3/4 text-center mb-8`}>Ranking de mejores tiendas del mes</h3>
                         <span className={"font-quicksand text-gray-800 w-3/4 text-2xl  font-semibold "}>¿Tu tienda podría estar acá el mes que viene?</span>
                         <section className={`${!isInView ? "opacity-100" : "opacity-0"} transition-opacity -translate-y-6 ease-in-out duration-700 w-[100%] md:w-[50%] lg:w-[45%] relative flex items-center justify-center`}>
                             {rankingImg && (
@@ -478,28 +520,8 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                     noResults ? (
                         <NoResultsMessage />
                     ) : windowWidth < 500 ? (
-                        <section
-                            key={JSON.stringify(uniqueProducts)}
-                            className={`flex flex-col w-full mb-20 items-center justify-center transition-opacity ease-in-out`}
-                        >
-                            {uniqueProducts.map(i => {
-                                return ((
-                                    <AnimationScroll key={i.id_producto}>
-                                        <ProductCard
-                                            onDelete={() => handleDeleteProduct(i.id_producto)}
-                                            admin={userType}
-                                            rating={i.rating}
-                                            name={i.nombre_producto}
-                                            price={i["precio"]}
-                                            image={`/api/${i["ruta_imagen"]}`}
-                                            stock={i["stock"]}
-                                            freeShipping={true}
-                                            phone={true}
-                                            onClick={() => !userType && ecommerce ? navigate(`product/${i["id_producto"]}`) : navigate(`/product/${i["id_producto"]}`)}
-                                        />
-                                    </AnimationScroll>
-                                ))
-                            })}
+                        <section className={`flex flex-col mb-20 w-full items-center justify-center transition-opacity ease-in-out `}>
+                            {showProductsMobile(uniqueProducts)}
                         </section>
                     ) : (
                         <section className={`flex flex-col mb-20 w-full items-center justify-center transition-opacity ease-in-out `}>

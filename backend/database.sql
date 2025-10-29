@@ -1,11 +1,17 @@
 -- Active: 1756304004613@@127.0.0.1@3306@tolo
 
+DROP DATABASE tolo;
+
+-- Active: 1758104807084@@127.0.0.1@3306
 CREATE DATABASE tolo;
 USE tolo;
+
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NULL,
     contraseña VARCHAR(255) NULL,
     tipo_usuario ENUM(
         'cliente',
@@ -13,6 +19,7 @@ CREATE TABLE usuarios (
         'ecommerce',
         'admin'
     ) NOT NULL,
+    google_id VARCHAR(255) UNIQUE NULL,
     google_id VARCHAR(255) UNIQUE NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
@@ -46,6 +53,7 @@ CREATE TABLE ecommerces (
     descripcion TEXT DEFAULT NULL,
     rango_actual INT UNSIGNED DEFAULT 1,
     facturacion_acumulada INT DEFAULT 0,
+    map TEXT DEFAULT NULL,
     map TEXT DEFAULT NULL,
     logo VARCHAR(255) DEFAULT NULL,
     home VARCHAR(255) DEFAULT NULL FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
@@ -230,6 +238,9 @@ VALUES (
         'Electrodomésticos',
         'Aparatos y equipos eléctricos para el hogar'
     );
+
+INSERT INTO
+    categorias (nombre_categoria, descripcion)
 INSERT INTO categorias (nombre_categoria, descripcion)
 VALUES (
         'Alquiler de campos',
@@ -271,6 +282,8 @@ CREATE TABLE imagenes_productos (
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
+
 
 CREATE TABLE comentarios_productos (
     id_comentario INT PRIMARY KEY AUTO_INCREMENT,
@@ -392,6 +405,12 @@ CREATE TABLE envios (
     codigo_postal VARCHAR(100),
     departamento VARCHAR(60) NOT NULL,
     ciudad VARCHAR(60) NOT NULL,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    celular VARCHAR(255) NOT NULL,
+    codigo_postal VARCHAR(100),
+    departamento VARCHAR(60) NOT NULL,
+    ciudad VARCHAR(60) NOT NULL,
     direccion_entrega TEXT NOT NULL,
     estado_envio ENUM(
         'pendiente',
@@ -446,5 +465,22 @@ CREATE TABLE custom_shops (
     footer_color VARCHAR(100) NOT NULL,
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE
 );
-SELECT *
-from detalles_compra;
+
+CREATE TABLE visitas (
+    id_visita INT PRIMARY KEY AUTO_INCREMENT,
+    fecha DATETIME
+);
+
+CREATE TABLE respuestas_comentario (
+    id_respuesta INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_comentario INT NOT NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    respuesta TEXT NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (id_comentario) REFERENCES comentarios_productos (id_comentario) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
+);
+
+
+

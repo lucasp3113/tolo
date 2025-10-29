@@ -53,7 +53,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // celu cuando la imagen es grande
   if (phone && useOverlayLayout && imageLoaded) {
     return (
-      <div onClick={onClick} className={`z-50 cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
+      <div onClick={onClick} className={`z-50 cursor-pointer relative p-2 mb-0.5 bg-white overflow-hidden flex items-center justify-center w-1/2 m-0 ${cart ? "h-34" : ""}`}>
         <div className="w-44 aspect-square flex-shrink-0 bg-gray-100">
           <img
             loading="lazy"
@@ -91,7 +91,15 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           )}
           {!client && (
             <div className="flex gap-2 pt-4 absolute bottom-0">
-              <Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />
+              {!admin && (
+                <Button
+                  color={"blue"}
+                  size={"md"}
+                  className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"}
+                  text={<FaPen className="text-3xl text-sky-800" />}
+                  onClick={onUpdate}
+                />
+              )}
               <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
             </div>
           )}
@@ -103,7 +111,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // celu cuando la imagen es chica
   if (phone) {
     return (
-      <div onClick={onClick} className={`cursor-pointer relative p-2 mb-0.5 bg-white shadow overflow-hidden flex items-center justify-center w-full m-0 ${cart ? "h-34" : ""}`}>
+      <div onClick={onClick} className={`cursor-pointer w-1/2 relative p-2 mb-0.5 bg-white  overflow-hidden flex flex-col items-center justify-center m-0 ${cart ? "h-34" : ""}`}>
         <section className="flex flex-col items-center justify-center">
           {rating > 0 && (
             <Rating
@@ -157,7 +165,15 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
 
           {!client && (
             <div className="flex gap-2 pt-4 absolute bottom-0">
-              <Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />
+              {!admin && (
+                <Button
+                  color={"blue"}
+                  size={"md"}
+                  className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"}
+                  text={<FaPen className="text-3xl text-sky-800" />}
+                  onClick={onUpdate}
+                />
+              )}
               <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
             </div>
           )}
@@ -168,7 +184,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
 
   // compu
   return (
-    <div onClick={onClick} className={`cursor-pointer relative p-2 bg-white shadow overflow-hidden flex items-center justify-center ${client ? "h-100" : "h-104"} w-56 flex-col m-5 hover:shadow-lg transition-shadow`}>
+    <div onClick={onClick} className={`cursor-pointer relative p-2 bg-white overflow-hidden flex items-center justify-center ${client ? "h-100" : "h-104"} w-56 flex-col m-5 hover:shadow-lg transition-shadow`}>
       {rating > 0 && (
         <Rating
           className="absolute top-3 left-2"
@@ -220,7 +236,15 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
         )}
         {!client && (
           <div className="flex gap-2 pt-4 absolute bottom-0">
-            <Button color={"blue"} size={"md"} className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"} text={<FaPen className="text-3xl text-sky-800" />} onClick={onUpdate} />
+            {!admin && (
+              <Button
+                color={"blue"}
+                size={"md"}
+                className={" !bg-transparent !m-0 !mt-1 !shadow-none !rounded-lg"}
+                text={<FaPen className="text-3xl text-sky-800" />}
+                onClick={onUpdate}
+              />
+            )}
             <Button color={"red"} size={"md"} className={" !bg-transparent !m-0 !shadow-none !rounded-lg"} text={<ImBin className="text-3xl !mt-1 text-red-600" />} onClick={onDelete} />
           </div>
         )}

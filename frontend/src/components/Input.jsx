@@ -44,7 +44,6 @@ export default function Input({
       if (!allowedTypes.includes(file.type)) {
         return `El archivo "${file.name}" no es una imagen válida. Solo se permiten: JPG y PNG`;
       }
-
       if (file.size > maxSize) {
         return `El archivo "${file.name}" es demasiado grande. Máximo 5MB`;
       }
@@ -65,7 +64,7 @@ export default function Input({
         </span>
       ) : type === "file" ? undefined : (
         <span className={errors[name]
-          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-white"
+          ? "absolute text-2xl -translate-1/3 right-1 top-1/2 text-gray-400"
           : `absolute text-2xl right-3 top-1/2 text-gray-400 ${moreIcons ? "w-full" : ""}`}>
           {icon}
         </span>

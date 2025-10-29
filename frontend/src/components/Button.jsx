@@ -68,7 +68,7 @@ export default function Button ({
         font-semibold
         hover:scale-110
         transition-transform
-        duration-300
+        duration-200
         cursor-pointer
         m-2
         shadow
