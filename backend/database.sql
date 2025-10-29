@@ -473,7 +473,7 @@ CREATE TABLE visitas (
     fecha DATETIME
 );
 
-SELECT * FROM visitas;
+SELECT * FROM ecommerces;
 
 CREATE TABLE respuestas_comentario (
     id_respuesta INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
