@@ -34,4 +34,3 @@ if ($data_base) {
         "message" => "ERROR de conexión"
     ]);
 }
-?>

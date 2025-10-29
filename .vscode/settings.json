@@ -56,6 +56,20 @@
             "name": "coneeeeeeect",
             "database": "tolo",
             "username": "root"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "paloma",
+            "database": "tolo",
+            "username": "root"
         }
     ]
 }

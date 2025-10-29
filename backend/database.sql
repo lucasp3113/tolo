@@ -9,9 +9,7 @@ USE tolo;
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
-    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
-    contraseña VARCHAR(255) NULL,
     contraseña VARCHAR(255) NULL,
     tipo_usuario ENUM(
         'cliente',
@@ -20,10 +18,14 @@ CREATE TABLE usuarios (
         'admin'
     ) NOT NULL,
     google_id VARCHAR(255) UNIQUE NULL,
-    google_id VARCHAR(255) UNIQUE NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN DEFAULT TRUE
 );
+
+INSERT INTO usuarios (nombre_usuario, email, contraseña, tipo_usuario)
+VALUES ('admin', 'tolostudiooficial@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'admin');
+
+
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_rango ENUM(
@@ -470,6 +472,8 @@ CREATE TABLE visitas (
     id_visita INT PRIMARY KEY AUTO_INCREMENT,
     fecha DATETIME
 );
+
+SELECT * FROM visitas;
 
 CREATE TABLE respuestas_comentario (
     id_respuesta INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,

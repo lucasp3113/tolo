@@ -78,7 +78,7 @@ if (!$data_base->connect_error) {
     $number_of_question_marks = implode(",", array_fill(0, count($hits), "?"));
 
     $query_text = $ecommerce_name ?
-        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, com.rating, c.nombre_categoria,
+        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.envio_gratis, com.rating, c.nombre_categoria,
     CASE 
         WHEN c.nombre_categoria IN ('" . implode("','", $special_image_categories) . "') THEN
             (SELECT tcp.stock
@@ -113,7 +113,7 @@ if (!$data_base->connect_error) {
     WHERE nombre_producto IN ($number_of_question_marks) AND p.id_ecommerce = e.id_ecommerce " . ($categorie ?
             "AND c.nombre_categoria = '$categorie'" : "")
         . ($order_by ? ' ORDER BY p.precio ' . $order_by : '') :
-        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, com.rating, c.nombre_categoria,
+        "SELECT p.id_producto, p.id_ecommerce, p.nombre_producto, p.precio, p.envio_gratis, com.rating, c.nombre_categoria,
     CASE 
         WHEN c.nombre_categoria IN ('" . implode("','", $special_image_categories) . "') THEN
             (SELECT tcp.stock
