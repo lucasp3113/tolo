@@ -40,7 +40,9 @@ const RatingMeter = memo(({ progress, getColor }) => {
           {progress.toFixed(1)}
         </text>
       </svg>
-      <p className="text-gray-600 text-sm mt-2 font-quicksand font-medium">Calificación</p>
+      <p className="text-gray-600 text-sm mt-2 font-quicksand font-medium">
+        Calificación
+      </p>
     </div>
   );
 });
@@ -63,7 +65,24 @@ const RatingMeterMobile = memo(({ progress, getColor }) => {
         strokeLinecap="round"
         style={{ transition: "stroke-dashoffset 0.1s linear" }}
       />
-      <text x="50" y="45" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#374151">
+      <path
+        d="M 10 50 A 40 40 0 0 1 90 50"
+        fill="transparent"
+        stroke={getColor(progress)}
+        strokeWidth="10"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+        style={{ transition: "stroke-dashoffset 0.1s linear" }}
+      />
+      <text
+        x="50"
+        y="45"
+        textAnchor="middle"
+        fontSize="14"
+        fontWeight="bold"
+        fill="#374151"
+      >
         {progress.toFixed(1)}
       </text>
     </svg>
@@ -110,7 +129,7 @@ const Chart = memo(({ chartData, chartType, isMobile }) => {
             fontSize: isMobile ? '12px' : '14px',
             color: '#fff'
           }}
-          labelStyle={{ color: '#94a3b8' }}
+          labelStyle={{ color: "#94a3b8" }}
         />
         <Line
           type="monotone"
@@ -127,25 +146,35 @@ const Chart = memo(({ chartData, chartType, isMobile }) => {
 });
 
 export default function SellerDashboard({ children }) {
-  const { ecommerce } = useParams();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [logo, setLogo] = useState(null);
   const rating = 4;
   const [progress, setProgress] = useState(0);
-  const [timeRange, setTimeRange] = useState('1semana');
+  const [timeRange, setTimeRange] = useState("1semana");
   const [chartData, setChartData] = useState([]);
-  const [chartType, setChartType] = useState('ventas');
+  const [chartType, setChartType] = useState("ventas");
+
+  const [ecommerce, setEcommerce] = useState({
+    nombre_ecommerce: "",
+    facturacion_acumulada: 0,
+    name_range: "",
+    commission_percentage: 0,
+    minimum_billing: 0,
+    next_range: "",
+    next_percentage: 0,
+  });
 
   let user = null;
   const token = localStorage.getItem("token");
   if (token) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = JSON.parse(atob(token.split(".")[1]));
     user = payload.user;
   }
 
   useEffect(() => {
-    axios.post("/api/show_profile_picture.php", { user })
+    axios
+      .post("/api/show_profile_picture.php", { user })
       .then((res) => {
         console.log(res.data.logo.logo);
         if (res.data?.logo?.logo) {
@@ -156,6 +185,25 @@ export default function SellerDashboard({ children }) {
       })
       .catch((err) => console.log(err));
   }, []);
+
+  useEffect(() => {
+    axios
+      .post("/api/ecommerce.php", { usuario: user })
+      .then((res) => {
+        if (res.data.success) {
+          setEcommerce({
+            nombre_ecommerce: res.data.ecommerce_name,
+            facturacion_acumulada: res.data.cumulative_billing,
+            name_range: res.data.name_range,
+            commission_percentage: res.data.commission_percentage,
+            minimum_billing: res.data.minimum_billing,
+            next_range: res.data.next_range,
+            next_percentage: res.data.next_percentage,
+          });
+        }
+      })
+      .catch((err) => console.log(err));
+  }, [user]);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -193,31 +241,44 @@ export default function SellerDashboard({ children }) {
         return Array.from({ length: 24 }, (_, i) => ({
           name: `${i}:00`,
           ventas: Math.floor(Math.random() * 10),
-          ganancias: Math.floor(Math.random() * 500)
+          ganancias: Math.floor(Math.random() * 500),
         }));
-      case '1semana':
-        return ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => ({
+      case "1semana":
+        return ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => ({
           name: day,
           ventas: Math.floor(Math.random() * 50),
-          ganancias: Math.floor(Math.random() * 3000)
+          ganancias: Math.floor(Math.random() * 3000),
         }));
       case '1mes':
         return Array.from({ length: 30 }, (_, i) => ({
           name: `${i + 1}`,
           ventas: Math.floor(Math.random() * 20),
-          ganancias: Math.floor(Math.random() * 1500)
+          ganancias: Math.floor(Math.random() * 1500),
         }));
-      case '5meses':
-        return ['Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5'].map(mes => ({
+      case "5meses":
+        return ["Mes 1", "Mes 2", "Mes 3", "Mes 4", "Mes 5"].map((mes) => ({
           name: mes,
           ventas: Math.floor(Math.random() * 200),
-          ganancias: Math.floor(Math.random() * 15000)
+          ganancias: Math.floor(Math.random() * 15000),
         }));
-      case '1año':
-        return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'].map(mes => ({
+      case "1año":
+        return [
+          "Ene",
+          "Feb",
+          "Mar",
+          "Abr",
+          "May",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dic",
+        ].map((mes) => ({
           name: mes,
           ventas: Math.floor(Math.random() * 150),
-          ganancias: Math.floor(Math.random() * 10000)
+          ganancias: Math.floor(Math.random() * 10000),
         }));
       default:
         return [];
@@ -243,19 +304,21 @@ export default function SellerDashboard({ children }) {
             <img
               src={logo}
               alt="Logo Comercio"
-              onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             />
           ) : (
             <span
-              onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="font-quicksand flex text-md font-semibold cursor-pointer items-center justify-center w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             >
               Añadir logo
             </span>
           )}
           <div className="flex-1 flex flex-col items-center">
-            <h1 className="text-xl font-bold font-quicksand text-gray-800">Arctec</h1>
+            <h1 className="text-xl font-bold font-quicksand text-gray-800">
+              Arctec
+            </h1>
             <div className="flex items-center text-xs text-gray-600 font-quicksand mt-1">
               <FaLocationDot className="mr-1 text-sky-600" size={10} />
               <span>San José, Uruguay</span>
@@ -267,13 +330,13 @@ export default function SellerDashboard({ children }) {
         <div className="flex-1 p-4 flex flex-col gap-4 pb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce}/create_product/`) : navigate("/create_product/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               + Añadir producto
             </button>
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce}/product_crud/`) : navigate("/product_crud/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Ver mis productos
@@ -287,7 +350,7 @@ export default function SellerDashboard({ children }) {
           <div className="bg-white shadow-md mb-22 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-800 font-quicksand flex items-center gap-2">
-                {chartType === 'ventas' ? (
+                {chartType === "ventas" ? (
                   <>
                     <span className="text-sky-600"></span>Ventas
                   </>
@@ -318,11 +381,11 @@ export default function SellerDashboard({ children }) {
 
             <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
               {[
-                { key: '1dia', label: '1D' },
-                { key: '1semana', label: '1S' },
-                { key: '1mes', label: '1M' },
-                { key: '5meses', label: '5M' },
-                { key: '1año', label: '1A' }
+                { key: "1dia", label: "1D" },
+                { key: "1semana", label: "1S" },
+                { key: "1mes", label: "1M" },
+                { key: "5meses", label: "5M" },
+                { key: "1año", label: "1A" },
               ].map(({ key, label }) => (
                 <button
                   key={key}
@@ -350,12 +413,12 @@ export default function SellerDashboard({ children }) {
           <img
             src={logo}
             alt="Logo Comercio"
-            onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="w-36 h-36 cursor-pointer mb-4 border-4 border-sky-600 rounded-full object-contain bg-white p-2 shadow-lg"
           />
         ) : (
           <span
-            onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="font-quicksand w-36 h-36 mb-4 border-4 border-sky-600 rounded-full font-semibold flex text-xl cursor-pointer items-center justify-center bg-white p-2 shadow-lg"
           >
             Añadir logo
@@ -372,14 +435,14 @@ export default function SellerDashboard({ children }) {
 
         <section className="w-full flex flex-col mt-auto">
           <button
-            onClick={() => ecommerce ? navigate(`/${ecommerce}/create_product/`) : navigate("/create_product/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center"
           >
             <span className="text-xl">+</span>
             Añadir Producto
           </button>
           <button
-            onClick={() => ecommerce ? navigate(`/${ecommerce}/product_crud/`) : navigate("/product_crud/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center translate-y-1.5"
           >
             Ver Mis Productos

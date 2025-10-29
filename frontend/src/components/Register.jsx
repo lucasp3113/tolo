@@ -54,6 +54,7 @@ export default function Register({ pc = false }) {
                 login(token, expiration);
 
                 const urls = {
+                    admin: ecommerce ? `/${ecommerce}/admin_panel` : "/admin_panel",
                     ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
                     vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
                     cliente: ecommerce ? `/${ecommerce}/` : "/"
@@ -109,6 +110,7 @@ export default function Register({ pc = false }) {
                 }
                 sessionStorage.setItem('loginSuccess', 'success')
                 navigate(urls[userType])
+                axios.post("/api/add_views.php")
             })
             .catch((err) => {
                 sessionStorage.setItem('loginSuccess', 'error')

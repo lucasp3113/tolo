@@ -5,14 +5,63 @@ import logoTolo from '../assets/logoTolo.webp'
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-export default function Account(contextGoodContrast) {
+
+export default function Account() {
+    const [color, setColor] = useState(null)
+    const [goodContrast, setGoodContrast] = useState(true)
+    const { ecommerce: nameEcommerce } = useParams();
+
     useEffect(() => {
-        console.log(contextGoodContrast)
-    }, [])
+        nameEcommerce && (
+            nameEcommerce && axios.post("/api/show_custom_store.php", {
+                ecommerce: nameEcommerce
+            })
+                .then((res) => {
+                    setColor(res.data.data.header_color)
+                })
+                .catch((res) => console.log(res))
+        )
+    }, [nameEcommerce])
+
+
+
+    useEffect(() => {
+        if (color) {
+            setGoodContrast(hasGoodContrast('#FFFFFF', color, 1.45));
+        }
+    }, [color]);
+
+
+    function hasGoodContrast(color1, color2, threshold = 1.1) {
+        if (!color1 || !color2) return true;
+
+        const getLuminance = (hex) => {
+            if (!hex || !hex.startsWith('#')) return 0;
+
+            const rgb = parseInt(hex.slice(1), 16);
+            const r = (rgb >> 16) & 0xff;
+            const g = (rgb >> 8) & 0xff;
+            const b = (rgb >> 0) & 0xff;
+
+            const [rs, gs, bs] = [r, g, b].map(c => {
+                c = c / 255;
+                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            });
+
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        };
+
+        const lum1 = getLuminance(color1);
+        const lum2 = getLuminance(color2);
+        const brightest = Math.max(lum1, lum2);
+        const darkest = Math.min(lum1, lum2);
+        const contrast = (brightest + 0.05) / (darkest + 0.05);
+
+        return contrast >= threshold;
+    }
 
     const [isLogin, setIsLogin] = useState(true);
     const [isAnimating, setIsAnimating] = useState(false);
-    const { ecommerce: nameEcommerce } = useParams();
     const [logoEcommerce, setLogoEcommerce] = useState(null);
     const [headerColor, setHeaderColor] = useState(null)
 
@@ -144,7 +193,7 @@ export default function Account(contextGoodContrast) {
                         {/* <h1 className="text-5xl text-white md:text-6xl font-bold text-center mb-6">
                             {isLogin ? '¡Bienvenido!' : '¡Hola!'}
                         </h1> */}
-                        <p className="text-lg text-center mb-4 text-sky-100">
+                        <p className={`text-lg font-quicksand font-semibold text-center mb-4 ${goodContrast ? "text-sky-100" : "text-gray-700"}`}>
                             {isLogin
                                 ? '¿No tienes cuenta? Regístrate ahora'
                                 : '¿Ya tienes cuenta? Inicia sesión'}
@@ -152,7 +201,7 @@ export default function Account(contextGoodContrast) {
                         <button
                             onClick={toggleForm}
                             disabled={isAnimating}
-                            className="bg-white/20 border-2 border-white text-white font-semibold text-lg px-10 py-3 rounded-full hover:bg-white/30 hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                            className={`${goodContrast ? "bg-white/20 hover:bg-white/30 border-white" : "bg-black "} border-2 text-white font-semibold text-lg px-10 py-3 rounded-full  hover:scale-105 transition-all duration-300 disabled:opacity-50`}
                         >
                             {isLogin ? 'Crear cuenta' : 'Iniciar sesión'}
                         </button>

@@ -16,9 +16,10 @@ export default function RutaProtegida({ children }) {
 
     axios
       .post(`/api/verify_token.php?token=${token}`)
-      .then(() => {
+      .then((res) => {
         setValido(true);
         setValidando(false);
+        console.log(res)
       })
       .catch(() => {
         localStorage.removeItem("token");

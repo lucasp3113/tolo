@@ -204,7 +204,6 @@ export default function DropdownCategories({register, errors, direction, watch})
         />
     );
 
-    // Render para móvil - filas de 2 dropdowns
     const renderMobileCategories = () => (
         <fieldset className='flex flex-col items-start justify-center w-100'>
             {/* Fila 1: Vestimenta - Tecnología */}
@@ -325,7 +324,6 @@ export default function DropdownCategories({register, errors, direction, watch})
         </fieldset>
     );
 
-    // Render para desktop - diseño original
     const renderDesktopCategories = () => (
         <fieldset className='flex flex-col items-start justify-center w-full max-w-full'>
             <section className='grid grid-cols-3 gap-6 w-full'>

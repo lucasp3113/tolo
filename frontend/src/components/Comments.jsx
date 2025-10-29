@@ -1,3 +1,5 @@
+import { FaYandex } from "react-icons/fa";
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
@@ -5,20 +7,27 @@ import { ImBin } from "react-icons/im";
 import Rating from "../components/Rating";
 import Button from "../components/Button";
 import ProtectedComponent from "../components/ProtectedComponent";
+import { motion, AnimatePresence } from "framer-motion";
+import Alert from "./Alert";
 
 const CommentsSection = ({ productId }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({ total_comentarios: 0, promedio_rating: 0 });
+  const [stats, setStats] = useState({
+    total_comentarios: 0,
+    promedio_rating: 0,
+  });
   const [rating, setRating] = useState(0);
+  const [activeReplyForm, setActiveReplyForm] = useState(null);
+  const [visibleReplies, setVisibleReplies] = useState({});
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-    watch
+    watch,
   } = useForm();
 
   const comentarioValue = watch("comentario", "");
@@ -29,7 +38,7 @@ const CommentsSection = ({ productId }) => {
 
   if (token) {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       userId = payload.id_usuario;
       currentUser = payload;
     } catch (e) {
@@ -37,14 +46,34 @@ const CommentsSection = ({ productId }) => {
     }
   }
 
+  const handleDeleteReply = async (id_respuesta) => {
+    try {
+      const res = await axios.delete("/api/delete_reply.php", {
+        data: { replyId: id_respuesta },
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.data.success) {
+        await loadComments();
+      }
+    } catch (err) {
+      console.error("Error al eliminar respuesta:", err);
+    }
+  };
+
   const loadComments = async () => {
     setLoading(true);
     setError(null);
+    setError(null);
     try {
-      const response = await axios.get(`/api/show_comments.php?productId=${productId}`);
+      const response = await axios.get(
+        `/api/show_comments.php?productId=${productId}`
+      );
+
       if (response.data.success) {
         setComments(response.data.comments || []);
-        setStats(response.data.stats || { total_comentarios: 0, promedio_rating: 0 });
+        setStats(
+          response.data.stats || { total_comentarios: 0, promedio_rating: 0 }
+        );
       }
     } catch (err) {
       console.error("Error cargando comentarios:", err);
@@ -56,6 +85,15 @@ const CommentsSection = ({ productId }) => {
   const handleSubmitComment = async (data) => {
     if (!rating || rating === 0) {
       setError("Por favor selecciona una calificación");
+      return;
+    }
+
+    const hasUserReplied = comments.some(
+      (comment) => comment.id_usuario === userId
+    );
+
+    if (hasUserReplied) {
+      setError("Ya has comentado en este producto. Solo se permite un comentario por usuario.");
       return;
     }
 
@@ -71,49 +109,51 @@ const CommentsSection = ({ productId }) => {
 
     try {
       setError(null);
-      console.log("Enviando comentario:", {
-        productId: productId,
-        userId: userId,
-        rating: rating,
-        comentario: data.comentario.trim()
-      });
-
-      const response = await axios.post("/api/add_comment.php", {
-        productId: parseInt(productId),
-        userId: parseInt(userId),
-        rating: parseFloat(rating),
-        comentario: data.comentario.trim()
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        "/api/add_comment.php",
+        {
+          productId: parseInt(productId),
+          userId: parseInt(userId),
+          rating: parseFloat(rating),
+          comentario: data.comentario.trim(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
-
-      console.log("Respuesta del servidor:", response.data);
+      );
 
       if (response.data.success) {
         setRating(0);
         reset();
-        await loadComments();
+        await loadComments(); 
         setError(null);
       } else {
         setError(response.data.message || "Error al enviar comentario");
       }
     } catch (err) {
       console.error("Error enviando comentario:", err);
-      setError(err.response?.data?.message || "Error al enviar comentario");
+      setShowErrorMessage(true);
     }
   };
+
 
   const handleDeleteComment = async (commentId) => {
     try {
       const response = await axios.post("/api/delete_comment.php", {
         commentId: commentId,
-        userId: userId
+        userId: userId,
       });
 
       if (response.data.success) {
-        loadComments();
+        setActiveReplyForm(null);
+        setVisibleReplies((prev) => {
+          const copy = { ...prev };
+          delete copy[commentId];
+          return copy;
+        });
+        await loadComments();
       } else {
         setError(response.data.message || "Error al eliminar comentario");
       }
@@ -128,75 +168,346 @@ const CommentsSection = ({ productId }) => {
     }
   }, [productId]);
 
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showAlreadyRepliedAlert, setShowAlreadyRepliedAlert] = useState(false);
+  const [showNotLogged, setShowNotLogged] = useState(false);
+
   const CommentItem = ({ comment }) => {
-    const isOwner = currentUser && currentUser.id_usuario === comment.id_usuario;
+    const isOwner =
+      currentUser && currentUser.id_usuario === comment.id_usuario;
+
+    const replies = comment.respuestas || [];
+    const hasUserReplied = comments.some(
+      (comment) => comment.id_usuario === currentUser.id_usuario
+    );
+    const [charCount, setCharCount] = useState(0);
+
+    const {
+      register: registerReply,
+      handleSubmit: handleSubmitReply,
+      reset: resetReply,
+    } = useForm();
 
     const getInitials = (name) => {
       return name
-        .split(' ')
+        .split(" ")
         .slice(0, 2)
-        .map(n => n[0])
-        .join('')
+        .map((n) => n[0])
+        .join("")
         .toUpperCase();
     };
 
+    const handleInputChange = (e) => {
+      setCharCount(e.target.value.length);
+    };
+
+    const toggleReplyForm = () => {
+      if (activeReplyForm === comment.id_comentario) {
+        setActiveReplyForm(null);
+        setCharCount(0);
+        resetReply();
+      } else {
+        setActiveReplyForm(comment.id_comentario);
+        setCharCount(0);
+        resetReply();
+      }
+    };
+
+    const toggleShowReplies = () => {
+      setVisibleReplies((prev) => ({
+        ...prev,
+        [comment.id_comentario]: !prev[comment.id_comentario],
+      }));
+    };
+
+    const onSubmitAnswer = async (data) => {
+      if (!userId) {
+        setShowNotLogged(true);
+        return;
+      }
+
+      const alreadyReplied = replies.some((r) => r.id_usuario === userId);
+      if (alreadyReplied) {
+        setShowAlreadyRepliedAlert(true);
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          "/api/respuestas_comentario.php",
+          {
+            commentId: comment.id_comentario,
+            userId: parseInt(userId),
+            respuesta: data.answer.trim(),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data.success) {
+          const nuevaRespuesta = response.data.respuesta;
+
+          // ESTA ES LA CLAVE
+          setComments((prevComments) =>
+            prevComments.map((c) =>
+              c.id_comentario === comment.id_comentario
+                ? {
+                  ...c,
+                  respuestas: [...(c.respuestas || []), nuevaRespuesta],
+                  total_respuestas: (c.total_respuestas || 0) + 1,
+                }
+                : c
+            )
+          );
+
+          resetReply();
+          setActiveReplyForm(null);
+          setCharCount(0);
+          setVisibleReplies((prev) => ({
+            ...prev,
+            [comment.id_comentario]: true,
+          }));
+        } else {
+          setError(response.data.message || "Error al enviar respuesta");
+        }
+      } catch (err) {
+        console.error("Error enviando respuesta:", err);
+        setError("Error al enviar respuesta");
+      }
+    };
+
+    const getReplyColor = (index) => {
+      const colors = [
+        { from: "from-green-500", to: "to-green-600" },
+        { from: "from-purple-500", to: "to-purple-600" },
+        { from: "from-orange-500", to: "to-orange-600" },
+        { from: "from-pink-500", to: "to-pink-600" },
+        { from: "from-indigo-500", to: "to-indigo-600" },
+      ];
+      return colors[index % colors.length];
+    };
+
+    const replyCount = comment.total_respuestas || replies.length;
+
     return (
-      <div className="flex flex-col mb-12 mt-2 sm:mt-5 gap-2 sm:gap-4 w-full max-w-full overflow-hidden">
-        <div className="flex items-start gap-2 sm:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-3 sm:p-5 relative w-full min-w-0">
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-md">
-              {getInitials(comment.nombre_usuario)}
+      <div className="flex flex-col mb-22 mt-2 md:mt-5 md:mb-12 gap-2 md:gap-4 max-w-full">
+        <div>
+          <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
+            <div className="flex-shrink-0">
+              <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
+                {getInitials(comment.nombre_usuario)}
+              </div>
             </div>
-          </div>
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-1 sm:gap-2 mb-2">
-              <h2 className="font-semibold text-sm sm:text-lg md:text-xl text-gray-900 break-words">
-                {comment.nombre_usuario}
-              </h2>
-              <h2 className="text-xs sm:text-sm text-gray-500">
-                {comment.tiempo_transcurrido}
-              </h2>
-            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                  {comment.nombre_usuario}
+                </h2>
+                <h2 className="text-xs md:text-sm text-gray-500">
+                  {comment.tiempo_transcurrido}
+                </h2>
+              </div>
+              <div className="mb-1 md:mb-2">
+                <Rating
+                  id={`comment-rating-${comment.id_comentario}`}
+                  value={parseFloat(comment.rating)}
+                  readonly={true}
+                  showValue={true}
+                  size="md"
+                />
+              </div>
 
-            <div className="mb-2">
-              <Rating
-                id={`comment-rating-${comment.id_comentario}`}
-                value={parseFloat(comment.rating)}
-                readonly={true}
-                showValue={true}
-                size="sm"
-              />
-            </div>
-
-            <section className="w-full min-w-0">
-              <p className="break-words text-sm sm:text-base text-gray-900 leading-relaxed overflow-wrap-anywhere">
+              <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
                 {comment.comentario}
               </p>
-            </section>
+              <section className="-translate-x-3">
+                {replyCount > 0 && (
+                  <Button
+                    size="md"
+                    text={
+                      visibleReplies[comment.id_comentario]
+                        ? "Ocultar respuestas"
+                        : `Ver ${replyCount} ${replyCount === 1 ? "respuesta" : "respuestas"
+                        }`
+                    }
+                    onClick={toggleShowReplies}
+                    className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
+                  />
+                )}
+
+                {!activeReplyForm && (
+                  <Button
+                    size="md"
+                    text="Responder"
+                    onClick={toggleReplyForm}
+                    className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
+                  />
+                )}
+              </section>
+            </div>
+
+            {isOwner && (
+              <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                <button
+                  onClick={() => handleDeleteComment(comment.id_comentario)}
+                  className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                  title="Eliminar comentario"
+                >
+                  <ImBin className="scale-155 cursor-pointer" />
+                </button>
+              </div>
+            )}
           </div>
 
-          {isOwner && (
-            <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-2 flex-shrink-0">
-              <button
-                onClick={() => handleDeleteComment(comment.id_comentario)}
-                className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                title="Eliminar comentario"
+          <AnimatePresence>
+            {activeReplyForm === comment.id_comentario && (
+              <motion.section
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="w-full flex flex-col items-end"
               >
-                <ImBin className="text-base sm:text-lg" />
-              </button>
-            </div>
-          )}
+                <form
+                  onSubmit={handleSubmitReply(onSubmitAnswer)}
+                  className="w-full flex flex-col items-end"
+                >
+                  <input
+                    type="text"
+                    {...registerReply("answer", {
+                      required: true,
+                      minLength: 5,
+                    })}
+                    onChange={handleInputChange}
+                    placeholder="¿Qué opinas de este comentario?"
+                    className="w-[90%] p-2 md:p-3 mt-2 text-sm -translate-x-0.5 md:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                  <section className="w-full flex items-center justify-end mt-3">
+                    <Button
+                      size="md"
+                      text="Cancelar"
+                      type="button"
+                      onClick={toggleReplyForm}
+                      className="shadow-none hover:scale-none! -translate-y-3 transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black!"
+                    />
+                    <Button
+                      color="sky"
+                      size="md"
+                      text="Responder"
+                      type="submit"
+                      disabled={charCount < 4}
+                      className={`${charCount > 4
+                        ? "bg-[#3884fc] hover:bg-[#306ccc]"
+                        : "bg-gray-400 cursor-default! opacity-50"
+                        } shadow-none -translate-y-3 hover:scale-100! transition-colors! duration-100`}
+                    />
+                  </section>
+                </form>
+              </motion.section>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="border-b border-gray-100"></div>
+        <AnimatePresence>
+          {visibleReplies[comment.id_comentario] && replies.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex gap-3 md:gap-4 ml-3 md:ml-5"
+            >
+              <div className="flex gap-3 md:gap-4 ml-3 md:ml-5">
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 md:w-12 h-full flex flex-col items-center">
+                    <div className="w-[2px] bg-gray-300 flex-1"></div>
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col gap-4">
+                  {replies.map((reply, index) => {
+                    const isReplyOwner =
+                      currentUser &&
+                      currentUser.id_usuario === reply.id_usuario;
+
+                    const colorScheme = getReplyColor(index);
+
+                    return (
+                      <div
+                        key={reply.id_respuesta}
+                        className="relative w-[34.57rem]"
+                      >
+                        <svg
+                          className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
+                          viewBox="0 0 40 30"
+                          fill="none"
+                        >
+                          <path
+                            d="M0 0 C3 25, 15 25, 40 25"
+                            stroke="#d1d5db"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+
+                        <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
+                          <div className="flex-shrink-0">
+                            <div
+                              className={`w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md`}
+                            >
+                              {getInitials(reply.nombre_usuario)}
+                            </div>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                              <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                                {reply.nombre_usuario}
+                              </h2>
+
+                              <h2 className="text-xs md:text-sm text-gray-500">
+                                {reply.tiempo_transcurrido}
+                              </h2>
+                            </div>
+
+                            <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                              {reply.respuesta}
+                            </p>
+                          </div>
+
+                          {isReplyOwner && (
+                            <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                              <button
+                                onClick={() =>
+                                  handleDeleteReply(reply.id_respuesta)
+                                }
+                                className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                                title="Eliminar respuesta"
+                              >
+                                <ImBin className="scale-155 cursor-pointer" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
 
   return (
-    <section className="text-gray-700 p-2 sm:p-3 w-full min-w-0 overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-5">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">Comentarios</h1>
+    <section className="text-gray-700 p-2 md:p-3 w-full min-w-0 overflow-hidden font-quicksand">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 md:mb-5">
+        <h1 className="text-2xl md:text-3xl font-semibold">Comentarios</h1>
         {stats.total_comentarios > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             <Rating
@@ -227,10 +538,15 @@ const CommentsSection = ({ productId }) => {
       )}
 
       {currentUser && (
-        <div className="p-2 sm:p-3 rounded-md mb-4 w-full overflow-hidden">
-          <form onSubmit={handleSubmit(handleSubmitComment)} className="space-y-2 sm:space-y-3 w-full">
+        <div className="p-2 md:p-3 rounded-md mb-4">
+          <form
+            onSubmit={handleSubmit(handleSubmitComment)}
+            className="space-y-2 md:space-y-3"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="text-xs sm:text-sm md:text-base">Tu calificación:</span>
+              <span className="text-xs sm:text-sm md:text-base">
+                Tu calificación:
+              </span>
               <div className="flex items-center gap-2 flex-wrap">
                 <Rating
                   id="new-comment-rating"
@@ -239,11 +555,13 @@ const CommentsSection = ({ productId }) => {
                   showValue={true}
                   size="md"
                 />
-                <span className="text-xs sm:text-sm text-gray-500">({rating}/5)</span>
+                <span className="text-xs md:text-sm text-gray-500">
+                  ({rating}/5)
+                </span>
               </div>
               {rating === 0 && (
                 <span className="text-red-500 text-xs">
-                  * Selecciona una calificación
+                  Selecciona una calificación
                 </span>
               )}
             </div>
@@ -253,7 +571,7 @@ const CommentsSection = ({ productId }) => {
                 {...register("comentario", {
                   required: "El comentario es requerido",
                   minLength: { value: 5, message: "Mínimo 5 caracteres" },
-                  maxLength: { value: 500, message: "Máximo 500 caracteres" }
+                  maxLength: { value: 500, message: "Máximo 500 caracteres" },
                 })}
                 maxLength={1000}
                 placeholder="Comparte tu experiencia con este producto..."
@@ -269,17 +587,15 @@ const CommentsSection = ({ productId }) => {
               </div>
             </div>
 
-            <ProtectedComponent>
-              <Button
-                color="sky"
-                text={isSubmitting ? "Publicando..." : "Publicar"}
-                size="md"
-                type="submit"
-                disabled={isSubmitting || !rating || rating === 0}
-                className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${isSubmitting || !rating ? " cursor-not-allowed" : ""
-                  }`}
-              />
-            </ProtectedComponent>
+            <Button
+              color="sky"
+              text={isSubmitting ? "Publicando..." : "Publicar"}
+              size="md"
+              type="submit"
+              disabled={isSubmitting || !rating || rating === 0}
+              className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${isSubmitting || !rating ? " cursor-not-allowed" : ""
+                }`}
+            />
           </form>
         </div>
       )}
@@ -312,6 +628,36 @@ const CommentsSection = ({ productId }) => {
           ))
         )}
       </div>
+      {showAlreadyRepliedAlert && (
+        <Alert
+          type="toast"
+          variant="error"
+          title="Ya respondiste a este comentario."
+          duration={4000}
+          onClose={() => setShowAlreadyRepliedAlert(false)}
+          show={true}
+        />
+      )}
+      {showNotLogged && (
+        <Alert
+          type="toast"
+          variant="error"
+          title="Debes tener una sesión iniciada para interactuar con este producto."
+          duration={4000}
+          onClose={() => setShowNotLogged(false)}
+          show={true}
+        />
+      )}
+      {showErrorMessage && (
+        <Alert
+          type="toast"
+          variant="error"
+          title="Error al publicar comentario."
+          duration={4000}
+          onClose={() => setShowErrorMessage(false)}
+          show={true}
+        />
+      )}
     </section>
   );
 };

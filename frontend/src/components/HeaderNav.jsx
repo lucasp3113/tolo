@@ -15,10 +15,12 @@ import Button from '../components/Button';
 import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
+import { PiCrownSimpleFill } from "react-icons/pi";
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed, setContextGoodContrast }) {
+export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed }) {
   const [goodContrast, setGoodContrast] = useState(true);
   const [goodContrast2, setGoodContrast2] = useState(true);
+  
   function hasGoodContrast(color1, color2, threshold = 1.1) {
     if (!color1 || !color2) return true;
 
@@ -47,10 +49,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     return contrast >= threshold;
   }
 
-  
-
   useEffect(() => {
-    setContextGoodContrast(hasGoodContrast('#FFFFFF', color, 1.45))
     if (color) {
       setGoodContrast(hasGoodContrast('#f87171', color, 1.45));
       setGoodContrast2(hasGoodContrast('#FFFFFF', color, 1.45));
@@ -98,7 +97,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
 
   useEffect(() => {
     if (!nameEcommerce) {
-      setLogoEcommerce(null); 
+      setLogoEcommerce(null);
       setLogoLoaded(false);
       return;
     }
@@ -132,6 +131,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
     dataForm["nameEcommerce"] = nameEcommerce || null;
     axios.post("/api/search.php", dataForm)
       .then(res => {
+        console.log(res)
         setLoading(false)
         setWord(dataForm.search);
         if (res.data.data) {
@@ -190,7 +190,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 key="search"
                 type="text"
                 name="search"
-                className={`${goodContrast2 ?  "border-none" : "!bg-gray-200 !rounded-full placeholder:!text-gray-600 !p-5"} ${nameEcommerce ? "bg-white" : "!bg-sky-700 !text-white !rounded-2xl focus:outline-none autofill:!bg-sky-700 placeholder:!text-white caret-white autofill:!text-white autofill:shadow-[inset_0_0_0px_1000px_rgb(3,105,161)]  [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"} pr-10  h-9 mb-3  !font-semibold `}
+                className={`${goodContrast2 ? "border-none" : "!bg-gray-200 placeholder:!text-gray-600"} ${nameEcommerce ? "bg-white" : "!bg-sky-700 !text-white !rounded-2xl focus:outline-none autofill:!bg-sky-700 placeholder:!text-white caret-white autofill:!text-white autofill:shadow-[inset_0_0_0px_1000px_rgb(3,105,161)]  [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]"} pr-10  h-9 mb-3 !rounded-full !p-5 !font-semibold `}
                 icon={
                   <Button type='submit' className="bg-transparent -translate-y-2 translate-x-2 shadow-none" text={<IoSearch className={`${nameEcommerce ? "text-gray-500" : "text-white "} text-2xl -translate-y-[75%]`} />} />
                 }
@@ -238,13 +238,14 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 icon: {
                   name: userType === 'ecommerce' || userType === 'vendedor_particular'
                     ? <MdSpaceDashboard className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />
-                    : <TiShoppingCart className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />,
+                    : userType === 'admin' ? <PiCrownSimpleFill className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} /> : <TiShoppingCart className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />,
                   expand: true
                 },
                 animation: false,
                 onClick: () => {
                   if (userType === "ecommerce") nameEcommerce ? navigate(`/${nameEcommerce}/ecommerce_dashboard/`) : navigate("/ecommerce_dashboard/");
                   else if (userType === "cliente") nameEcommerce ? navigate(`/${nameEcommerce}/shopping_cart/`) : navigate("/shopping_cart/");
+                  else if (userType === "admin") navigate(`/admin_panel/`)
                   else nameEcommerce ? navigate(`/${nameEcommerce}/seller_dashboard/`) : navigate("/seller_dashboard/");
                 },
               },

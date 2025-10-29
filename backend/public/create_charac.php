@@ -1,5 +1,4 @@
 <?php
-mysqli_report(MYSQLI_REPORT_OFF);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -40,15 +39,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $body = json_decode(file_get_contents("php://input"), true);
+for ($i = 0; $i < count($body["data"]); $i++) {
+    $query = $data_base->prepare("INSERT INTO caracteristicas_producto(id_producto, caracteristica) VALUES(?, ?)");
+    $query->bind_param("is", $body["productId"], $body["data"][$i]);
+    if($query->execute()) {
+        continue;
+    } else {
+        http_response_code(400);
+        echo json_encode([
+            "success"=> false,
 
-// Validar datos recibidos
-if (!$body || !isset($body["productId"]) || !isset($body["data"]) || !is_array($body["data"])) {
-    http_response_code(400);
-    echo json_encode([
-        "success" => false,
-        "message" => "Datos inválidos. Se requiere 'productId' y 'data' (array)"
-    ]);
-    exit;
+        ]);
+        exit;
+    }
 }
 
 // Validar que data no esté vacío
