@@ -1,14 +1,43 @@
 import React, { useState, useEffect, useCallback, memo } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useNavigate } from "react-router-dom";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { useParams } from "react-router-dom";
 
 const RatingMeter = memo(({ progress, getColor }) => {
   const radius = 40;
   const circumference = Math.PI * radius;
   const offset = circumference - (progress / 5) * circumference;
+  const [rating, setRating] = useState();
+
+  let userId = null
+  const token = localStorage.getItem("token");
+  if (token) {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    userId = payload.id_usuario
+  }
+
+
+  useEffect(() => {
+    axios
+      .post("/api/ecommerce_rating.php", {
+        userId: userId,
+      })
+      .then((res) => {
+        console.log("✅", res);
+        setRating(res.data.data[0].promedio_rating)
+      })
+      .catch((res) => console.log(res));
+  }, []);
 
   return (
     <div className="mb-6 flex flex-col items-center">
@@ -54,7 +83,12 @@ const RatingMeterMobile = memo(({ progress, getColor }) => {
 
   return (
     <svg width="60" height="40" viewBox="0 0 100 50" className="flex-shrink-0">
-      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="transparent" stroke="#e5e7eb" strokeWidth="10" />
+      <path
+        d="M 10 50 A 40 40 0 0 1 90 50"
+        fill="transparent"
+        stroke="#e5e7eb"
+        strokeWidth="10"
+      />
       <path
         d="M 10 50 A 40 40 0 0 1 90 50"
         fill="transparent"
@@ -97,47 +131,62 @@ const Chart = memo(({ chartData, chartType, isMobile }) => {
           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
             <stop
               offset="5%"
-              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'}
+              stopColor={chartType === "ventas" ? "#0ea5e9" : "#22c55e"}
               stopOpacity={0.3}
             />
             <stop
               offset="95%"
-              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'}
+              stopColor={chartType === "ventas" ? "#0ea5e9" : "#22c55e"}
               stopOpacity={0}
             />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="#f1f5f9"
+          vertical={false}
+        />
         <XAxis
           dataKey="name"
-          tick={{ fill: '#94a3b8', fontSize: isMobile ? 10 : 11, fontFamily: 'Quicksand' }}
-          axisLine={{ stroke: '#e2e8f0' }}
+          tick={{
+            fill: "#94a3b8",
+            fontSize: isMobile ? 10 : 11,
+            fontFamily: "Quicksand",
+          }}
+          axisLine={{ stroke: "#e2e8f0" }}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: '#94a3b8', fontSize: isMobile ? 10 : 11, fontFamily: 'Quicksand' }}
+          tick={{
+            fill: "#94a3b8",
+            fontSize: isMobile ? 10 : 11,
+            fontFamily: "Quicksand",
+          }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#1e293b',
-            borderRadius: '8px',
-            border: 'none',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            fontFamily: 'Quicksand',
-            fontSize: isMobile ? '12px' : '14px',
-            color: '#fff'
+            backgroundColor: "#1e293b",
+            borderRadius: "8px",
+            border: "none",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            fontFamily: "Quicksand",
+            fontSize: isMobile ? "12px" : "14px",
+            color: "#fff",
           }}
           labelStyle={{ color: "#94a3b8" }}
         />
         <Line
           type="monotone"
-          dataKey={chartType === 'ventas' ? 'ventas' : 'ganancias'}
-          stroke={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'}
+          dataKey={chartType === "ventas" ? "ventas" : "ganancias"}
+          stroke={chartType === "ventas" ? "#0ea5e9" : "#22c55e"}
           strokeWidth={isMobile ? 2.5 : 3}
           dot={false}
-          activeDot={{ r: isMobile ? 5 : 6, fill: chartType === 'ventas' ? '#0ea5e9' : '#22c55e' }}
+          activeDot={{
+            r: isMobile ? 5 : 6,
+            fill: chartType === "ventas" ? "#0ea5e9" : "#22c55e",
+          }}
           fill="url(#colorValue)"
         />
       </LineChart>
@@ -149,7 +198,7 @@ export default function SellerDashboard({ children }) {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [logo, setLogo] = useState(null);
-  const rating = 4;
+  const rating = {rating};
   const [progress, setProgress] = useState(0);
   const [timeRange, setTimeRange] = useState("1semana");
   const [chartData, setChartData] = useState([]);
@@ -237,7 +286,7 @@ export default function SellerDashboard({ children }) {
 
   const generateDummyData = useCallback(() => {
     switch (timeRange) {
-      case '1dia':
+      case "1dia":
         return Array.from({ length: 24 }, (_, i) => ({
           name: `${i}:00`,
           ventas: Math.floor(Math.random() * 10),
@@ -249,7 +298,7 @@ export default function SellerDashboard({ children }) {
           ventas: Math.floor(Math.random() * 50),
           ganancias: Math.floor(Math.random() * 3000),
         }));
-      case '1mes':
+      case "1mes":
         return Array.from({ length: 30 }, (_, i) => ({
           name: `${i + 1}`,
           ventas: Math.floor(Math.random() * 20),
@@ -295,7 +344,6 @@ export default function SellerDashboard({ children }) {
     return "green";
   }, []);
 
-
   if (isMobile) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -304,12 +352,20 @@ export default function SellerDashboard({ children }) {
             <img
               src={logo}
               alt="Logo Comercio"
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() =>
+                ecommerce
+                  ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`)
+                  : navigate("/profile_picture/")
+              }
               className="w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             />
           ) : (
             <span
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() =>
+                ecommerce
+                  ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`)
+                  : navigate("/profile_picture/")
+              }
               className="font-quicksand flex text-md font-semibold cursor-pointer items-center justify-center w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             >
               Añadir logo
@@ -330,13 +386,21 @@ export default function SellerDashboard({ children }) {
         <div className="flex-1 p-4 flex flex-col gap-4 pb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+              onClick={() =>
+                ecommerce
+                  ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`)
+                  : navigate("/create_product/")
+              }
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               + Añadir producto
             </button>
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+              onClick={() =>
+                ecommerce
+                  ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`)
+                  : navigate("/product_crud/")
+              }
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Ver mis productos
@@ -363,16 +427,22 @@ export default function SellerDashboard({ children }) {
 
               <div className="flex gap-1 bg-gray-50 p-1 rounded-lg">
                 <button
-                  onClick={() => setChartType('ventas')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ventas' ? 'bg-sky-600 text-white' : 'text-gray-600'
-                    }`}
+                  onClick={() => setChartType("ventas")}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                    chartType === "ventas"
+                      ? "bg-sky-600 text-white"
+                      : "text-gray-600"
+                  }`}
                 >
                   Ventas
                 </button>
                 <button
-                  onClick={() => setChartType('ganancias')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ganancias' ? 'bg-green-600 text-white' : 'text-gray-600'
-                    }`}
+                  onClick={() => setChartType("ganancias")}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                    chartType === "ganancias"
+                      ? "bg-green-600 text-white"
+                      : "text-gray-600"
+                  }`}
                 >
                   Ganancias
                 </button>
@@ -390,15 +460,22 @@ export default function SellerDashboard({ children }) {
                 <button
                   key={key}
                   onClick={() => setTimeRange(key)}
-                  className={`px-3 py-1 rounded-md text-xs font-semibold font-quicksand whitespace-nowrap duration-150 ${timeRange === key ? 'bg-gray-800 text-white' : 'text-gray-500 bg-gray-50'
-                    }`}
+                  className={`px-3 py-1 rounded-md text-xs font-semibold font-quicksand whitespace-nowrap duration-150 ${
+                    timeRange === key
+                      ? "bg-gray-800 text-white"
+                      : "text-gray-500 bg-gray-50"
+                  }`}
                 >
                   {label}
                 </button>
               ))}
             </div>
 
-            <Chart chartData={chartData} chartType={chartType} isMobile={true} />
+            <Chart
+              chartData={chartData}
+              chartType={chartType}
+              isMobile={true}
+            />
           </div>
         </div>
       </div>
@@ -413,12 +490,20 @@ export default function SellerDashboard({ children }) {
           <img
             src={logo}
             alt="Logo Comercio"
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() =>
+              ecommerce
+                ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`)
+                : navigate("/profile_picture/")
+            }
             className="w-36 h-36 cursor-pointer mb-4 border-4 border-sky-600 rounded-full object-contain bg-white p-2 shadow-lg"
           />
         ) : (
           <span
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() =>
+              ecommerce
+                ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`)
+                : navigate("/profile_picture/")
+            }
             className="font-quicksand w-36 h-36 mb-4 border-4 border-sky-600 rounded-full font-semibold flex text-xl cursor-pointer items-center justify-center bg-white p-2 shadow-lg"
           >
             Añadir logo
@@ -435,14 +520,22 @@ export default function SellerDashboard({ children }) {
 
         <section className="w-full flex flex-col mt-auto">
           <button
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+            onClick={() =>
+              ecommerce
+                ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`)
+                : navigate("/create_product/")
+            }
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center"
           >
             <span className="text-xl">+</span>
             Añadir Producto
           </button>
           <button
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+            onClick={() =>
+              ecommerce
+                ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`)
+                : navigate("/product_crud/")
+            }
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center translate-y-1.5"
           >
             Ver Mis Productos
@@ -451,15 +544,13 @@ export default function SellerDashboard({ children }) {
       </section>
 
       <section className="w-1/3 flex items-center justify-center">
-        <section className="w-[90%]">
-          {children}
-        </section>
+        <section className="w-[90%]">{children}</section>
       </section>
 
       <section className="w-2/5 mr-2 bg-white shadow-md flex flex-col h-full">
         <section className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-800 font-quicksand flex items-center gap-2">
-            {chartType === 'ventas' ? (
+            {chartType === "ventas" ? (
               <>
                 <span className="text-sky-600"></span>
                 Ventas
@@ -474,20 +565,22 @@ export default function SellerDashboard({ children }) {
 
           <section className="flex gap-2 bg-gray-50 p-2 rounded-4xl">
             <button
-              onClick={() => setChartType('ventas')}
-              className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ventas'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
-                }`}
+              onClick={() => setChartType("ventas")}
+              className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                chartType === "ventas"
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
             >
               Ventas
             </button>
             <button
-              onClick={() => setChartType('ganancias')}
-              className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ganancias'
-                ? 'bg-green-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
-                }`}
+              onClick={() => setChartType("ganancias")}
+              className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                chartType === "ganancias"
+                  ? "bg-green-600 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
             >
               Ganancias
             </button>
@@ -496,19 +589,20 @@ export default function SellerDashboard({ children }) {
 
         <section className="flex gap-2 mb-4">
           {[
-            { key: '1dia', label: '1D' },
-            { key: '1semana', label: '1S' },
-            { key: '1mes', label: '1M' },
-            { key: '5meses', label: '5M' },
-            { key: '1año', label: '1A' }
+            { key: "1dia", label: "1D" },
+            { key: "1semana", label: "1S" },
+            { key: "1mes", label: "1M" },
+            { key: "5meses", label: "5M" },
+            { key: "1año", label: "1A" },
           ].map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setTimeRange(key)}
-              className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${timeRange === key
-                ? 'bg-gray-800 text-white'
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
-                }`}
+              className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${
+                timeRange === key
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+              }`}
             >
               {label}
             </button>

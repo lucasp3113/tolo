@@ -472,7 +472,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                         <h3 className={`${!isInView ? "opacity-100" : "opacity-0"} text-gray-900 mt-4 md:mt-0 font-bold text-3xl md:text-4xl lg:text-4xl h-18 translate-y-8 md:translate-y-14 font-quicksand w-3/4 text-center mb-8`}>Ranking de mejores tiendas del mes</h3>
                         <span className={"font-quicksand text-gray-800 w-3/4 text-2xl  font-semibold "}>¿Tu tienda podría estar acá el mes que viene?</span>
                         <section className={`${!isInView ? "opacity-100" : "opacity-0"} transition-opacity -translate-y-6 ease-in-out duration-700 w-[100%] md:w-[50%] lg:w-[45%] relative flex items-center justify-center`}>
-                            {rankingImg && (
+                            {rankingImg && false && (
                                 <section className='absolute inset-0 z-10'>
                                     <img
                                         onClick={() => navigate(`/${rankingImg[1]["nombre_ecommerce"]}`)}
@@ -550,6 +550,6 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                     </div>
                 )
             )}
-        </section >
+        </section>
     );
 }

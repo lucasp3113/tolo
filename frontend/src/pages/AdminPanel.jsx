@@ -942,6 +942,7 @@ export default function AdminPanel() {
     <ProductCRUD
       ecommerce={selectedEcommerce}
       setProductCrud={setProductCrud}
+      isAdmin={selectedEcommerce}
     />
   );
 }

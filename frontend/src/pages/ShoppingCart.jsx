@@ -522,6 +522,7 @@ border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none flex 
             <CheckoutBricks
               total={priceShipping + totalPrice[selectedSeller]}
               idCompra={proceedToPayment.idCarrito}
+              data={productos}
               onPaymentSuccess={(paymentData) => {
                 console.log('Pago exitoso:', paymentData);
               }}

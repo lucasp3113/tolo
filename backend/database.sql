@@ -4,6 +4,7 @@ DROP DATABASE tolo;
 
 -- Active: 1758104807084@@127.0.0.1@3306
 CREATE DATABASE tolo;
+
 USE tolo;
 
 CREATE TABLE usuarios (
@@ -22,9 +23,19 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
-INSERT INTO usuarios (nombre_usuario, email, contraseña, tipo_usuario)
-VALUES ('admin', 'tolostudiooficial@gmail.com', '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG', 'admin');
-
+INSERT INTO
+    usuarios (
+        nombre_usuario,
+        email,
+        contraseña,
+        tipo_usuario
+    )
+VALUES (
+        'admin',
+        'tolostudiooficial@gmail.com',
+        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
+        'admin'
+    );
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -38,7 +49,9 @@ CREATE TABLE rangos (
     facturacion_minima INT NOT NULL DEFAULT 0,
     porcentaje_comision DECIMAL(4, 2) NOT NULL
 );
-INSERT INTO rangos (
+
+INSERT INTO
+    rangos (
         nombre_rango,
         facturacion_minima,
         porcentaje_comision
@@ -48,6 +61,7 @@ VALUES ('junior', 0, 10),
     ('semi_senior', 25000, 6),
     ('senior', 75000, 4),
     ('elite', 350000, 2);
+
 CREATE TABLE ecommerces (
     id_ecommerce INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT UNSIGNED UNIQUE,
@@ -61,12 +75,26 @@ CREATE TABLE ecommerces (
     home VARCHAR(255) DEFAULT NULL FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
+
+SELECT * FROM usuarios;
+
+    SELECT
+    COUNT(*) as total_comentarios,
+    AVG(rating) as promedio_rating
+    FROM comentarios_productos
+    JOIN productos p ON p.id_producto = comentarios_productos.id_producto
+    JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
+    WHERE e.id_usuario = 10
+    AND activo = 1
+
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_categoria VARCHAR(30) NOT NULL,
     descripcion TEXT DEFAULT NULL
 );
-INSERT INTO categorias (nombre_categoria, descripcion)
+
+INSERT INTO
+    categorias (nombre_categoria, descripcion)
 VALUES (
         'Electrónica',
         'Dispositivos y gadgets electrónicos'
@@ -235,7 +263,9 @@ VALUES (
         'Inmuebles',
         'Bienes raíces y propiedades'
     );
-INSERT INTO categorias (nombre_categoria, descripcion)
+
+INSERT INTO
+    categorias (nombre_categoria, descripcion)
 VALUES (
         'Electrodomésticos',
         'Aparatos y equipos eléctricos para el hogar'
@@ -243,7 +273,8 @@ VALUES (
 
 INSERT INTO
     categorias (nombre_categoria, descripcion)
-INSERT INTO categorias (nombre_categoria, descripcion)
+INSERT INTO
+    categorias (nombre_categoria, descripcion)
 VALUES (
         'Alquiler de campos',
         'Campos disponibles para alquiler'
@@ -256,6 +287,7 @@ VALUES (
         'Alquiler de herramientas',
         'Herramientas disponibles para alquiler'
     );
+
 CREATE TABLE productos (
     id_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_vendedor INT UNSIGNED NOT NULL,
@@ -268,9 +300,9 @@ CREATE TABLE productos (
     fecha_publicacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id_vendedor) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE
-    SET NULL
+    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
+
 CREATE TABLE productos_categorias (
     id_producto INT UNSIGNED NOT NULL,
     id_categoria INT UNSIGNED NOT NULL,
@@ -278,14 +310,13 @@ CREATE TABLE productos_categorias (
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE,
     FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria) ON DELETE CASCADE
 );
+
 CREATE TABLE imagenes_productos (
     id_imagen INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
-
-
 
 CREATE TABLE comentarios_productos (
     id_comentario INT PRIMARY KEY AUTO_INCREMENT,
@@ -303,15 +334,27 @@ CREATE TABLE comentarios_productos (
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     UNIQUE KEY unique_user_product (id_usuario, id_producto)
 );
+
+SELECT
+    COUNT(*) as total_comentarios,
+    AVG(rating) as promedio_rating
+FROM comentarios_productos
+JOIN productos p ON p.id_producto = comentarios_productos.id_producto
+JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
+WHERE
+    e.nombre_ecommerce = ?
+    AND activo = 1
+
 CREATE TABLE carrito (
     id_carrito INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT UNSIGNED NOT NULL,
     id_ecommerce INT UNSIGNED NOT NULL,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces(id_ecommerce) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE CASCADE,
     UNIQUE KEY unique_usuario_ecommerce (id_usuario, id_ecommerce)
 );
+
 CREATE TABLE items_carrito (
     id_item INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_carrito INT UNSIGNED NOT NULL,
@@ -319,10 +362,11 @@ CREATE TABLE items_carrito (
     cantidad INT NOT NULL DEFAULT 1,
     precio_unitario DECIMAL(10, 2) NOT NULL,
     fecha_agregado DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_carrito) REFERENCES carrito(id_carrito) ON DELETE CASCADE,
-    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
+    FOREIGN KEY (id_carrito) REFERENCES carrito (id_carrito) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE,
     UNIQUE KEY unique_carrito_producto (id_carrito, id_producto)
 );
+
 CREATE TABLE compras (
     id_compra INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_cliente INT UNSIGNED NOT NULL,
@@ -337,24 +381,25 @@ CREATE TABLE compras (
         'entregado',
         'cancelada'
     ) NOT NULL DEFAULT 'pendiente',
-    FOREIGN KEY (id_cliente) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces(id_ecommerce) ON DELETE RESTRICT,
+    FOREIGN KEY (id_cliente) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE RESTRICT,
     INDEX idx_ecommerce_fecha (id_ecommerce, fecha_compra)
 );
 
 CREATE TABLE detalles_compra (
-        id_detalle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-        id_compra INT UNSIGNED NOT NULL,
-        id_producto INT UNSIGNED NOT NULL,
-        cantidad INT NOT NULL,
-        precio_unitario DECIMAL(10, 2) NOT NULL,
-        subtotal DECIMAL(10, 2) NOT NULL,
-        comision DECIMAL(10, 2) NOT NULL DEFAULT 0,
-        FOREIGN KEY (id_compra) REFERENCES compras(id_compra) ON DELETE CASCADE,
-        FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE RESTRICT
-    );
+    id_detalle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    id_compra INT UNSIGNED NOT NULL,
+    id_producto INT UNSIGNED NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    comision DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE RESTRICT
+);
 
-SELECT p.id_producto,
+SELECT
+    p.id_producto,
     p.id_ecommerce,
     p.nombre_producto,
     p.precio,
@@ -363,15 +408,19 @@ SELECT p.id_producto,
     (
         SELECT i.ruta_imagen
         FROM imagenes_productos i
-        WHERE i.id_producto = p.id_producto
+        WHERE
+            i.id_producto = p.id_producto
         LIMIT 1
     ) AS ruta_imagen
-FROM productos p
+FROM
+    productos p
     JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
     JOIN detalles_compra d ON d.id_producto = p.id_producto
     JOIN compras c ON c.id_compra = d.id_compra
-WHERE e.nombre_ecommerce = 'LaFerre'
-GROUP BY p.id_producto,
+WHERE
+    e.nombre_ecommerce = 'LaFerre'
+GROUP BY
+    p.id_producto,
     p.id_ecommerce,
     p.nombre_producto,
     p.precio
@@ -394,9 +443,10 @@ CREATE TABLE pagos (
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     external_resource_url TEXT,
     payment_reference VARCHAR(100),
-    FOREIGN KEY (id_compra) REFERENCES compras(id_compra) ON DELETE CASCADE,
+    FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     INDEX idx_mp_payment (mercadopago_payment_id)
 );
+
 CREATE TABLE envios (
     id_envio INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_compra INT UNSIGNED NOT NULL,
@@ -425,6 +475,7 @@ CREATE TABLE envios (
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     UNIQUE KEY unique_compra_envio (id_compra)
 );
+
 CREATE TABLE notificaciones (
     id_notificacion INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT UNSIGNED NOT NULL,
@@ -433,6 +484,7 @@ CREATE TABLE notificaciones (
     fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
+
 CREATE TABLE colores_producto (
     id_color INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
@@ -440,12 +492,14 @@ CREATE TABLE colores_producto (
     stock SMALLINT UNSIGNED DEFAULT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
 CREATE TABLE imagenes_color_producto (
     id_imagen_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
+
 CREATE TABLE talles_color_producto (
     id_talle_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
@@ -453,12 +507,14 @@ CREATE TABLE talles_color_producto (
     stock SMALLINT NOT NULL,
     FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
+
 CREATE TABLE caracteristicas_producto (
     id_caracteristica INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,
     caracteristica VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
 CREATE TABLE custom_shops (
     id_custom_shop INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_ecommerce INT UNSIGNED NOT NULL UNIQUE,
@@ -473,7 +529,11 @@ CREATE TABLE visitas (
     fecha DATETIME
 );
 
-SELECT * FROM ecommerces;
+SELECT * FROM productos;
+
+SELECT * FROM colores_producto;
+
+SELECT stock FROM productos WHERE id_producto = 7
 
 CREATE TABLE respuestas_comentario (
     id_respuesta INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -485,6 +545,3 @@ CREATE TABLE respuestas_comentario (
     FOREIGN KEY (id_comentario) REFERENCES comentarios_productos (id_comentario) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
 );
-
-
-

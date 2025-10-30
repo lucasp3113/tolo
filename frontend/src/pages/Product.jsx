@@ -233,7 +233,7 @@ export default function Product(productId) {
   return (
     <section className="">
       {width >= 500 ? (
-        <article className="w-[95%] lg:w-[85%] xl:w-[80%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-6 mx-auto text-left gap-8">
+        <article className="w-full max-w-[90%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-6 mx-auto text-left gap-8">
           <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
             <div className="flex justify-center border-b border-gray-200 mb-6">
               <Carrusel
@@ -262,7 +262,7 @@ export default function Product(productId) {
                     key={index}
                   >
                     <li
-                      className={`mb-0 h-12 break-inside-avoid-column flex items-center pl-5`}
+                      className={`mb-0 h-12 break-inside-avoid-column break-words overflow-hidden flex items-center pl-5`}
                     >
                       {caracteristica}
                     </li>
@@ -352,7 +352,7 @@ export default function Product(productId) {
                 <Button
                   color="sky"
                   text="Comprar ahora"
-                  className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                  className="bg-[#3884fc] hover:bg-[#306ccc] hover:scale-none! text-white rounded-md! transition-colors! duration-100! font-semibold w-full h-[3rem] m-auto"
                 />
               </ProtectedComponent>
 
@@ -362,7 +362,7 @@ export default function Product(productId) {
                   onClick={() => handleAddToCart()}
                   theme="blue"
                   text="Añadir al carrito"
-                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! hover:scale-none! rounded-md! transition-colors! duration-100! font-semibold w-full h-[3rem] m-auto"
                 />
               </ProtectedComponent>
             </div>
