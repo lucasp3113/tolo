@@ -13,6 +13,36 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useParams } from "react-router-dom";
+import { FiCopy } from "react-icons/fi";
+
+function ShareEcommerceLink({ nombreEcommerce }) {
+  const [copied, setCopied] = useState(false);
+
+  const encodedName = encodeURIComponent(nombreEcommerce);
+  const ecommerceUrl = `https://tolo.lat/${encodedName}`;
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(ecommerceUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Error copiando enlace:", err);
+    }
+  };
+
+  return (
+    <div className="relative flex justify-end p-3">
+      <button
+        onClick={copyToClipboard}
+        className="flex items-center w-3xs align-end gap-2 bg-slate-100 cursor-pointer hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg shadow-sm text-sm font-medium transition"
+      >
+        <FiCopy className="text-slate-600" />
+        {copied ? "¡Copiado!" : "¡Copia el enlace de tu página!"}
+      </button>
+    </div>
+  );
+}
 
 const RatingMeter = memo(({ progress, getColor }) => {
   const radius = 40;
@@ -113,7 +143,7 @@ const Chart = memo(({ chartData, chartType, isMobile }) => {
     <div className="w-full h-[300px] flex justify-center items-center">
       {noData ? (
         <p className="flex flex-col text-gray-500 text-sm md:text-base font-[Quicksand]">
-          <VscError className="m-auto text-6xl mb-11 text-red-300"/>
+          <VscError className="m-auto text-6xl mb-11 text-red-300" />
           No se encontraron {chartType === "ganancias"
             ? "ganancias"
             : "ventas"}{" "}
@@ -398,9 +428,10 @@ export default function SellerDashboard({ children }) {
             <h1 className="text-xl font-bold font-quicksand text-gray-800">
               {ecommerce.nombre_ecommerce}
             </h1>
-            <div className="flex items-center text-xs text-gray-600 font-quicksand mt-1">
-              <FaLocationDot className="mr-1 text-sky-600" size={10} />
-              <span>San José, Uruguay</span>
+            <div className="flex items-center justify-between w-full mt-2">
+              <ShareEcommerceLink
+                nombreEcommerce={ecommerce.nombre_ecommerce}
+              />
             </div>
           </div>
           <RatingMeterMobile progress={progress} getColor={getColor} />
@@ -539,8 +570,7 @@ export default function SellerDashboard({ children }) {
         <RatingMeter progress={progress} getColor={getColor} />
 
         <section className="flex items-center justify-center mb-8 text-gray-700 font-quicksand">
-          <FaLocationDot className="text-sky-600 mr-2" size={18} />
-          <span className="font-medium">San José, Uruguay</span>
+          <ShareEcommerceLink nombreEcommerce={ecommerce.nombre_ecommerce} />
         </section>
 
         <section className="w-full flex flex-col mt-auto">
