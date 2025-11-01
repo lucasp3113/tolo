@@ -78,13 +78,15 @@ CREATE TABLE ecommerces (
 
 SELECT * FROM usuarios;
 
-    SELECT
+SELECT
     COUNT(*) as total_comentarios,
     AVG(rating) as promedio_rating
-    FROM comentarios_productos
+FROM
+    comentarios_productos
     JOIN productos p ON p.id_producto = comentarios_productos.id_producto
     JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
-    WHERE e.id_usuario = 10
+WHERE
+    e.id_usuario = 10
     AND activo = 1
 
 CREATE TABLE categorias (
@@ -338,9 +340,10 @@ CREATE TABLE comentarios_productos (
 SELECT
     COUNT(*) as total_comentarios,
     AVG(rating) as promedio_rating
-FROM comentarios_productos
-JOIN productos p ON p.id_producto = comentarios_productos.id_producto
-JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
+FROM
+    comentarios_productos
+    JOIN productos p ON p.id_producto = comentarios_productos.id_producto
+    JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
 WHERE
     e.nombre_ecommerce = ?
     AND activo = 1
@@ -386,6 +389,28 @@ CREATE TABLE compras (
     INDEX idx_ecommerce_fecha (id_ecommerce, fecha_compra)
 );
 
+SELECT * FROM compras;
+
+SELECT 
+  c.id_compra,
+  c.id_ecommerce,
+  e.nombre_ecommerce,
+  c.id_cliente,
+  u.nombre_usuario
+FROM compras c
+JOIN ecommerces e ON e.id_ecommerce = c.id_ecommerce
+JOIN usuarios u ON u.id_usuario = c.id_cliente
+ORDER BY c.fecha_compra DESC;
+
+SELECT id_compra, id_cliente, id_ecommerce
+FROM compras
+ORDER BY id_compra DESC
+LIMIT 10;
+
+
+
+SELECT * FROM ecommerces
+
 CREATE TABLE detalles_compra (
     id_detalle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_compra INT UNSIGNED NOT NULL,
@@ -397,6 +422,8 @@ CREATE TABLE detalles_compra (
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE RESTRICT
 );
+
+SELECT * FROM detalles_compra;
 
 SELECT
     p.id_producto,

@@ -24,12 +24,14 @@ $query = $data_base->prepare("
     SELECT 
         c.id_compra, 
         u.nombre_usuario AS cliente, 
+        e.nombre_ecommerce AS ecommerce, 
         c.fecha_compra, 
         c.total, 
         c.comision_plataforma,
         c.estado
     FROM compras c
     JOIN usuarios u ON u.id_usuario = c.id_cliente
+    JOIN ecommerces e ON e.id_ecommerce = c.id_ecommerce
     ORDER BY c.fecha_compra DESC
     LIMIT 30
 ");

@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react";
 import { FaInstagram } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 import { FaFacebookSquare } from "react-icons/fa";
 import { Color } from "three";
 
@@ -17,11 +16,7 @@ export default function Footer({ color }) {
     };
 
     const handleIgClick = () => {
-        window.open("https://www.instagram.com", "_blank");
-    };
-
-    const handleXClick = () => {
-        window.open("https://www.x.com", "_blank");
+        window.open("https://www.instagram.com/tolo.uy", "_blank");
     };
 
     const handlePoliciesClick = () => {
@@ -48,10 +43,6 @@ export default function Footer({ color }) {
                 <FaInstagram
                     className="text-3xl md:text-4xl lg:text-4xl cursor-pointer hover:text-pink-500 transition-all duration-300"
                     onClick={handleIgClick}
-                />
-                <FaXTwitter
-                    className="text-3xl md:text-4xl lg:text-4xl cursor-pointer hover:text-black transition-all duration-300"
-                    onClick={handleXClick}
                 />
                 <button
                     onClick={handlePoliciesClick}

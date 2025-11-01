@@ -250,6 +250,12 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 },
               },
               isLoggedIn && {
+                title: "",
+                icon: { name: <IoSettings className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300`} />, expand: false },
+                animation: false,
+                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/settings/`) : navigate('/settings/'),
+              },
+                            isLoggedIn && {
                 title: '',
                 icon: { name: <BiLogOut className={`${!goodContrast ? "text-white" : "text-red-400"} text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />, expand: true },
                 animation: false,
@@ -259,12 +265,6 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                   logout();
                   nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate('/');
                 },
-              },
-              isLoggedIn && {
-                title: "",
-                icon: { name: <IoSettings className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300`} />, expand: false },
-                animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/settings/`) : navigate('/settings/'),
               },
             ].filter(Boolean)}
           />
