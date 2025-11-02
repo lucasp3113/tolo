@@ -26,6 +26,7 @@ import PaymentsHistory from './pages/PaymentsHistory';
 import CustomHome from './pages/CustomHouse'
 import Maps from './pages/Maps';
 import Account from './pages/Account';
+import Favicon from './pages/Favicon'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
@@ -64,7 +65,7 @@ function App() {
                 <Route
                   path="/:ecommerce?/login/"
                   element={
-                    <Layout setUserType={setUserType}>
+                    <Layout  setUserType={setUserType}>
                       <Login />
                     </Layout>
                   }
@@ -142,7 +143,7 @@ function App() {
                 }>
                 </Route>
                 <Route path='/:ecommerce?/product/:id' element={
-                  <Layout fixed={true}>
+                  <Layout logoCenter={true} fixed={true}>
                     <Product />
                   </Layout>
                 }>
@@ -174,38 +175,57 @@ function App() {
                 <Route
                   path="/:ecommerce?/change_user/"
                   element={
-                    <Layout >
-                      <ChangeUser />
-                    </Layout>
+                    <ProtectedRoute>
+                      <Layout >
+                        <ChangeUser />
+                      </Layout>
+                    </ProtectedRoute>
                   }
                 />
                 <Route path='/:ecommerce?/change_ecommerce/' element={
-                  <Layout >
-                    <ChangeEcommerce />
-                  </Layout>
+                  <ProtectedRoute>
+                    <Layout >
+                      <ChangeEcommerce />
+                    </Layout>
+                  </ProtectedRoute>
                 } />
                 <Route path='/:ecommerce?/profile_picture/' element={
-                  <Layout >
-                    <ProfilePicture />
-                  </Layout>
+                  <ProtectedRoute>
+                    <Layout >
+                      <ProfilePicture />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path='/:ecommerce?/favicon/' element={
+                  <ProtectedRoute>
+                    <Layout >
+                      <Favicon />
+                    </Layout>
+                  </ProtectedRoute>
                 } />
                 <Route path='/:ecommerce?/customize_home/' element={
-                  <Layout >
-                    <CustomHome />
-                  </Layout>
+                  <ProtectedRoute>
+                    <Layout >
+                      <CustomHome />
+                    </Layout>
+                  </ProtectedRoute>
                 } />
                 <Route
                   path="/:ecommerce?/customize_store/"
                   element={
-                    <Layout colors={colors} isCustomizeStore={true} change={change}>
-                      <CustomizeStore setChange={setChange} change={change} setColorsForLayaut={setColors} />
-                    </Layout>
+                    <ProtectedRoute>
+                      <Layout colors={colors} isCustomizeStore={true} change={change}>
+                        <CustomizeStore setChange={setChange} change={change} setColorsForLayaut={setColors} />
+                      </Layout>
+                    </ProtectedRoute>
                   }
                 />
                 <Route path='/:ecommerce?/maps/' element={
-                  <Layout >
-                    <Maps />
-                  </Layout>
+                  <ProtectedRoute>
+                    <Layout >
+                      <Maps />
+                    </Layout>
+                  </ProtectedRoute>
                 } />
               </Routes>
             </AuthProvider>

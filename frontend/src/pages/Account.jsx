@@ -3,6 +3,7 @@ import Login from '../components/Login';
 import Register from '../components/Register';
 import logoTolo from '../assets/logoTolo.webp'
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -10,6 +11,7 @@ export default function Account() {
     const [color, setColor] = useState(null)
     const [goodContrast, setGoodContrast] = useState(true)
     const { ecommerce: nameEcommerce } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         nameEcommerce && (
@@ -188,7 +190,7 @@ export default function Account() {
                             }`}
                     >
                         <section className='flex items-center justify-center w-34 h-18 scale-120 cursor-pointer'>
-                            <img src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo} loading='lazy' className={`${logoEcommerce && "mb-12 scale-75"} object-contain`} alt="Logo" />
+                            <img onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}`) : navigate("/")} src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo} loading='lazy' className={`${logoEcommerce && "mb-12 transition-transform duration-300 ease-in-out hover:!scale-80 scale-75"} object-contain`} alt="Logo" />
                         </section>
                         {/* <h1 className="text-5xl text-white md:text-6xl font-bold text-center mb-6">
                             {isLogin ? '¡Bienvenido!' : '¡Hola!'}
@@ -201,7 +203,7 @@ export default function Account() {
                         <button
                             onClick={toggleForm}
                             disabled={isAnimating}
-                            className={`${goodContrast ? "bg-white/20 hover:bg-white/30 border-white" : "bg-black "} border-2 text-white font-semibold text-lg px-10 py-3 rounded-full  hover:scale-105 transition-all duration-300 disabled:opacity-50`}
+                            className={`${goodContrast ? "bg-white/20 hover:bg-white/30 border-white" : "bg-black "} border-2 text-white font-semibold z-50 cursor-pointer text-lg px-10 py-3 rounded-full  hover:scale-105 transition-all duration-300 disabled:opacity-50`}
                         >
                             {isLogin ? 'Crear cuenta' : 'Iniciar sesión'}
                         </button>

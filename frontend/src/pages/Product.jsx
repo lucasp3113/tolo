@@ -14,8 +14,11 @@ import CommentsSection from "../components/Comments";
 export default function Product(productId) {
   const { ecommerce } = useParams();
 
-  const [stats, setStats] = useState(0);
   const [data, setData] = useState(null);
+
+
+
+  const [stats, setStats] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -30,11 +33,21 @@ export default function Product(productId) {
   }
 
   function handleAddToCart() {
+    console.log('=== DEBUG FINAL ===');
+    console.log('selectedColorId:', selectedColorId);
+    console.log('selectedTalleId:', selectedTalleId);
+    console.log('selectedColor:', selectedColor);
+    console.log('selectedSize:', selectedSize);
+    console.log('data.colores[selectedColor]:', data.colores[selectedColor]);
+
+
     axios.post("/api/add_to_cart.php", {
       id_client: userId,
       id_product: id,
       amount: quantity,
-      price: data.precio
+      price: data.precio,
+      id_color: selectedColorId,
+      id_talle_color_producto: selectedTalleId
     })
       .then((res) => {
         sessionStorage.setItem('addToCartSuccess', 'success')
@@ -52,7 +65,7 @@ export default function Product(productId) {
       .then((res) => {
         setData(res.data.data);
         (res);
-        console.log
+        console.log(res)
         setLoading(false);
       })
       .catch((err) => {
@@ -95,21 +108,29 @@ export default function Product(productId) {
     return [];
   };
 
-  const getAvailableSizes = () => {
-    if (!data || !data.colores) return [];
-    if (Array.isArray(data.colores)) return [];
-
-    const firstColor = Object.keys(data.colores)[0];
-    if (firstColor && data.colores[firstColor].talles) {
-      return data.colores[firstColor].talles.map(talle => talle.talle);
+  const getAvailableSizes = (selectedColor) => {
+    if (!data || !data.colores || !selectedColor) return [];
+    if (Array.isArray(data.colores)) {
+      const colorData = data.colores.find(c => c.nombre === selectedColor);
+      if (colorData && colorData.talles) {
+        return colorData.talles.map(talle => talle.talle);
+      }
+    } else {
+      const colorData = data.colores[selectedColor];
+      if (colorData && colorData.talles) {
+        return colorData.talles.map(talle => talle.talle);
+      }
     }
     return [];
   };
 
   const availableColors = getAvailableColors();
-  const availableSizes = getAvailableSizes();
   const [selectedColor, setSelectedColor] = useState("");
-  const [selectedSize, setSelectedSize] = useState(availableSizes[0] || null);
+  const availableSizes = React.useMemo(() => {
+    return getAvailableSizes(selectedColor);
+  }, [data, selectedColor]);
+
+  const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
     if (availableColors.length > 0 && !selectedColor) {
@@ -149,6 +170,41 @@ export default function Product(productId) {
 
   const colorImages = getColorImages();
 
+  const selectedColorId = (() => {
+    if (!data?.colores || !selectedColor) return null;
+
+    if (Array.isArray(data.colores)) {
+      const colorData = data.colores.find(c => c.nombre === selectedColor);
+      return colorData?.id_color ?? null;
+    } else {
+      return data.colores[selectedColor]?.id_color ?? null;
+    }
+  })();
+
+  const selectedTalleId = (() => {
+    if (!data?.colores || !selectedColor || !selectedSize) return null;
+
+    if (Array.isArray(data.colores)) {
+      const colorData = data.colores.find(c => c.nombre === selectedColor);
+      return colorData?.talles?.find(t => t.talle === selectedSize)?.id_talle_color_producto ?? null;
+    } else {
+      const colorData = data.colores[selectedColor];
+      return colorData?.talles?.find(t => t.talle === selectedSize)?.id_talle_color_producto ?? null;
+    }
+  })();
+
+  useEffect(() => {
+    if (availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0]);
+    }
+    if (availableSizes.length > 0 && !availableSizes.includes(selectedSize)) {
+      setSelectedSize(availableSizes[0]);
+    } else if (availableSizes.length === 0) {
+      setSelectedSize(null);
+    }
+  }, [availableColors, availableSizes, selectedColor]);
+
+
   const getCurrentStock = () => {
     if (!data) return 0;
 
@@ -172,7 +228,7 @@ export default function Product(productId) {
     return 0;
   };
 
-  const stock = getCurrentStock();
+
 
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
@@ -181,6 +237,39 @@ export default function Product(productId) {
     userRating: 0,
     productAverage: 4.0,
   });
+
+  useEffect(() => {
+    if (availableColors.length > 0 && !selectedColor) {
+      setSelectedColor(availableColors[0]);
+    }
+    if (availableSizes.length > 0 && !selectedSize) {
+      setSelectedSize(availableSizes[0]);
+    }
+  }, [availableColors, availableSizes]);
+
+  const stock = React.useMemo(() => {
+    if (!data) return 0;
+
+    if (data.stock !== undefined) return data.stock;
+
+    if (data.colores && selectedColor) {
+      const colorData = Array.isArray(data.colores)
+        ? data.colores.find(c => c.nombre === selectedColor)
+        : data.colores[selectedColor];
+
+      if (!colorData) return 0;
+
+      if (selectedSize && colorData.talles) {
+        const talleData = colorData.talles.find(t => t.talle === selectedSize);
+        return talleData?.stock ?? 0;
+      }
+
+      return colorData.stock ?? 0;
+    }
+
+    return 0;
+  }, [data, selectedColor, selectedSize]);
+
 
   const handleRatingChange = (newRating, ratingId) => {
     setRatings((prev) => ({

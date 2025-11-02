@@ -113,6 +113,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                                 rating={producto.rating}
                                 price={producto.precio}
                                 image={`/api/${producto.ruta_imagen}`}
+                                image2={producto.imagen_2 && `/api/${producto.imagen_2}`}
                                 stock={producto.stock}
                                 freeShipping={true}
                                 phone={false}
@@ -144,6 +145,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                                 rating={producto.rating}
                                 price={producto.precio}
                                 image={`/api/${producto.ruta_imagen}`}
+                                image2={producto.imagen_2 && `/api/${producto.imagen_2}`}
                                 stock={producto.stock}
                                 freeShipping={true}
                                 onDelete={() => handleDeleteProduct(producto.id_producto)}
@@ -180,6 +182,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
     }
 
     useEffect(() => {
+        console.log(searchData)
         if (searchData !== null) {
             setSearchData(null);
         }
@@ -349,7 +352,8 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                             />
                         </section>
 
-                        {windowWidth >= 500 && bestSellersData ? showProducts(bestSellersData) : null}
+                        {windowWidth >= 500 && bestSellersData ? showProducts(bestSellersData) :
+                        bestSellersData && showProductsMobile(bestSellersData)}
                     </>
                 ) : (
                     <section className={`flex flex-col mt-8 items-center h-full md:justify-between justify-start w-full relative`} >
@@ -533,6 +537,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                                         rating={producto.rating}
                                         price={producto.precio}
                                         image={`/api/${producto.ruta_imagen}`}
+                                        image2={producto.imagen_2 && `/api/${producto.imagen_2}`}
                                         stock={producto.stock}
                                         freeShipping={true}
                                         phone={windowWidth >= 500 ? false : true}

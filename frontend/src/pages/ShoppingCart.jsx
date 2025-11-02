@@ -27,9 +27,16 @@ export default function ShoppingCart() {
   const [priceShipping, setPriceShipping] = useState(null);
   const [currentStep, setCurrentStep] = useState("first");
 
+
+
   const [selectedSend, setSelectedSend] = useState("send");
   const { register, handleSubmit, formState: { errors }, setError } = useForm()
   const [departamento, setDepartamento] = useState(null);
+
+  const productosDelVendedor = productos.filter(
+    (p) => p.vendedor === selectedSeller
+  );
+
 
   const [proceedToPayment, setProceedToPayment] = useState({});
   useEffect(() => {
@@ -72,6 +79,17 @@ export default function ShoppingCart() {
       .catch(res => console.log(res))
   }, [selectedSeller])
 
+  const [userCoins, setUserCoins] = useState(Number(user?.tolo_coins) || 0);
+
+  useEffect(() => {
+    axios.post('/api/coins.php', { id: userId })
+      .then(res => {
+        setUserCoins(Number(res.data.tolo_coins))
+      })
+      .catch(err => console.log(err));
+  }, []);
+
+
   useEffect(() => {
     axios
       .post('/api/show_cart.php', { client: user })
@@ -94,6 +112,7 @@ export default function ShoppingCart() {
           objectPrice[seller] = 0;
           objectCategories[seller] = [];
         });
+
 
         uniqueProducts.forEach(p => {
           objectPrice[p.vendedor] += parseFloat(p.precio_unitario) * p.cantidad;
@@ -135,6 +154,16 @@ export default function ShoppingCart() {
       calculateShipping(objectCategories[selectedSeller]);
     }
   }, [productos, selectedSeller]);
+
+  const totalFinal = (priceShipping || 0) + (totalPrice?.[selectedSeller] || 0);
+  const userToloCoins = userCoins || 0;
+  const discountWithToloCoins = Math.min(userToloCoins, totalFinal || 0);
+  const totalAfterToloCoins = (totalFinal || 0) - discountWithToloCoins;
+  const toloCoinsGanados = totalPrice?.[selectedSeller] * 0.01 || 0;
+  console.log("Subtotal:", totalPrice?.[selectedSeller]);
+  console.log("ToloCoins ganados calculados:", totalPrice?.[selectedSeller] * 0.01);
+  console.log("ToloCoins ganados final:", toloCoinsGanados);
+
 
 
   function deleteProduct(id_producto) {
@@ -190,10 +219,10 @@ export default function ShoppingCart() {
     };
 
     let maxPrecio = 0;
-    categorias.forEach(cat => {
+    productos.length > 0 && categorias && (categorias.forEach(cat => {
       const precio = preciosCategorias[cat] ?? 0;
       if (precio > maxPrecio) maxPrecio = precio;
-    });
+    }));
 
     let precioFinal = 0;
     if (maxPrecio > 0) {
@@ -218,6 +247,7 @@ export default function ShoppingCart() {
                 onDelete={(id) => {
                   setProductos(prev => prev.filter(p => p.id_item !== id));
                 }}
+                shopping={true}
                 cart={true}
                 name={producto.nombre_producto}
                 price={producto.precio_unitario}
@@ -236,6 +266,8 @@ export default function ShoppingCart() {
 
     return jsx;
   }
+
+
 
   const renderStep = () => {
     switch (currentStep) {
@@ -275,6 +307,7 @@ export default function ShoppingCart() {
                         onDelete={(id) => {
                           setProductos(prev => prev.filter(p => p.id_item !== id));
                         }}
+                        shopping={true}
                         name={producto.nombre_producto}
                         price={producto.precio_unitario}
                         image={`/api/${producto.ruta_imagen}`}
@@ -305,12 +338,14 @@ export default function ShoppingCart() {
                 </section>
                 <section className='flex items-center justify-between w-full mt-2'>
                   <h2 className='font-quicksand ml-3 font-medium text-xl'>ToloCoins</h2>
-                  <span className='font-quicksand text-green-600 mr-1 font-medium text-xl'>- ${priceShipping}</span>
+                  <span className='font-quicksand text-green-600 mr-1 font-medium text-xl'>
+                    - ${discountWithToloCoins.toFixed(2)}
+                  </span>
                 </section>
                 <section className='flex items-center justify-between w-full mt-2'>
                   <h2 className='font-quicksand ml-3 font-bold text-xl'>Total</h2>
                   <span className='font-quicksand font-bold text-xl'>
-                    ${priceShipping + totalPrice[selectedSeller]}
+                    ${totalAfterToloCoins.toFixed(2)}
                   </span>
                 </section>
                 <Button
@@ -319,7 +354,7 @@ export default function ShoppingCart() {
                     setProceedToPayment({
                       idCarrito: productos
                         .filter(producto => producto.vendedor === selectedSeller)[0].id_carrito,
-                      totalPrice: priceShipping + totalPrice[selectedSeller],
+                      totalPrice: totalAfterToloCoins,
                       metodo_envio: "Esto se realizará en la tercera entrega",
                       direccion_entrega: "Esto se realizará en la tercera entrega",
                     })
@@ -520,7 +555,11 @@ border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none flex 
             </section>
             <h2 className={"font-quicksand text-3xl translate-y-5 font-bold"}>Métodos de pago</h2>
             <CheckoutBricks
-              total={priceShipping + totalPrice[selectedSeller]}
+              toloCoinsGanados={toloCoinsGanados}
+              toloCoinsRestados={userCoins}
+              userId={userId}
+              data={productosDelVendedor}
+              total={totalAfterToloCoins}
               idCompra={proceedToPayment.idCarrito}
               onPaymentSuccess={(paymentData) => {
                 console.log('Pago exitoso:', paymentData);

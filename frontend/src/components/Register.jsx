@@ -97,6 +97,7 @@ export default function Register({ pc = false }) {
     }, [selected]);
 
     function registrationRequest(data) {
+        ecommerce && (data["select"] = "Cliente");
         axios.post("/api/register.php", data)
             .then((res) => {
                 const token = res.data.token
@@ -113,6 +114,7 @@ export default function Register({ pc = false }) {
                 axios.post("/api/add_views.php")
             })
             .catch((err) => {
+                console.log(data)
                 sessionStorage.setItem('loginSuccess', 'error')
                 window.dispatchEvent(new CustomEvent('loginError'))
                 setError("user", {
@@ -292,41 +294,45 @@ export default function Register({ pc = false }) {
                         </>
                     )}
 
-                    <Input
-                        type={"select"}
-                        required={"true"}
-                        label={"Tipo de cuenta"}
-                        register={register}
-                        errors={errors}
-                        watch={watch}
-                        account={pc}
-                        options={[
-                            "Cliente",
-                            "Vendedor",
-                            "e-commerce(tienda)"
-                        ]}
-                        name={"select"}
-                    />
-
-                    {showEcommerce && (
-                        <div className={`transition-opacity duration-700 ${visible ? "opacity-100" : "opacity-0"}`}>
+                    {!ecommerce && (
+                        <>
                             <Input
-                                type={"text"}
-                                account={pc}
-                                name={"nameEcommerce"}
-                                placeholder={"Nombre del e-commerce"}
-                                required={true}
-                                minLength={3}
+                                type={"select"}
+                                required={"true"}
+                                label={"Tipo de cuenta"}
+                                register={register}
                                 errors={errors}
                                 watch={watch}
-                                maxLength={25}
-                                label={"Nombre del e-commerce(Tienda)"}
-                                register={register}
+                                account={pc}
+                                options={[
+                                    "Cliente",
+                                    "Vendedor",
+                                    "e-commerce(tienda)"
+                                ]}
+                                name={"select"}
                             />
-                        </div>
+
+                            {showEcommerce && (
+                                <div className={`transition-opacity duration-700 ${visible ? "opacity-100" : "opacity-0"}`}>
+                                    <Input
+                                        type={"text"}
+                                        account={pc}
+                                        name={"nameEcommerce"}
+                                        placeholder={"Nombre del e-commerce"}
+                                        required={true}
+                                        minLength={3}
+                                        errors={errors}
+                                        watch={watch}
+                                        maxLength={25}
+                                        label={"Nombre del e-commerce(Tienda)"}
+                                        register={register}
+                                    />
+                                </div>
+                            )}
+                        </>
                     )}
 
-                    <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 border-3 hover:border-sky-800 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Crear cuenta"} />
+                    <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 border-3 border-sky-800 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Crear cuenta"} />
 
                     <div className="flex flex-col font-quicksand font-semibold items-center justify-center mt-3">
                         <GoogleLogin

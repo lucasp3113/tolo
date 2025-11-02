@@ -16,11 +16,14 @@ import { CiSliderHorizontal } from 'react-icons/ci';
 import { TiShoppingCart } from "react-icons/ti";
 import Model3D from '../components/Model3D';
 import { PiCrownSimpleFill } from "react-icons/pi";
+import { TbFavicon } from "react-icons/tb";
+import ToloCoin from "./ToloCoin";
 
-export default function HeaderNav({ search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed }) {
+
+export default function HeaderNav({ logoCenter, search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed }) {
   const [goodContrast, setGoodContrast] = useState(true);
   const [goodContrast2, setGoodContrast2] = useState(true);
-  
+
   function hasGoodContrast(color1, color2, threshold = 1.1) {
     if (!color1 || !color2) return true;
 
@@ -150,10 +153,10 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
   }, [dataForm]);
 
   return (
-    <header style={{ backgroundColor: color || "#075985" }} className={`bg-sky-800 w-full h-20 sm:h-12 md:h-20 lg:h-20 flex items-center ${fixed && "fixed mb-20"} z-50 justify-between`}>
+    <header style={{ backgroundColor: color || "#075985" }} className={`bg-sky-800 w-full border-gray-600 h-20 sm:h-12 md:h-20 lg:h-20 flex items-center ${fixed && "fixed mb-20"} z-50 justify-between`}>
       {logo ? (
         <div
-          className="flex items-center justify-center w-22 h-full cursor-pointer"
+          className={`flex items-center justify-center w-22 h-full cursor-pointer ${logoCenter && windowWidth < 500 && logoEcommerce && "absolute left-1/2 -translate-x-1/2 !w-32"}`}
           onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")}
         >
           {logoLoaded ? (
@@ -161,7 +164,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo}
               alt="Logo"
               loading="lazy"
-              className={`${!logoEcommerce && ""} ml-3 h-[95%] w-full object-contain`}
+              className={`${!logoEcommerce && ""} ml-3 h-[80%] w-full object-contain`}
             />
           ) : (
             <img src={logoTolo} alt="Logo" loading='lazy' className="w-full h-full object-cover" />
@@ -169,15 +172,32 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
         </div>
 
       ) : (
-        <section className={`flex items-center w-full ${windowWidth < 500 ? "justify-center" : "justify-start"}`}>
-          <h1 className={`font-quicksand text-2xl ${goodContrast2 ? "text-white" : "text-black"} font-black ${windowWidth ? "ml-2" : ""}`}>Tu carrito</h1>
-          <Model3D
-            src="/models/carrito.glb"
-            className={`w-22 h-16 ${!goodContrast2 && "invert"}`}
-            cameraOrbit="90deg 90deg 16m"
-            autoRotate={true}
-            onClick={() => console.log("clic en modelo 3D")}
-          />
+        <section className="relative flex items-center w-full">
+          {/* En móvil: ToloCoin a la izquierda */}
+          {windowWidth < 500 && isLoggedIn && (
+            <div className={`${windowWidth < 500 ? "absolute left-0 -translate-x-5 scale-90 " : ""}`}>
+              <ToloCoin goodContrast={goodContrast2}/>
+            </div>
+          )}
+
+          {/* Carrito - en el centro en móvil, a la izquierda en desktop */}
+          <div className={`flex items-center ${windowWidth < 500 ? "absolute left-1/2 -translate-x-1/2" : "ml-2"}`}>
+            <h1 className={`font-quicksand whitespace-nowrap text-2xl ${goodContrast2 ? "text-white" : "text-black"} font-black ${windowWidth ? "ml-2" : ""}`}>Tu carrito</h1>
+            <Model3D
+              src="/models/carrito.glb"
+              className={`w-22 h-16 ${!goodContrast2 && "invert"}`}
+              cameraOrbit="90deg 90deg 16m"
+              autoRotate={true}
+              onClick={() => console.log("clic en modelo 3D")}
+            />
+          </div>
+
+          {/* En desktop: ToloCoin en el centro */}
+          {windowWidth >= 500 && isLoggedIn && (
+            <div className="m-auto">
+              <ToloCoin  goodContrast={goodContrast2}/>
+            </div>
+          )}
         </section>
       )}
       {search && (
@@ -223,7 +243,7 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
               },
               !isLoggedIn && {
                 title: '',
-                icon: { name: <FaUserCircle className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px] transition-transform ease-in-out duration-300 hover:scale-125`} />, expand: true },
+                icon: { name: <FaUserCircle className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[30px] transition-transform ease-in-out duration-300 hover:scale-110`} />, expand: true },
                 animation: false,
                 onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/account/`) : navigate('/account'),
               },
@@ -237,8 +257,8 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 title: "",
                 icon: {
                   name: userType === 'ecommerce' || userType === 'vendedor_particular'
-                    ? <MdSpaceDashboard className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />
-                    : userType === 'admin' ? <PiCrownSimpleFill className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} /> : <TiShoppingCart className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />,
+                    ? <MdSpaceDashboard className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-110`} />
+                    : userType === 'admin' ? <PiCrownSimpleFill className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-110`} /> : <TiShoppingCart className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[20px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-110`} />,
                   expand: true
                 },
                 animation: false,
@@ -250,8 +270,14 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                 },
               },
               isLoggedIn && {
+                title: "",
+                icon: { name: <IoSettings className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-110 ease-in-out duration-300`} />, expand: false },
+                animation: false,
+                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/settings/`) : navigate('/settings/'),
+              },
+              isLoggedIn && {
                 title: '',
-                icon: { name: <BiLogOut className={`${!goodContrast ? "text-white" : "text-red-400"} text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-125`} />, expand: true },
+                icon: { name: <BiLogOut className={`${!goodContrast ? "text-white" : "text-red-400"} text-[30px] sm:text-[15px] md:text-[30px] lg:text-[35px] transition-transform ease-in-out duration-300 hover:scale-110`} />, expand: true },
                 animation: false,
                 onClick: () => {
                   localStorage.removeItem("token");
@@ -259,12 +285,6 @@ export default function HeaderNav({ search, setSearchData, setPanelFilter, setDa
                   logout();
                   nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate('/');
                 },
-              },
-              isLoggedIn && {
-                title: "",
-                icon: { name: <IoSettings className={`${goodContrast2 ? "text-white" : "text-gray-500"} text-[30px] sm:text-[15px] md:text-[25px] lg:text-[35px] transition-transform hover:scale-125 ease-in-out duration-300`} />, expand: false },
-                animation: false,
-                onClick: () => nameEcommerce ? navigate(`/${nameEcommerce}/settings/`) : navigate('/settings/'),
               },
             ].filter(Boolean)}
           />

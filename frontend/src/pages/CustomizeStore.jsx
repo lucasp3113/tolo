@@ -41,7 +41,7 @@ export default function PersonalizarTienda({ setColorsForLayaut, change, setChan
         '#00FF00',
         '#239B23',
         '#D401FF',
-        '#7216f2',
+        '#643ab6',
         '#4A90E2',
         '#0000FF',
         '#00CED1',

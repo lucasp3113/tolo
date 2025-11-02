@@ -3,19 +3,24 @@ import { useState, useEffect } from 'react';
 import Dropdown from './Dropdown';
 import Input from './Input';
 
-export default function DropdownCategories({register, errors, direction, watch}) {
+export default function DropdownCategories({ register, errors, direction, watch, selected = null }) {
     const [isMobile, setIsMobile] = useState(false);
 
+    const isSelected = (categoryName) => {
+        return selected && Array.isArray(selected) && selected.some(item => item.nombre_categoria === categoryName);
+    };
+    
     useEffect(() => {
-            const checkScreenSize = () => {
-                setIsMobile(window.innerWidth < 768);
-            };
-    
-            checkScreenSize();
-            window.addEventListener('resize', checkScreenSize);
-    
-            return () => window.removeEventListener('resize', checkScreenSize);
-        }, []);
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
+
     const VestimentaDropdown = () => (
         <Dropdown
             text="Vestimenta"
@@ -25,12 +30,12 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Calzado" label="Calzado" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ropa hombre" label="Ropa hombre" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ropa mujer" label="Ropa mujer" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ropa unisex" label="Ropa unisex" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ropa niño" label="Ropa niño" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ropa niña" label="Ropa niña" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Calzado" label="Calzado" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Calzado")} />
+                        <Input type="checkbox" name="Ropa hombre" label="Ropa hombre" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ropa hombre")} />
+                        <Input type="checkbox" name="Ropa mujer" label="Ropa mujer" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ropa mujer")} />
+                        <Input type="checkbox" name="Ropa unisex" label="Ropa unisex" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ropa unisex")} />
+                        <Input type="checkbox" name="Ropa niño" label="Ropa niño" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ropa niño")} />
+                        <Input type="checkbox" name="Ropa niña" label="Ropa niña" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ropa niña")} />
                     </fieldset>
                 )
             }]}
@@ -46,10 +51,10 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Electrónica" label="Electrónica" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Computación" label="Computación" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Celulares y accesorios" label="Celulares y accesorios" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Videojuegos" label="Videojuegos" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Electrónica" label="Electrónica" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Electrónica")} />
+                        <Input type="checkbox" name="Computación" label="Computación" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Computación")} />
+                        <Input type="checkbox" name="Celulares y accesorios" label="Celulares y accesorios" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Celulares y accesorios")} />
+                        <Input type="checkbox" name="Videojuegos" label="Videojuegos" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Videojuegos")} />
                     </fieldset>
                 )
             }]}
@@ -65,10 +70,10 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Vehículos" label="Vehículos" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Repuestos y autopartes" label="Repuestos y autopartes" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Motocicletas" label="Motocicletas" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Náutica" label="Náutica" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Vehículos" label="Vehículos" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Vehículos")} />
+                        <Input type="checkbox" name="Repuestos y autopartes" label="Repuestos y autopartes" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Repuestos y autopartes")} />
+                        <Input type="checkbox" name="Motocicletas" label="Motocicletas" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Motocicletas")} />
+                        <Input type="checkbox" name="Náutica" label="Náutica" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Náutica")} />
                     </fieldset>
                 )
             }]}
@@ -84,10 +89,10 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Electrodomésticos" label="Electrodomésticos" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Hogar y Cocina" label="Hogar y Cocina" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Herramientas y Ferretería" label="Herramientas y Ferretería" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Jardín y exteriores" label="Jardín y exteriores" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Electrodomésticos" label="Electrodomésticos" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Electrodomésticos")} />
+                        <Input type="checkbox" name="Hogar y Cocina" label="Hogar y Cocina" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Hogar y Cocina")} />
+                        <Input type="checkbox" name="Herramientas y Ferretería" label="Herramientas y Ferretería" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Herramientas y Ferretería")} />
+                        <Input type="checkbox" name="Jardín y exteriores" label="Jardín y exteriores" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Jardín y exteriores")} />
                     </fieldset>
                 )
             }]}
@@ -103,10 +108,9 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Alquiler de campos" label="Alquiler de campos" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Alquiler de casas" label="Alquiler de casas" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Alquiler de herramientas" label="Alquiler de herramientas" register={register} watch={watch} errors={errors} className='!flex-row' />
-
+                        <Input type="checkbox" name="Alquiler de campos" label="Alquiler de campos" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Alquiler de campos")} />
+                        <Input type="checkbox" name="Alquiler de casas" label="Alquiler de casas" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Alquiler de casas")} />
+                        <Input type="checkbox" name="Alquiler de herramientas" label="Alquiler de herramientas" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Alquiler de herramientas")} />
                     </fieldset>
                 )
             }]}
@@ -122,8 +126,8 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Bebés y niños" label="Bebés y niños" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Juguetes" label="Juguetes" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Bebés y niños" label="Bebés y niños" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Bebés y niños")} />
+                        <Input type="checkbox" name="Juguetes" label="Juguetes" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Juguetes")} />
                     </fieldset>
                 )
             }]}
@@ -139,8 +143,8 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Oficina y papelería" label="Oficina y papelería" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Libros" label="Libros" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Oficina y papelería" label="Oficina y papelería" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Oficina y papelería")} />
+                        <Input type="checkbox" name="Libros" label="Libros" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Libros")} />
                     </fieldset>
                 )
             }]}
@@ -156,10 +160,10 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Ganado bovino" label="Ganado bovino" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ganado ovino" label="Ganado ovino" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ganado equino" label="Ganado equino" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Ganado caprino" label="Ganado caprino" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Ganado bovino" label="Ganado bovino" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ganado bovino")} />
+                        <Input type="checkbox" name="Ganado ovino" label="Ganado ovino" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ganado ovino")} />
+                        <Input type="checkbox" name="Ganado equino" label="Ganado equino" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ganado equino")} />
+                        <Input type="checkbox" name="Ganado caprino" label="Ganado caprino" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Ganado caprino")} />
                     </fieldset>
                 )
             }]}
@@ -175,9 +179,9 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Perros" label="Perros" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Gatos" label="Gatos" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Mascotas" label="Mascotas" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Perros" label="Perros" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Perros")} />
+                        <Input type="checkbox" name="Gatos" label="Gatos" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Gatos")} />
+                        <Input type="checkbox" name="Mascotas" label="Mascotas" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Mascotas")} />
                     </fieldset>
                 )
             }]}
@@ -193,11 +197,11 @@ export default function DropdownCategories({register, errors, direction, watch})
                 type: "custom",
                 content: (
                     <fieldset className='flex flex-col items-start justify-center'>
-                        <Input type="checkbox" name="Agro e insumos rurales" label="Agro e insumos rurales" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Herramientas de campo" label="Herramientas de campo" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Maquinaria agrícola" label="Maquinaria agrícola" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Alimentos agroindustriales" label="Alimentos agroindustriales" register={register} watch={watch} errors={errors} className='!flex-row' />
-                        <Input type="checkbox" name="Productos orgánicos" label="Productos orgánicos" register={register} watch={watch} errors={errors} className='!flex-row' />
+                        <Input type="checkbox" name="Agro e insumos rurales" label="Agro e insumos rurales" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Agro e insumos rurales")} />
+                        <Input type="checkbox" name="Herramientas de campo" label="Herramientas de campo" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Herramientas de campo")} />
+                        <Input type="checkbox" name="Maquinaria agrícola" label="Maquinaria agrícola" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Maquinaria agrícola")} />
+                        <Input type="checkbox" name="Alimentos agroindustriales" label="Alimentos agroindustriales" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Alimentos agroindustriales")} />
+                        <Input type="checkbox" name="Productos orgánicos" label="Productos orgánicos" register={register} watch={watch} errors={errors} className='!flex-row' defaultChecked={isSelected("Productos orgánicos")} />
                     </fieldset>
                 )
             }]}
@@ -206,38 +210,31 @@ export default function DropdownCategories({register, errors, direction, watch})
 
     const renderMobileCategories = () => (
         <fieldset className='flex flex-col items-start justify-center w-100'>
-            {/* Fila 1: Vestimenta - Tecnología */}
             <section className='grid grid-cols-2 gap-1 w-full'>
                 <VestimentaDropdown />
                 <TecnologiaDropdown />
             </section>
 
-            {/* Fila 2: Vehículos - Hogar */}
             <section className='grid grid-cols-2 gap-1 w-full mt-4'>
                 <VehiclesDropdown />
                 <AgroDropdown />
-
             </section>
 
-            {/* Fila 3: Niños - Oficina */}
             <section className='grid grid-cols-2 gap-1 w-full mt-4'>
                 <NinosDropdown />
                 <OficinaDropdown />
             </section>
 
-            {/* Fila 4: Ganado - Mascotas */}
             <section className='grid grid-cols-2 gap-1 w-full mt-4'>
                 <GanadoDropdown />
                 <MascotasDropdown />
             </section>
 
-            {/* Fila 5 */}
             <section className='grid grid-cols-2 w-full mt-4 justify-items-center'>
                 <HogarDropdown />
                 <Rentals />
             </section>
 
-            {/* Checkboxes individuales - 2 columnas */}
             <section className='grid grid-cols-2 gap-10 mt-4 w-full justify-items-start'>
                 <Input
                     type="checkbox"
@@ -247,6 +244,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full ml-4.5'
+                    defaultChecked={isSelected("Instrumentos Musicales")}
                 />
                 <Input
                     type="checkbox"
@@ -256,6 +254,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Accesorios")}
                 />
             </section>
 
@@ -268,6 +267,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full ml-4.5'
+                    defaultChecked={isSelected("Salud y Belleza")}
                 />
                 <Input
                     type="checkbox"
@@ -277,6 +277,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Deportes y Aire libre")}
                 />
             </section>
 
@@ -289,6 +290,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full ml-4.5'
+                    defaultChecked={isSelected("Música y Películas")}
                 />
                 <Input
                     type="checkbox"
@@ -298,6 +300,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Alimentos y Bebidas")}
                 />
             </section>
 
@@ -310,6 +313,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full ml-4.5'
+                    defaultChecked={isSelected("Aves de corral")}
                 />
                 <Input
                     type="checkbox"
@@ -319,6 +323,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Inmuebles")}
                 />
             </section>
         </fieldset>
@@ -353,6 +358,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Instrumentos Musicales")}
                 />
                 <Input
                     type="checkbox"
@@ -362,6 +368,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Accesorios")}
                 />
                 <Input
                     type="checkbox"
@@ -371,6 +378,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Salud y Belleza")}
                 />
                 <Input
                     type="checkbox"
@@ -380,6 +388,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Deportes y Aire libre")}
                 />
             </section>
 
@@ -392,6 +401,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Música y Películas")}
                 />
                 <Input
                     type="checkbox"
@@ -401,6 +411,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Alimentos y Bebidas")}
                 />
                 <Input
                     type="checkbox"
@@ -410,6 +421,7 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Aves de corral")}
                 />
                 <Input
                     type="checkbox"
@@ -419,10 +431,12 @@ export default function DropdownCategories({register, errors, direction, watch})
                     watch={watch}
                     errors={errors}
                     className='!flex-row w-full'
+                    defaultChecked={isSelected("Inmuebles")}
                 />
             </section>
         </fieldset>
     );
+
     return (
         <Dropdown
             text="Categorias"

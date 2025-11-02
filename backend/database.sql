@@ -19,7 +19,8 @@ CREATE TABLE usuarios (
     ) NOT NULL,
     google_id VARCHAR(255) UNIQUE NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    estado BOOLEAN DEFAULT TRUE
+    estado BOOLEAN DEFAULT TRUE,
+    tolo_coins DECIMAL (10,2) DEFAULT 0 
 );
 
 INSERT INTO usuarios (nombre_usuario, email, contraseña, tipo_usuario)
@@ -48,6 +49,7 @@ VALUES ('junior', 0, 10),
     ('semi_senior', 25000, 6),
     ('senior', 75000, 4),
     ('elite', 350000, 2);
+    
 CREATE TABLE ecommerces (
     id_ecommerce INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT UNSIGNED UNIQUE,
@@ -56,16 +58,22 @@ CREATE TABLE ecommerces (
     rango_actual INT UNSIGNED DEFAULT 1,
     facturacion_acumulada INT DEFAULT 0,
     map TEXT DEFAULT NULL,
-    map TEXT DEFAULT NULL,
     logo VARCHAR(255) DEFAULT NULL,
-    home VARCHAR(255) DEFAULT NULL FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
+    home VARCHAR(255) DEFAULT NULL 
+    favicon VARCHAR(255) DEFAULT NULL
+    REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
+
+SELECT * FROM ecommerces
+
+
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_categoria VARCHAR(30) NOT NULL,
     descripcion TEXT DEFAULT NULL
 );
+
 INSERT INTO categorias (nombre_categoria, descripcion)
 VALUES (
         'Electrónica',
@@ -271,6 +279,41 @@ CREATE TABLE productos (
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE
     SET NULL
 );
+
+SELECT 
+    p.id_producto, 
+    p.id_ecommerce, 
+    p.nombre_producto, 
+    p.precio, 
+    SUM(d.cantidad) AS cantidad_vendida,
+    COUNT(DISTINCT c.id_cliente) AS compradores_distintos,
+    (
+    SELECT i.ruta_imagen FROM imagenes_productos i
+    WHERE i.id_producto = p.id_producto
+    LIMIT 1
+    ) AS ruta_imagen
+FROM productos p
+JOIN ecommerces e 
+    ON e.id_ecommerce = p.id_ecommerce
+JOIN detalles_compra d 
+    ON d.id_producto = p.id_producto
+JOIN compras c 
+    ON c.id_compra = d.id_compra
+WHERE e.nombre_ecommerce = 'Bohemian Design'
+GROUP BY 
+    p.id_producto, 
+    p.id_ecommerce, 
+    p.nombre_producto,
+    p.precio
+ORDER BY cantidad_vendida DESC
+LIMIT 30;
+
+
+
+SELECT * FROM usuarios
+
+UPDATE usuarios SET tolo_coins = 0
+
 CREATE TABLE productos_categorias (
     id_producto INT UNSIGNED NOT NULL,
     id_categoria INT UNSIGNED NOT NULL,
@@ -312,17 +355,27 @@ CREATE TABLE carrito (
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces(id_ecommerce) ON DELETE CASCADE,
     UNIQUE KEY unique_usuario_ecommerce (id_usuario, id_ecommerce)
 );
+
 CREATE TABLE items_carrito (
     id_item INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_carrito INT UNSIGNED NOT NULL,
     id_producto INT UNSIGNED NOT NULL,
+    id_color INT UNSIGNED NULL,
+    id_talle_color_producto INT UNSIGNED NULL,
     cantidad INT NOT NULL DEFAULT 1,
     precio_unitario DECIMAL(10, 2) NOT NULL,
     fecha_agregado DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_carrito) REFERENCES carrito(id_carrito) ON DELETE CASCADE,
     FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
-    UNIQUE KEY unique_carrito_producto (id_carrito, id_producto)
+    FOREIGN KEY (id_color) REFERENCES colores_producto(id_color) ON DELETE SET NULL,
+    FOREIGN KEY (id_talle_color_producto) REFERENCES talles_color_producto(id_talle_color_producto) ON DELETE SET NULL,
+    UNIQUE KEY unique_item_variant (id_carrito, id_producto, id_color, id_talle_color_producto)
 );
+
+SELECT * FROM items_carrito
+
+
+
 CREATE TABLE compras (
     id_compra INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_cliente INT UNSIGNED NOT NULL,
@@ -407,12 +460,6 @@ CREATE TABLE envios (
     codigo_postal VARCHAR(100),
     departamento VARCHAR(60) NOT NULL,
     ciudad VARCHAR(60) NOT NULL,
-    nombre VARCHAR(50) NOT NULL,
-    apellido VARCHAR(50) NOT NULL,
-    celular VARCHAR(255) NOT NULL,
-    codigo_postal VARCHAR(100),
-    departamento VARCHAR(60) NOT NULL,
-    ciudad VARCHAR(60) NOT NULL,
     direccion_entrega TEXT NOT NULL,
     estado_envio ENUM(
         'pendiente',
@@ -440,12 +487,22 @@ CREATE TABLE colores_producto (
     stock SMALLINT UNSIGNED DEFAULT NULL,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE CASCADE
 );
+
 CREATE TABLE imagenes_color_producto (
     id_imagen_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
     ruta_imagen VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
+
+SELECT * FROM productos
+
+
+
+SELECT * FROM talles_color_producto WHERE id_talle_color_producto IN (49);
+
+SELECT * FROM items_carrito
+
 CREATE TABLE talles_color_producto (
     id_talle_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
@@ -453,6 +510,8 @@ CREATE TABLE talles_color_producto (
     stock SMALLINT NOT NULL,
     FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
+
+
 CREATE TABLE caracteristicas_producto (
     id_caracteristica INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_producto INT UNSIGNED NOT NULL,

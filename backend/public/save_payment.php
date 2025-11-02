@@ -122,6 +122,7 @@ try {
     $query->execute();
     $id_compra = $data_base->insert_id;
     
+
     $query = $data_base->prepare("
         INSERT INTO detalles_compra (id_compra, id_producto, cantidad, precio_unitario, subtotal, comision)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -193,6 +194,31 @@ try {
         $tipo_notif = "pago_cancelado";
     }
     
+        //Actualizar ToloCoins del usuario
+
+        $tolo_usados = isset($body['tolo_coins_usados']) ? $body['tolo_coins_usados'] : 0;
+
+       
+        $tolo_ganados = floor($body['amount'] * 0.01); 
+
+    
+        $query = $data_base->prepare("SELECT tolo_coins FROM usuarios WHERE id_usuario = ?");
+        $query->bind_param("i", $carrito['id_usuario']);
+        $query->execute();
+        $result = $query->get_result();
+        $row = $result->fetch_assoc();
+        $actuales = $row['tolo_coins'] ?? 0;
+
+        $nuevos_tolo = max(0, $actuales - $tolo_usados + $tolo_ganados);
+
+       
+        $query = $data_base->prepare("UPDATE usuarios SET tolo_coins = ? WHERE id_usuario = ?");
+        $query->bind_param("di", $nuevos_tolo, $carrito['id_usuario']);
+        $query->execute();
+
+        
+        error_log("ToloCoins actualizados para usuario {$carrito['id_usuario']}: usados={$tolo_usados}, ganados={$tolo_ganados}, nuevos={$nuevos_tolo}");
+
     $query = $data_base->prepare("
         INSERT INTO notificaciones (id_usuario, mensaje, tipo) 
         VALUES (?, ?, ?)

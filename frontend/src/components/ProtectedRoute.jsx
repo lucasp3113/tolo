@@ -5,7 +5,14 @@ import axios from "axios";
 export default function RutaProtegida({ children }) {
   const [validando, setValidando] = useState(true);
   const [valido, setValido] = useState(false);
-  const {ecommerce} = useParams()
+  const { ecommerce } = useParams()
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      setWidth(window.innerWidth);
+    });
+  });
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -30,7 +37,7 @@ export default function RutaProtegida({ children }) {
 
   if (validando) return null
 
-  if (!valido) return <Navigate to={ecommerce ? `/${ecommerce}/login/` : "/login"} replace />;
+  if (!valido) return <Navigate to={width < 500 ? ecommerce ? `/${ecommerce}/login/` : "/login" : ecommerce ? `/${ecommerce}/account/` : "/account"} replace />;
 
   return children;
 }

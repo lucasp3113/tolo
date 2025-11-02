@@ -22,8 +22,8 @@ import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 
 
-export default function CreateProduct({ edit = false, onCancel, id }) {
-    const {ecommerce} = useParams()
+export default function CreateProduct({ edit = false, onCancel, id, productData = null }) {
+    const { ecommerce } = useParams()
     const navigate = useNavigate()
     function finish() {
         sessionStorage.setItem('createProductSuccess', 'success')
@@ -43,6 +43,50 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
     const [currentStep, setCurrentStep] = useState(null)
     const [sizes, setSizes] = useState(false)
 
+    // Estados para las imágenes existentes del producto (sin color)
+    const [existingProductImages, setExistingProductImages] = useState([]);
+
+    useEffect(() => {
+        if (edit && productData) {
+            // Pre-llenar datos básicos del producto
+            const defaultValues = {
+                nameProduct: productData.nombre_producto || '',
+                productPrice: productData.precio || '',
+                productDescription: productData.descripcion || '',
+                shipping: productData.envio_gratis === 1 || productData.envio_gratis === '1'
+            };
+
+            // Si no tiene colores, agregar el stock y las imágenes
+            if (!productData.colores || Object.keys(productData.colores).length === 0) {
+                defaultValues.productStock = productData.stock || '';
+                
+                // Guardar las imágenes existentes para mostrar preview
+                if (productData.imagenes && productData.imagenes.length > 0) {
+                    setExistingProductImages(productData.imagenes);
+                }
+            }
+
+            // Pre-marcar las categorías
+            if (productData.categorias) {
+                productData.categorias.forEach(cat => {
+                    defaultValues[cat] = true;
+                });
+            }
+
+            formProduct.reset(defaultValues);
+
+            // Detectar si tiene colores para setear el estado
+            if (productData.colores && Object.keys(productData.colores).length > 0) {
+                setColor(true);
+                // Verificar si algún color tiene talles
+                const hasSizes = Object.values(productData.colores).some(color =>
+                    color.talles && color.talles.length > 0
+                );
+                setSizes(hasSizes);
+            }
+        }
+    }, [edit, productData])
+
     const [numColor, setNumColor] = useState(1)
     const [visibleColors, setVisibleColors] = useState([true])
 
@@ -60,6 +104,13 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
     const [dataColors, setDataColors] = useState(null)
     const [dataCharac, setDataCharac] = useState(null)
 
+    const [categories, setCategories] = useState(null)
+
+    useEffect(() => {
+        axios.post("/api/show_categories.php", {productId: id})
+            .then((res) => setCategories(res.data.data))
+            .catch((res) => console.log(res))
+    }, [])
 
     useEffect(() => {
         if (currentStep === "showColors") {
@@ -82,8 +133,72 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
         }
     }, [currentStep])
 
-    const [colorEdit, setColorEdit] = useState(null)
+    // Prellenar características al entrar en modo edición
+    useEffect(() => {
+        if (edit && productData && productData.caracteristicas && currentStep === "showCharac") {
+            setDataCharac(productData.caracteristicas.map((carac, index) => ({
+                id_caracteristica: index,
+                caracteristica: carac
+            })));
+        }
+    }, [edit, productData, currentStep]);
 
+    // Prellenar colores al entrar en modo edición
+    useEffect(() => {
+        if (edit && productData && productData.colores && currentStep === "showColors") {
+            const colorsArray = Object.entries(productData.colores).map(([nombre, data]) => ({
+                id_color: data.id_color,
+                nombre: nombre,
+                ruta_imagen: data.imagenes?.[0] || '',
+                talles: data.talles || []
+            }));
+            setDataColors(colorsArray);
+        }
+    }, [edit, productData, currentStep]);
+
+    const [colorEdit, setColorEdit] = useState(null)
+    const [editingColorData, setEditingColorData] = useState(null)
+
+    // Prellenar el formulario de color cuando se va a editar
+    useEffect(() => {
+        if (colorEdit && productData && productData.colores && currentStep === "addColor") {
+            // Buscar el color que se está editando
+            const colorEntry = Object.entries(productData.colores).find(
+                ([nombre, data]) => data.id_color === colorEdit
+            );
+
+            if (colorEntry) {
+                const [colorName, colorData] = colorEntry;
+                
+                // Prellenar el nombre del color
+                formColor.setValue('nameColor1', colorName);
+                
+                // Si tiene talles, configurar el estado y prellenar
+                if (colorData.talles && colorData.talles.length > 0) {
+                    setColorSizes([colorData.talles.length]);
+                    setVisibleColorSizes([Array(colorData.talles.length).fill(true)]);
+                    
+                    // Prellenar cada talle y su stock
+                    colorData.talles.forEach((talleObj, idx) => {
+                        formColor.setValue(`nameSizeColor1${idx}`, talleObj.talle);
+                        formColor.setValue(`nameStockSizeColor1${idx}`, talleObj.stock);
+                    });
+                } else {
+                    // Si no tiene talles, prellenar solo el stock del color
+                    // Necesitarías tener el stock del color en los datos
+                    setColorSizes([1]);
+                    setVisibleColorSizes([[true]]);
+                }
+
+                // Guardar datos del color para mostrar imágenes existentes
+                setEditingColorData(colorData);
+            }
+        } else if (!colorEdit && currentStep === "addColor") {
+            // Limpiar al añadir un nuevo color
+            setEditingColorData(null);
+            formColor.reset();
+        }
+    }, [colorEdit, productData, currentStep]);
 
     function colorSave(formValues) {
         for (let i = 1; i <= numColor; i++) {
@@ -105,7 +220,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                 idProducto: productId,
                 nameColor: colorName,
                 nameSizes: arrSizes,
-                idColor: edit ? colorEdit : null,
+                idColor: colorEdit || null,
                 nameStocks: arrStocks,
                 nameStockColor: formValues["nameStockColor"]
             };
@@ -114,11 +229,13 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             console.log(payload)
             const files = formColor.watch(`imagesColor${i}`) || [];
             Array.from(files).forEach(file => fd.append('images[]', file));
-            axios.post(!edit ? '/api/add_color.php' : '/api/update_color.php', fd, {
+            axios.post(colorEdit ? '/api/update_color.php' : '/api/add_color.php', fd, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
                 .then(res => {
                     setCurrentStep("showColors")
+                    setColorEdit(null)
+                    setEditingColorData(null)
                     console.log(res)
                     console.log(files)
                 })
@@ -137,34 +254,27 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
             .catch((err) => console.log(err))
     }
 
-    // //tenes q usar esta funcion pero tipo, poner currentStep en addColor pero de alguna forma actualizar en vez de crear
-
-    // function colorUpdate(idColor) {
-    //     axios.post("/api/update_color.php", {
-    //         idColor: idColor
-    //     })
-    //         .then(res => console.log(res))
-    //         .catch(res => console.log(res))
-    // }
-
     function createCharac(dataForm) {
-        const data = [];
-        Object.values(dataForm).forEach((d) => {
-            data.push(d)
-        })
-        console.log(dataForm)
-        console.log(data)
+        const newData = Object.values(dataForm).filter(Boolean);
+
+        // Evitá enviar las que ya están en dataCharac
+        const existing = dataCharac?.map(c => c.caracteristica) || [];
+        const filtered = newData.filter(d => !existing.includes(d));
+
+        if (filtered.length === 0) return; // no hay nada nuevo que agregar
+
         axios.post("/api/create_charac.php", {
-            productId: productId,
-            data: data
+            productId,
+            data: filtered
         })
             .then((res) => {
-                setCurrentStep("showCharac")
-                setDataCharac(res.data.data)
-                console.log(productId)
+                setDataCharac(res.data.data);
+                setCurrentStep("showCharac");
+                formCharac.reset();
             })
-            .catch((err) => console.log(err))
+            .catch(console.log);
     }
+
 
     function deleteCharac(idCharac) {
         axios.post("/api/delete_charac.php", {
@@ -265,6 +375,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
         const colorVisible = visibleColors[colorIdx] ?? false
         const sizesCount = colorSizes[colorIdx] ?? 1
         const visibleSizesForColor = visibleColorSizes[colorIdx] ?? Array.from({ length: sizesCount }).map((_, i) => i === 0)
+        
         return (
             <section key={colorIdx} className={`transition-opacity ease-in-out duration-700 ${colorVisible ? "opacity-100" : "opacity-0"}`}>
                 <Input
@@ -279,25 +390,44 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     icon={<IoMdColorPalette />}
                 />
 
+                {/* Mostrar imágenes existentes del color al editar */}
+                {editingColorData && editingColorData.imagenes && editingColorData.imagenes.length > 0 && (
+                    <div className="m-3">
+                        <p className="text-sm text-gray-600 mb-2">Imágenes actuales del color:</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {editingColorData.imagenes.map((imagen, idx) => (
+                                <div key={`existing-${idx}`} className="relative">
+                                    <img 
+                                        src={`/api/uploads/products/${imagen}`} 
+                                        alt={`Color existente ${idx + 1}`} 
+                                        className="w-full h-24 object-cover rounded-lg border border-blue-300" 
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Si seleccionas nuevas imágenes, reemplazarán las actuales</p>
+                    </div>
+                )}
+
                 <Input
                     type="file"
                     name={`imagesColor${displayNumber}`}
-                    label="Imágenes del producto"
+                    label={editingColorData ? "Cambiar imágenes del color" : "Imágenes del producto"}
                     register={formColor.register}
                     errors={formColor.formState.errors}
                     multiple={true}
-                    required={true}
+                    required={!editingColorData}
                 />
 
                 {(formColor.watch(`imagesColor${displayNumber}`) && formColor.watch(`imagesColor${displayNumber}`).length > 0) && (
                     <div className="m-3">
-                        <p className="text-sm text-gray-600 mb-2">{formColor.watch(`imagesColor${displayNumber}`).length} imagen(es) seleccionada(s):</p>
+                        <p className="text-sm text-green-600 mb-2">Nuevas imágenes seleccionadas ({formColor.watch(`imagesColor${displayNumber}`).length}):</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {Array.from(formColor.watch(`imagesColor${displayNumber}`)).map((file, idx) => {
                                 const url = URL.createObjectURL(file);
                                 return (
                                     <div key={idx} className="relative">
-                                        <img src={url} alt={`preview`} className="w-full h-24 object-cover rounded-lg border border-gray-200" onLoad={() => URL.revokeObjectURL(url)} />
+                                        <img src={url} alt={`preview`} className="w-full h-24 object-cover rounded-lg border border-green-300" onLoad={() => URL.revokeObjectURL(url)} />
                                         <div className="mt-1">
                                             <span className="text-xs text-gray-500 block truncate">{file.name}</span>
                                             <span className="text-xs text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
@@ -568,11 +698,30 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                 <form className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl' onSubmit={formColor.handleSubmit(colorSave)}>
                     {color && (
                         <>
-                            <h2 className='font-quicksand m-auto w-full font-semibold text-2xl'>Colores</h2>
+                            <h2 className='font-quicksand m-auto w-full font-semibold text-2xl'>
+                                {colorEdit ? 'Editar Color' : 'Colores'}
+                            </h2>
                             {jsxColor}
                         </>
                     )}
-                    <Button onClick={formColor.handleSubmit(colorSave)} className={"w-50"} color={"blue"} size={"md"} text={"Guardar"} />
+                    <section className='flex items-center justify-between'>
+                        <Button type="submit" className={"w-50 m-auto"} color={"blue"} size={"md"} text={"Guardar"} />
+                        {/* {colorEdit && (
+                            <Button 
+                                type="button"
+                                onClick={() => {
+                                    setCurrentStep("showColors");
+                                    setColorEdit(null);
+                                    setEditingColorData(null);
+                                    formColor.reset();
+                                }} 
+                                className={"w-50"} 
+                                color={"gray"} 
+                                size={"md"} 
+                                text={"Cancelar"} 
+                            />
+                        )} */}
+                    </section>
                 </form>
             );
 
@@ -582,24 +731,27 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                     <h2 className='font-quicksand m-auto w-full font-black mb-2 text-3xl'>Colores</h2>
                     {dataColors && dataColors.map((c, index) => (
                         <div className='flex relative items-center w-full m-auto justify-between mt-1 mb-4 z-50' key={`color${index}`}>
-                            <section className='w-full flex ml-22'>
-                                <img className={`w-10`} src={`/api/uploads/products/${c.ruta_imagen}`} loading='lazy' alt="" />
-                                <span className='font-quicksand text-2xl font-semibold'>{c.nombre}</span>
+                            <section className='w-full items-center flex justify-between'>
+                                <img className={`w-16 mr-4`} src={`/api/uploads/products/${c.ruta_imagen}`} loading='lazy' alt="" />
+                                <span className='font-quicksand text-2xl whitespace-nowrap font-semibold'>{c.nombre}</span>
                             </section>
-                            {dataColors.length > 1 && (
-                                <section className='flex mr-3 justify-end w-full'>
-                                    <FaRegTrashCan onClick={() => colorDelete(c.id_color)} className='text-red-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120 mr-1' />
-                                    <FaPen onClick={() => {
-                                        setCurrentStep("addColor")
-                                        setColorEdit(c.id_color)
-                                    }} className='text-blue-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120 ml-1' />
-                                </section>
-                            )}
+                            <section className='flex mr-3 justify-end w-full'>
+                                <FaRegTrashCan onClick={() => colorDelete(c.id_color)} className='text-red-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120 mr-1' />
+                                <FaPen onClick={() => {
+                                    setCurrentStep("addColor")
+                                    setColorEdit(c.id_color)
+                                }} className='text-blue-600 text-2xl transition-transform duration-300 ease-in-out hover:scale-120 ml-1' />
+                            </section>
+
                         </div>
                     ))}
                     <section className='flex mt-2 items-center justify-between'>
-                        <Button onClick={() => setCurrentStep("addColor")} className={"w-50"} color={"blue"} size={"md"} text={"Añadir color"} />
-                        <Button onClick={() => setCurrentStep(edit ? "showCharac" : "addCharac")} className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
+                        <Button onClick={() => {
+                            setCurrentStep("addColor");
+                            setColorEdit(null);
+                            setEditingColorData(null);
+                        }} type="button" className={"w-50"} color={"blue"} size={"md"} text={"Añadir color"} />
+                        <Button onClick={() => setCurrentStep(edit ? "showCharac" : "addCharac")} type="button" className={"w-50"} color={"green"} size={"md"} text={"Siguiente"} />
                     </section>
                 </form>
             );
@@ -628,7 +780,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         </div>
                     ))}
                     <section className='flex mt-2 items-center justify-between'>
-                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} type='button' color={"blue"} size={"md"} text={"Añadir caracteristica"} />
+                        <Button onClick={() => setCurrentStep("addCharac")} className={"w-50"} type='button' color={"blue"} size={"md"} text={"Añadir otra"} />
                         <Button className={"w-50"} color={"green"} size={"md"} text={"Finalizar"} />
                     </section>
                 </form>
@@ -649,7 +801,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         errors={formProduct.formState.errors}
                         required={true}
                         minLength={3}
-                        maxLength={30}
+                        maxLength={40}
                         icon={<FaBoxOpen />}
                     />
                     <Input
@@ -664,7 +816,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         maxLength={20}
                         validate={value => Number(value) > 0 || "El precio no puede ser negativo ni 0"}
                     />
-                    <DropdownCategories watch={formProduct.watch} register={formProduct.register} errors={formProduct.formState.errors} direction={"b"} />
+                    <DropdownCategories selected={categories} watch={formProduct.watch} register={formProduct.register} errors={formProduct.formState.errors} direction={"b"} />
                     {!color && (
                         <Input
                             type={"number"}
@@ -679,20 +831,47 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                         />
                     )}
                     {!color && (
-                        <Input
-                            type="file"
-                            name="images"
-                            label="Imágenes del producto"
-                            register={formProduct.register}
-                            errors={formProduct.formState.errors}
-                            multiple={true}
-                            required={!edit}
-                        />
+                        <>
+                            {/* Mostrar imágenes existentes del producto */}
+                            {edit && existingProductImages.length > 0 && (
+                                <div className="m-3">
+                                    <p className="text-sm text-gray-600 mb-2">Imágenes actuales del producto:</p>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        {existingProductImages.map((imagen, index) => {
+                                            const imageUrl = imagen.startsWith('uploads/') ? `/api/${imagen}` : `/api/uploads/products/${imagen}`;
+                                            return (
+                                                <div key={`existing-${index}`} className="relative">
+                                                    <img
+                                                        src={imageUrl}
+                                                        alt={`Imagen actual ${index + 1}`}
+                                                        className="w-full h-24 object-cover rounded-lg border border-blue-300"
+                                                    />
+                                                    <div className="mt-1">
+                                                        <span className="text-xs text-blue-600 block">Imagen actual</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2">Si seleccionas nuevas imágenes, reemplazarán las actuales</p>
+                                </div>
+                            )}
+                            
+                            <Input
+                                type="file"
+                                name="images"
+                                label={edit && existingProductImages.length > 0 ? "Cambiar imágenes del producto" : "Imágenes del producto"}
+                                register={formProduct.register}
+                                errors={formProduct.formState.errors}
+                                multiple={true}
+                                required={!edit}
+                            />
+                        </>
                     )}
                     {selectedFiles.length > 0 && (
                         <div className="m-3">
-                            <p className="text-sm text-gray-600 mb-2">
-                                {selectedFiles.length} imagen(es) seleccionada(s):
+                            <p className="text-sm text-green-600 mb-2">
+                                Nuevas imágenes seleccionadas ({selectedFiles.length}):
                             </p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 {selectedFiles.map((file, index) => {
@@ -703,7 +882,7 @@ export default function CreateProduct({ edit = false, onCancel, id }) {
                                             <img
                                                 src={imageUrl}
                                                 alt={`Preview ${index + 1}`}
-                                                className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                                className="w-full h-24 object-cover rounded-lg border border-green-300"
                                                 onLoad={() => URL.revokeObjectURL(imageUrl)}
                                             />
                                             <div className="mt-1">

@@ -10,6 +10,39 @@ const RatingMeter = memo(({ progress, getColor }) => {
   const circumference = Math.PI * radius;
   const offset = circumference - (progress / 5) * circumference;
 
+  useEffect(() => {
+  const interval = setInterval(() => {
+    const iframes = document.querySelectorAll("iframe");
+    if (!iframes.length) return;
+
+    for (const iframe of iframes) {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc) continue;
+
+        const target = doc.querySelector(".tawk-icon-right");
+        if (target) {
+          target.remove(); 
+          clearInterval(interval);
+
+          const observer = new MutationObserver(() => {
+            const again = doc.querySelector(".tawk-icon-right");
+            if (again) again.remove();
+          });
+
+          observer.observe(doc.body, { childList: true, subtree: true });
+          return;
+        }
+      } catch (e) {
+    
+      }
+    }
+  }, 300);
+
+  return () => clearInterval(interval);
+}, []);
+
+
   return (
     <div className="mb-6 flex flex-col items-center">
       <svg width="100" height="60" viewBox="0 0 100 50">
@@ -285,6 +318,9 @@ export default function SellerDashboard({ children }) {
     }
   }, [timeRange]);
 
+  const { ecommerce: nameEcommerce } = useParams();
+  console.log(nameEcommerce)
+
   useEffect(() => {
     setChartData(generateDummyData());
   }, [generateDummyData]);
@@ -304,12 +340,12 @@ export default function SellerDashboard({ children }) {
             <img
               src={logo}
               alt="Logo Comercio"
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             />
           ) : (
             <span
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="font-quicksand flex text-md font-semibold cursor-pointer items-center justify-center w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             >
               Añadir logo
@@ -330,13 +366,13 @@ export default function SellerDashboard({ children }) {
         <div className="flex-1 p-4 flex flex-col gap-4 pb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               + Añadir producto
             </button>
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Ver mis productos
@@ -413,12 +449,12 @@ export default function SellerDashboard({ children }) {
           <img
             src={logo}
             alt="Logo Comercio"
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="w-36 h-36 cursor-pointer mb-4 border-4 border-sky-600 rounded-full object-contain bg-white p-2 shadow-lg"
           />
         ) : (
           <span
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="font-quicksand w-36 h-36 mb-4 border-4 border-sky-600 rounded-full font-semibold flex text-xl cursor-pointer items-center justify-center bg-white p-2 shadow-lg"
           >
             Añadir logo
@@ -435,14 +471,14 @@ export default function SellerDashboard({ children }) {
 
         <section className="w-full flex flex-col mt-auto">
           <button
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center"
           >
             <span className="text-xl">+</span>
             Añadir Producto
           </button>
           <button
-            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center translate-y-1.5"
           >
             Ver Mis Productos

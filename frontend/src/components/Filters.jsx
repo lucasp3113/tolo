@@ -24,6 +24,7 @@ export default function Filters({ setPanelFilter, dataCategories, word, setSearc
     function filter(data) {
         data["search"] = word
         data["nameEcommerce"] = nameEcommerce
+        console.log(data)
         axios.post("/api/search.php", data)
             .then((res) => {
                 setSearchData(res.data.data)

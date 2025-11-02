@@ -18,6 +18,13 @@ export default function Login({ pc }) {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate()
 
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+
     const [showPassword, setShowPassword] = useState(false)
     const [message, setMessage] = useState(null);
 
@@ -115,7 +122,7 @@ export default function Login({ pc }) {
                 register={register}
                 errors={errors}
             />
-            <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 border-3 hover:border-sky-800 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
+            <Button className={"w-50 !text-lg md:p2 hover:bg-white hover:text-sky-800 hover:!scale-100 border-3 border-sky-800 !transition-all !ease-in-out !duration-500"} color={"blue"} size={"md"} text={"Iniciar sesión"} />
 
             <div className="flex flex-col font-quicksand font-semibold items-center justify-center mt-3">
                 <GoogleLogin

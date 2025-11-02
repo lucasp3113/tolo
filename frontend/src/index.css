@@ -56,7 +56,16 @@
   display: none !important;
 }
 
-.tawk-icon-right img{
+.tawk-icon-right {
+  display: none !important;
+}
+
+#tawkchat-minified-wrapper .tawk-min-container .tawk-icon-right {
+  display: none !important;
+}
+
+
+.tawk-icon-right {
   display: none !important;
 }
 

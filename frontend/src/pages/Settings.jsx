@@ -17,6 +17,7 @@ import { FaOpencart } from "react-icons/fa";
 import { TiShoppingCart } from "react-icons/ti";
 import { IoColorPalette } from "react-icons/io5";
 import { SiGo, SiGooglemaps } from "react-icons/si";
+import { TbFavicon } from "react-icons/tb";
 import axios from 'axios';
 
 
@@ -86,7 +87,7 @@ export default function Settings() {
                     }}
                     className="flex items-center justify-start -translate-y-6 -translate-x-6"
                 >
-                    <IoReturnUpBack className="w-18 mr-2 text-[40px]" />
+                    <IoReturnUpBack className="w-18 mr-2 cursor-pointer text-[40px]" />
                 </div>
             )}
 
@@ -124,27 +125,6 @@ export default function Settings() {
                                     </div>
                                     <p><IoIosArrowForward /></p>
                                 </li>
-                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
-                                    <div className="flex items-center justify-center ">
-                                        <FaUserCircle className="text-indigo-500 mr-2 text-[30px]" />
-                                        <h2 className="text-[20px]">Añadir/Cambiar foto de perfil</h2>
-                                    </div>
-                                    <p><IoIosArrowForward /></p>
-                                </li>
-                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/maps/`) : navigate("/maps/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
-                                    <div className="flex items-center justify-center ">
-                                        <SiGooglemaps className="text-sky-400 mr-2 text-[30px]" />
-                                        <h2 className="text-[20px]">Agregar ubicación de la tienda</h2>
-                                    </div>
-                                    <p><IoIosArrowForward /></p>
-                                </li>
-                                <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_ecommerce/`) : navigate("/change_ecommerce/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
-                                    <div className="flex items-center justify-center ">
-                                        <FaOpencart className="text-red-500 mr-3 ml-2 text-[20px] scale-150" />
-                                        <h2 className='text-[20px] whitespace-nowrap'>Cambiar nombre de la tienda</h2>
-                                    </div>
-                                    <p><IoIosArrowForward /></p>
-                                </li>
                             </>
                         )}
                     </>
@@ -157,10 +137,38 @@ export default function Settings() {
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/profile_picture/`) : navigate("/profile_picture/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <FaUserCircle className="text-indigo-500 mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Añadir/Cambiar foto de perfil</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
                         <li onClick={() => ecommerce ? navigate(`/${ecommerce}/customize_store/`) : navigate("/customize_store/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center ">
                                 <IoColorPalette className="text-red-600 mr-2 text-[30px]" />
                                 <h2 className="text-[20px]">Personalizar colores</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/maps/`) : navigate("/maps/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <SiGooglemaps className="text-sky-400 mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Agregar ubicación de la tienda</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/change_ecommerce/`) : navigate("/change_ecommerce/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <FaOpencart className="text-red-500 mr-3 ml-2 text-[20px] scale-150" />
+                                <h2 className='text-[20px] whitespace-nowrap'>Cambiar nombre de la tienda</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/favicon/`) : navigate("/favicon/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center ">
+                                <TbFavicon className="text-sky-700 mr-3 ml-2 text-[20px] scale-150" />
+                                <h2 className='text-[20px] whitespace-nowrap'>Añadir favicon</h2>
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>

@@ -83,7 +83,7 @@ if ($data_base->connect_error) {
 
         if ($trueSize) {
             $query = $data_base->prepare(
-                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.envio_gratis, p.fecha_publicacion, c.nombre, c.id_color, t.talle, t.stock, car.caracteristica, e.nombre_ecommerce
+                "SELECT p.id_producto, p.nombre_producto, p.descripcion, p.precio, p.envio_gratis, p.fecha_publicacion, c.nombre, c.id_color, t.talle, t.stock, t.id_talle_color_producto, car.caracteristica, e.nombre_ecommerce
                 FROM productos p
                 JOIN colores_producto c ON c.id_producto = p.id_producto
                 JOIN talles_color_producto t ON t.id_color = c.id_color
@@ -116,6 +116,7 @@ if ($data_base->connect_error) {
 
                     if (!isset($data["colores"][$color])) {
                         $data["colores"][$color] = [
+                            "id_color" => $colorId,
                             "talles" => [],
                             "imagenes" => []
                         ];
@@ -136,7 +137,8 @@ if ($data_base->connect_error) {
                     if (!$talleExiste) {
                         $data["colores"][$color]["talles"][] = [
                             "talle" => $size,
-                            "stock" => $row["stock"]
+                            "stock" => $row["stock"],
+                            "id_talle_color_producto" => $row["id_talle_color_producto"]
                         ];
                     }
 
@@ -206,6 +208,7 @@ if ($data_base->connect_error) {
 
                     if (!$colorExiste) {
                         $data["colores"][] = [
+                            "id_color" => $colorId,
                             "nombre" => $color,
                             "stock" => $row["stock"],
                             "imagenes" => []

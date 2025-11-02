@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function CheckoutBricks({ total = 1000, onPaymentSuccess, idCompra }) {
+function CheckoutBricks({ total, onPaymentSuccess, idCompra, data, toloCoinsGanados, toloCoinsRestados, userId }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [brickController, setBrickController] = useState(null);
     const [preferenceId, setPreferenceId] = useState(null);
     const navigate = useNavigate();
+    console.log(toloCoinsGanados)
+    console.log(toloCoinsRestados)
+    console.log(total)
 
     useEffect(() => {
+        console.log(data)
         const createPreference = async () => {
             try {
                 const response = await fetch('/api/create_preference.php', {
@@ -141,6 +146,21 @@ function CheckoutBricks({ total = 1000, onPaymentSuccess, idCompra }) {
                                                     sessionStorage.setItem('paymentSuccess', 'success')
                                                     navigate('/payments_history');
                                                     resolve();
+                                                    axios.post("/api/upload_stock.php", data)
+                                                        .then((res) => console.log(res))
+                                                        .catch((res) => console.log(res))
+                                                    axios.post('/api/update_tolo_coins.php', {
+                                                        id_usuario: userId,
+                                                        tolo_coins_usados: toloCoinsRestados,
+                                                        tolo_coins_ganados: toloCoinsGanados
+                                                    })
+                                                        .then(res => {
+                                                            console.log(toloCoinsGanados)
+                                                            console.log(toloCoinsRestados)
+                                                            console.log(res.data.nuevos_tolo_coins)
+                                                            // setUserCoins(Number(res.data.nuevos_tolo_coins));
+                                                        })
+                                                        .catch(err => console.log(err));
                                                 })
                                                 .catch(err => {
                                                     console.error('Error guardando en BD:', err);

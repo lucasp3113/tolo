@@ -29,7 +29,7 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
                 phone={false}
                 client={false}
                 onDelete={() => deleteProduct(producto.id_producto)}
-                onUpdate={() => setUpdate([true, producto.id_producto])}
+                onUpdate={() => handleEdit(producto.id_producto)}
               />
             ))}
           </section>
@@ -69,12 +69,22 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
   }
 
   const [update, setUpdate] = useState(false);
+  const [productData, setProductData] = useState(null);
 
-  // function updateProduct(id) {
-  //   axios.post("/api/updateProduct.php", {
-
-  //   })
-  // }
+  function handleEdit(id) {
+    axios
+      .post("/api/show_product.php", {
+        idProducto: id,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          setProductData(res.data.data);
+          setUpdate([true, id]);
+          console.log(res)
+        }
+      })
+      .catch((err) => console.log(err));
+  }
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -113,7 +123,7 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
           showProducts(productos)
         ) : (
           productos.map((producto) => (
-            <AnimationScroll>
+            <AnimationScroll key={producto.id_producto}>
               <ProductCard
                 isAdmin={isAdmin}
                 key={producto.id_producto}
@@ -125,7 +135,7 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
                 phone={windowWidth >= 500 ? false : true}
                 client={false}
                 onDelete={() => deleteProduct(producto.id_producto)}
-                onUpdate={() => setUpdate([true, producto.id_producto])}
+                onUpdate={() => handleEdit(producto.id_producto)}
               />
             </AnimationScroll>
           ))
@@ -133,8 +143,12 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
       ) : (
         <CreateProduct
           edit={true}
-          onCancel={() => setUpdate(false)}
+          onCancel={() => {
+            setUpdate(false);
+            setProductData(null);
+          }}
           id={update[1]}
+          productData={productData}
         />
       )}
     </div>

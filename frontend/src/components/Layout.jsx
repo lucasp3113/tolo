@@ -10,10 +10,50 @@ import Alert from './Alert'
 import { TbNurseFilled } from 'react-icons/tb'
 
 
-export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null, setLoading = null, notHeader = false, fixed = false, setGoodContrast3 }) {
+export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null, setLoading = null, notHeader = false, fixed = false, setGoodContrast3, logoCenter = false }) {
   const location = useLocation()
 
   const { ecommerce } = useParams()
+  useEffect(() => {
+    if (ecommerce) {
+      document.title = ecommerce;
+    } else {
+      document.title = "Tolo"; 
+    }
+  }, [ecommerce]);
+
+
+  useEffect(() => {
+    if (!ecommerce) {
+      const link = document.querySelector("link[rel='icon']") || document.createElement("link");
+      link.rel = "icon";
+      link.href = "/default_favicon.ico";
+      document.head.appendChild(link);
+      return;
+    }
+
+    axios.post("/api/show_favicon.php", { nameEcommerce: ecommerce })
+      .then(res => {
+        const link = document.querySelector("link[rel='icon']") || document.createElement("link");
+        link.rel = "icon";
+
+        if (res.data.success && res.data.img?.favicon) {
+          link.href = `/api/${res.data.img.favicon}?t=${Date.now()}`;
+        } else {
+          link.href = "/default_favicon.ico";
+        }
+
+        document.head.appendChild(link);
+      })
+      .catch(() => {
+        const link = document.querySelector("link[rel='icon']") || document.createElement("link");
+        link.rel = "icon";
+        link.href = "/default_favicon.ico";
+        document.head.appendChild(link);
+      });
+
+  }, [ecommerce]);
+
   const [headerColor, setHeaderColor] = useState(null);
   const [mainColor, setMainColor] = useState(null);
   const [footerColor, setFooterColor] = useState(null);
@@ -109,7 +149,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr_auto]">
       {!notHeader && (
-        <HeaderNav setGoodContrast3={setGoodContrast3} setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} fixed={fixed} />
+        <HeaderNav logoCenter={logoCenter} setGoodContrast3={setGoodContrast3} setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} fixed={fixed} />
       )}
       {/* <main className={`${!notHeader && "mt-20"}`}
         style={{ backgroundColor: ecommerce ? "#FFFFFF" : mainColor || "#FFFFFF" }}>
@@ -154,7 +194,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
         <Alert
           type="toast"
           variant="success"
-          title="Pago realizado exitosamente" ñ
+          title="Pago realizado exitosamente"
           duration={4000}
           onClose={() => setPaymentAlert(null)}
           show={true}

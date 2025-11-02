@@ -14,6 +14,7 @@ export default function Input({
   pattern,
   onChange,
   placeholder,
+  defaultChecked,
   label,
   icon,
   account,
@@ -26,6 +27,8 @@ export default function Input({
 
   const errorActual = errors?.[name];
 
+
+  
   useEffect(() => {
     if (errorActual && 'vibrate' in navigator) {
       navigator.vibrate(300);
@@ -34,13 +37,13 @@ export default function Input({
 
   const validateImageFiles = (files) => {
     if (!files || files.length === 0) return true;
-    
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/x-icon'];
     const maxSize = 5 * 1024 * 1024;
-    
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      
+
       if (!allowedTypes.includes(file.type)) {
         return `El archivo "${file.name}" no es una imagen válida. Solo se permiten: JPG y PNG`;
       }
@@ -48,13 +51,13 @@ export default function Input({
         return `El archivo "${file.name}" es demasiado grande. Máximo 5MB`;
       }
     }
-    
+
     return true;
   };
 
   return (
     <div className={type === "checkbox" ? "whitespace-nowrap flex items-center gap-2 m-3 " + className : type === "radio" ? "flex items-center gap-2 m-1 whitespace-nowrap" : "flex flex-col-reverse m-3 relative items-start"}>
-      {errors?.[name] && <span className='text-red-600 text-xs'>{errors[name].message}</span>}
+      {errors?.[name] && <span className='text-red-600 font-quicksand font-semibold text-xs'>{errors[name].message}</span>}
 
       {type === "checkbox" ? undefined : type === "textarea" ? (
         <span className={errors[name]
@@ -77,7 +80,7 @@ export default function Input({
             name={name}
             id={name}
             multiple={multiple}
-            accept="image/jpeg,image/jpg,image/png,image/webp" 
+            accept="image/jpeg,image/jpg,image/png,image/webp,image/x-icon"
             {...register(`${name}`, {
               required: {
                 value: required,
@@ -92,6 +95,7 @@ export default function Input({
           />
           <div className={`
             w-full px-3 py-2 rounded-lg cursor-pointer
+            ${errors?.[name] && errors?.[name].message.lenght >= 30 && "mb-8"}
             flex items-center justify-center gap-2
             ${errors?.[name]
               ? 'border-2 border-red-600 bg-red-50 text-red-700'
@@ -122,6 +126,7 @@ export default function Input({
           name={name}
           id={name}
           {...(type !== 'file' && type !== 'select' ? { value } : {})}
+          {...(type === 'checkbox' || type === 'radio' ? { defaultChecked } : {})}
           multiple={multiple}
           onChange={onChange}
           placeholder={placeholder}
@@ -162,7 +167,7 @@ export default function Input({
         </Component>
       )}
 
-      <label htmlFor={name} className={`text-sm mb-0.5 font-medium ${account ? "text-gray-700 scale-105 font-quicksand !font-bold" :"text-gray-700"}`}>
+      <label htmlFor={name} className={`text-sm mb-0.5 font-medium ${account ? "text-gray-700 scale-105 font-quicksand !font-bold" : "text-gray-700"}`}>
         {label}
       </label>
     </div>

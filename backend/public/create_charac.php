@@ -4,7 +4,6 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Manejar preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -28,7 +27,6 @@ if ($data_base->connect_error) {
     exit;
 }
 
-// Validar que sea POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
@@ -39,69 +37,65 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $body = json_decode(file_get_contents("php://input"), true);
-for ($i = 0; $i < count($body["data"]); $i++) {
-    $query = $data_base->prepare("INSERT INTO caracteristicas_producto(id_producto, caracteristica) VALUES(?, ?)");
-    $query->bind_param("is", $body["productId"], $body["data"][$i]);
-    if($query->execute()) {
-        continue;
-    } else {
-        http_response_code(400);
-        echo json_encode([
-            "success"=> false,
+$productId = $body["productId"] ?? null;
+$data = $body["data"] ?? [];
 
-        ]);
-        exit;
-    }
-}
-
-// Validar que data no esté vacío
-if (empty($body["data"])) {
+if (!$productId || empty($data)) {
     http_response_code(400);
     echo json_encode([
         "success" => false,
-        "message" => "El array 'data' no puede estar vacío"
+        "message" => "Faltan datos requeridos"
     ]);
     exit;
 }
 
-// Iniciar transacción para asegurar atomicidad
 $data_base->begin_transaction();
 
 try {
-    $query = $data_base->prepare("INSERT INTO caracteristicas_producto(id_producto, caracteristica) VALUES(?, ?)");
-    
-    if (!$query) {
-        throw new Exception("Error al preparar la consulta: " . $data_base->error);
-    }
-    
-    for ($i = 0; $i < count($body["data"]); $i++) {
-        $query->bind_param("is", $body["productId"], $body["data"][$i]);
-        
-        if (!$query->execute()) {
-            throw new Exception("Error al insertar característica: " . $query->error);
+    $queryCheck = $data_base->prepare("
+        SELECT id_caracteristica 
+        FROM caracteristicas_producto 
+        WHERE id_producto = ? AND caracteristica = ?
+    ");
+    $queryInsert = $data_base->prepare("
+        INSERT INTO caracteristicas_producto (id_producto, caracteristica)
+        VALUES (?, ?)
+    ");
+
+    foreach ($data as $charac) {
+        $charac = trim($charac);
+        if ($charac === "") continue;
+
+        $queryCheck->bind_param("is", $productId, $charac);
+        $queryCheck->execute();
+        $res = $queryCheck->get_result();
+
+        if ($res->num_rows === 0) {
+            $queryInsert->bind_param("is", $productId, $charac);
+            $queryInsert->execute();
         }
     }
-    
-    // Si todo salió bien, confirmar la transacción
+
     $data_base->commit();
-    
-    http_response_code(200);
+
+    $result = $data_base->query("SELECT * FROM caracteristicas_producto WHERE id_producto = $productId");
+    $rows = $result->fetch_all(MYSQLI_ASSOC);
+
     echo json_encode([
         "success" => true,
-        "message" => "Características insertadas correctamente",
-        "inserted" => count($body["data"])
+        "message" => "Características actualizadas correctamente",
+        "data" => $rows
     ]);
-    
+
 } catch (Exception $e) {
-    // Si hay error, revertir todos los cambios
     $data_base->rollback();
-    
-    http_response_code(400);
+    http_response_code(500);
     echo json_encode([
         "success" => false,
         "message" => $e->getMessage()
     ]);
+} finally {
+    $queryCheck->close();
+    $queryInsert->close();
+    $data_base->close();
 }
-
-$query->close();
-$data_base->close();
