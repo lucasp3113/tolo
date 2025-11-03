@@ -10,7 +10,7 @@ import Alert from './Alert'
 import { TbNurseFilled } from 'react-icons/tb'
 
 
-export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null, setLoading = null, notHeader = false, fixed = false, setGoodContrast3, logoCenter = false }) {
+export default function Layout({ children, search = false, setSearchData, logo = true, logoEcommerce, setUserType, preview = false, colors = null, goodContrast = null, change = null, setLoading = null, notHeader = false, fixed = false, setGoodContrast3, logoCenter = false, loginRegister = false }) {
   const location = useLocation()
 
   const { ecommerce } = useParams()
@@ -149,7 +149,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr_auto]">
       {!notHeader && (
-        <HeaderNav logoCenter={logoCenter} setGoodContrast3={setGoodContrast3} setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} fixed={fixed} />
+        <HeaderNav loginRegister={loginRegister} logoCenter={logoCenter} setGoodContrast3={setGoodContrast3} setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} fixed={fixed} />
       )}
       {/* <main className={`${!notHeader && "mt-20"}`}
         style={{ backgroundColor: ecommerce ? "#FFFFFF" : mainColor || "#FFFFFF" }}>

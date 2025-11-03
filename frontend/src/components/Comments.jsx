@@ -127,7 +127,7 @@ const CommentsSection = ({ productId }) => {
       if (response.data.success) {
         setRating(0);
         reset();
-        await loadComments(); 
+        await loadComments();
         setError(null);
       } else {
         setError(response.data.message || "Error al enviar comentario");
@@ -177,9 +177,10 @@ const CommentsSection = ({ productId }) => {
       currentUser && currentUser.id_usuario === comment.id_usuario;
 
     const replies = comment.respuestas || [];
-    const hasUserReplied = comments.some(
-      (comment) => comment.id_usuario === currentUser.id_usuario
-    );
+    const hasUserReplied = currentUser
+      ? comments.some((c) => c.id_usuario === currentUser.id_usuario)
+      : false;
+
     const [charCount, setCharCount] = useState(0);
 
     const {

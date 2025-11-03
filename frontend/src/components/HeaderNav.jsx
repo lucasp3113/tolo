@@ -20,7 +20,7 @@ import { TbFavicon } from "react-icons/tb";
 import ToloCoin from "./ToloCoin";
 
 
-export default function HeaderNav({ logoCenter, search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed }) {
+export default function HeaderNav({ logoCenter, search, setSearchData, setPanelFilter, setDataCategories, setWord, logo = true, setUserTypeForAdmin, color, setLoading, fixed, loginRegister = false }) {
   const [goodContrast, setGoodContrast] = useState(true);
   const [goodContrast2, setGoodContrast2] = useState(true);
 
@@ -156,7 +156,7 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
     <header style={{ backgroundColor: color || "#075985" }} className={`bg-sky-800 w-full border-gray-600 h-20 sm:h-12 md:h-20 lg:h-20 flex items-center ${fixed && "fixed mb-20"} z-50 justify-between`}>
       {logo ? (
         <div
-          className={`flex items-center justify-center w-22 h-full cursor-pointer ${logoCenter && windowWidth < 500 && logoEcommerce && "absolute left-1/2 -translate-x-1/2 !w-32"}`}
+          className={`flex items-center justify-center w-22 h-full cursor-pointer ${logoCenter && windowWidth < 500 && logoEcommerce && "absolute left-1/2 -translate-x-1/2 !w-32"} ${loginRegister && logoEcommerce && "!h-[10%]"}`}
           onClick={() => nameEcommerce ? navigate(`/${nameEcommerce}/`) : navigate("/")}
         >
           {logoLoaded ? (

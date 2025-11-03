@@ -65,7 +65,7 @@ function App() {
                 <Route
                   path="/:ecommerce?/login/"
                   element={
-                    <Layout  setUserType={setUserType}>
+                    <Layout loginRegister={true}  logoCenter={true}  setUserType={setUserType}>
                       <Login />
                     </Layout>
                   }
@@ -81,7 +81,7 @@ function App() {
                 <Route
                   path="/:ecommerce?/register/"
                   element={
-                    <Layout >
+                    <Layout loginRegister={true} logoCenter={true} >
                       <Register />
                     </Layout>
                   }

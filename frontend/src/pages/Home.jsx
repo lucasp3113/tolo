@@ -334,8 +334,8 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
             className={`
     flex flex-col items-center justify-between
     transition-colors duration-1000 ease-in-out
-    min-h-screen
-    ${searchData || ecommerce ? "bg-transparent" : !isInView ? "bg-white" : "bg-sky-800"}
+    min-h-[50%]
+    ${searchData || ecommerce || loading ? "bg-transparent" : !isInView ? "bg-white" : "bg-sky-800"}
   `}>
 
             {!searchData ? (

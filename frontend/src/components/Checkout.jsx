@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function CheckoutBricks({ total, onPaymentSuccess, idCompra, data, toloCoinsGanados, toloCoinsRestados, userId }) {
+    const { ecommerce } = useParams()
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [brickController, setBrickController] = useState(null);
@@ -144,7 +145,8 @@ function CheckoutBricks({ total, onPaymentSuccess, idCompra, data, toloCoinsGana
                                                         onPaymentSuccess({ id: result.id });
                                                     }
                                                     sessionStorage.setItem('paymentSuccess', 'success')
-                                                    navigate('/payments_history');
+                                           
+                                                    ecommerce ? navigate(`/${ecommerce}/payments_history/`) : navigate("/payments_history/")
                                                     resolve();
                                                     axios.post("/api/upload_stock.php", data)
                                                         .then((res) => console.log(res))

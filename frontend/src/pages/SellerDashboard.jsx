@@ -11,36 +11,36 @@ const RatingMeter = memo(({ progress, getColor }) => {
   const offset = circumference - (progress / 5) * circumference;
 
   useEffect(() => {
-  const interval = setInterval(() => {
-    const iframes = document.querySelectorAll("iframe");
-    if (!iframes.length) return;
+    const interval = setInterval(() => {
+      const iframes = document.querySelectorAll("iframe");
+      if (!iframes.length) return;
 
-    for (const iframe of iframes) {
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc) continue;
+      for (const iframe of iframes) {
+        try {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+          if (!doc) continue;
 
-        const target = doc.querySelector(".tawk-icon-right");
-        if (target) {
-          target.remove(); 
-          clearInterval(interval);
+          const target = doc.querySelector(".tawk-icon-right");
+          if (target) {
+            target.remove();
+            clearInterval(interval);
 
-          const observer = new MutationObserver(() => {
-            const again = doc.querySelector(".tawk-icon-right");
-            if (again) again.remove();
-          });
+            const observer = new MutationObserver(() => {
+              const again = doc.querySelector(".tawk-icon-right");
+              if (again) again.remove();
+            });
 
-          observer.observe(doc.body, { childList: true, subtree: true });
-          return;
+            observer.observe(doc.body, { childList: true, subtree: true });
+            return;
+          }
+        } catch (e) {
+
         }
-      } catch (e) {
-    
       }
-    }
-  }, 300);
+    }, 300);
 
-  return () => clearInterval(interval);
-}, []);
+    return () => clearInterval(interval);
+  }, []);
 
 
   return (
@@ -198,26 +198,87 @@ export default function SellerDashboard({ children }) {
     next_percentage: 0,
   });
 
-  let user = null;
-  const token = localStorage.getItem("token");
-  if (token) {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    user = payload.user;
-  }
+  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    axios
-      .post("/api/show_profile_picture.php", { user })
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setUser(payload.user);
+      setUserId(payload.id_usuario);
+    } catch (e) {
+    }
+  }, []);
+
+  const [pendingStepsFromAPI, setPendingStepsFromAPI] = useState([]);
+
+  useEffect(() => {
+    if (!userId) return;
+    axios.post("/api/pending_steps.php", { userId })
       .then((res) => {
-        console.log(res.data.logo.logo);
-        if (res.data?.logo?.logo) {
-          setLogo(`/api/${res.data.logo.logo}`);
-        } else {
-          setLogo(null);
-        }
+        console.log(res)
+        setPendingStepsFromAPI(res.data.data || []);
       })
       .catch((err) => console.log(err));
+  }, [userId]);
+
+  // Controlar visibilidad del chatbot solo en esta página
+  useEffect(() => {
+    // Mostrar chatbot al entrar
+    if (window.Tawk_API && typeof window.Tawk_API.showWidget === 'function') {
+      window.Tawk_API.showWidget();
+    }
+
+    // Ocultar chatbot al salir (cleanup function)
+    return () => {
+      if (window.Tawk_API && typeof window.Tawk_API.hideWidget === 'function') {
+        window.Tawk_API.hideWidget();
+      }
+    };
   }, []);
+
+  const [hoverPendings, setHoverPendings] = useState(true);
+  const steps = [
+    { key: 'logo', label: 'Agregar logo', path: '/profile_picture/' },
+    { key: 'favicon', label: 'Agregar favicon', path: '/favicon/' },
+    { key: 'imagen_inicio', label: 'Agregar imagen de inicio', path: '/customize_home/' },
+    { key: 'tiene_custom_shop', label: 'Configurar tienda', path: '/customize_store/' },
+    { key: 'ubicacion', label: 'Agregar ubicación', path: '/maps/' }
+  ];
+
+  const completedSteps = steps.filter(step => ecommerce[step.key]);
+  const totalSteps = steps.length;
+  const completedCount = steps.filter(step => {
+    const value = pendingStepsFromAPI[step.key];
+    return value && value !== 0 && value !== '';
+  }).length;
+  const pendingSteps = steps.filter(step => {
+    const value = pendingStepsFromAPI[step.key];
+    return !value || value === 0 || value === '';
+  });
+
+
+
+
+
+  useEffect(() => {
+    if (user) {
+      axios
+        .post("/api/show_profile_picture.php", { user })
+        .then((res) => {
+          console.log(res)
+          if (res.data?.logo?.logo) {
+            setLogo(`/api/${res.data.logo.logo}`);
+          } else {
+            setLogo(null);
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
 
   useEffect(() => {
     axios
@@ -319,7 +380,6 @@ export default function SellerDashboard({ children }) {
   }, [timeRange]);
 
   const { ecommerce: nameEcommerce } = useParams();
-  console.log(nameEcommerce)
 
   useEffect(() => {
     setChartData(generateDummyData());
@@ -335,6 +395,27 @@ export default function SellerDashboard({ children }) {
   if (isMobile) {
     return (
       <div className="flex flex-col min-h-screen">
+        {pendingSteps.length > 0 && (
+          <section onMouseEnter={() => setHoverPendings(false)}
+            onMouseLeave={() => setHoverPendings(true)}
+            className={`absolute z-50 text-green-500 font-quicksand font-semibold left-9 transition-colors ease-in-out duration-500 w-58 hover:h-38 p-1 whitespace-nowrap rounded-xl hover:bg-green-500 hover:text-white cursor-pointer text-lg bottom-0`}>
+            {!hoverPendings ? (
+              <ul className="">
+                {pendingSteps.map(step => (
+                  <li
+                    key={step.key}
+                    onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}${step.path}`) : navigate(step.path)}
+                    className="hover:underline cursor-pointer text-white"
+                  >
+                    {step.label}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              `${completedCount} de ${totalSteps} pasos completados`
+            )}
+          </section>
+        )}
         <div className="bg-white cursor-pointer relative w-full shadow p-4 flex items-center border-b border-gray-200">
           {logo ? (
             <img
@@ -444,7 +525,8 @@ export default function SellerDashboard({ children }) {
   // VERSIÓN DESKTOP
   return (
     <section className="w-full p-5 h-full flex justify-between items-center">
-      <section className="w-1/4 h-full shadow-md flex items-center flex-col p-4">
+
+      <section className="w-1/4 h-full relative shadow-md flex items-center flex-col p-4">
         {logo ? (
           <img
             src={logo}
@@ -464,10 +546,32 @@ export default function SellerDashboard({ children }) {
 
         <RatingMeter progress={progress} getColor={getColor} />
 
-        <section className="flex items-center justify-center mb-8 text-gray-700 font-quicksand">
-          <FaLocationDot className="text-sky-600 mr-2" size={18} />
-          <span className="font-medium">San José, Uruguay</span>
-        </section>
+        {pendingSteps.length > 0 && (
+          <section onMouseEnter={() => setHoverPendings(false)}
+            onMouseLeave={() => setHoverPendings(true)}
+            className={`absolute bottom-36 
+      z-50 text-green-500 font-quicksand font-semibold 
+      transition-all ease-in-out duration-500 
+      w-58 p-1 whitespace-nowrap rounded-xl left-1/2
+      hover:bg-green-500 hover:text-white 
+      cursor-pointer text-lg`}>
+            {!hoverPendings ? (
+              <ul className="">
+                {pendingSteps.map(step => (
+                  <li
+                    key={step.key}
+                    onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}${step.path}`) : navigate(step.path)}
+                    className="hover:underline cursor-pointer text-white"
+                  >
+                    {step.label}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              `${completedCount} de ${totalSteps} pasos completados`
+            )}
+          </section>
+        )}
 
         <section className="w-full flex flex-col mt-auto">
           <button
@@ -555,6 +659,6 @@ export default function SellerDashboard({ children }) {
           <Chart chartData={chartData} chartType={chartType} isMobile={false} />
         </section>
       </section>
-    </section>
+    </section >
   );
 }
