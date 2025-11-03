@@ -176,7 +176,7 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
           {/* En móvil: ToloCoin a la izquierda */}
           {windowWidth < 500 && isLoggedIn && (
             <div className={`${windowWidth < 500 ? "absolute left-0 -translate-x-5 scale-90 " : ""}`}>
-              <ToloCoin goodContrast={goodContrast2}/>
+              <ToloCoin goodContrast={goodContrast2} />
             </div>
           )}
 
@@ -195,7 +195,7 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
           {/* En desktop: ToloCoin en el centro */}
           {windowWidth >= 500 && isLoggedIn && (
             <div className="m-auto">
-              <ToloCoin  goodContrast={goodContrast2}/>
+              <ToloCoin goodContrast={goodContrast2} />
             </div>
           )}
         </section>
@@ -225,7 +225,7 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
               color="blue"
               size="lg"
               className={`!bg-transparent ${windowWidth < 500 ? windowWidth < 400 ? "-translate-x-9" : "-translate-x-8" : "absolute top-[50%] left-1/2 -translate-x-58 -translate-y-1/2 "} !shadow-none !rounded-none !m-0 !text-2xl`}
-              text={<CiSliderHorizontal className='text-4xl' />}
+              text={<CiSliderHorizontal className={`text-4xl ${goodContrast2 ? "text-white" : "text-black"}`} />}
             />
           )}
         </>
