@@ -28,6 +28,7 @@ import Maps from './pages/Maps';
 import Account from './pages/Account';
 import Favicon from './pages/Favicon'
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import Favorites from './pages/Favorites';
 
 
 function App() {
@@ -152,6 +153,14 @@ function App() {
                   <Layout logo={false} >
                     <ProtectedRoute>
                       <ShoppingCart />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+                />
+                <Route path='/:ecommerce?/favorites/' element={
+                  <Layout logoCenter={true} >
+                    <ProtectedRoute>
+                      <Favorites />
                     </ProtectedRoute>
                   </Layout>
                 }

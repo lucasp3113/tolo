@@ -6,7 +6,7 @@ import { FaPen } from "react-icons/fa";
 import axios from "axios";
 import Rating from './Rating';
 
-export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, idItem = null, admin = false, rating = null, shopping = false, image2 = null }) {
+export default function ProductCard({ name, price, image, stock, freeShipping, phone = false, client = true, onDelete, onUpdate, onClick, cart = false, amount = null, idItem = null, admin = false, rating = null, shopping = false, image2 = null, favorites = false }) {
   const [useOverlayLayout, setUseOverlayLayout] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // celu cuando la imagen es grande
   if (phone && useOverlayLayout && imageLoaded) {
     return (
-      <div onClick={onClick} className={`cursor-pointer ${shopping ? "w-full" : "w-1/2 flex-col"} relative p-2 mb-0.5 bg-transparent  overflow-hidden flex items-center justify-between m-0 ${cart ? "h-34" : "h-[350px]"}`}>
+      <div onClick={onClick} className={`cursor-pointer ${shopping ? "w-full" : "w-1/2 flex-col"} relative p-2 mb-0.5 bg-transparent ${favorites && "!w-full"} overflow-hidden flex items-center justify-between m-0 ${cart ? "h-34" : "h-[350px]"}`}>
         <div className="w-44 aspect-square flex-shrink-0 bg-gray-100">
           <img
             onMouseEnter={() => setHoverImage(true)}
@@ -131,7 +131,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
   // celu cuando la imagen es chica
   if (phone) {
     return (
-      <div onClick={onClick} className={`cursor-pointer ${shopping ? "w-full" : "w-1/2 flex-col"} relative p-2 mb-0.5 bg-transparent  overflow-hidden flex items-center justify-between m-0 ${cart ? "h-34" : "h-[350px]"}`}>
+      <div onClick={onClick} className={`cursor-pointer ${shopping ? "w-full" : "w-1/2 flex-col"} relative p-2 mb-0.5 bg-transparent ${favorites && "!w-full"}  overflow-hidden flex items-center justify-between m-0 ${cart ? "h-34" : "h-[350px]"}`}>
         <section className="flex flex-col items-center justify-center">
           <img
             loading="lazy"
@@ -176,7 +176,7 @@ export default function ProductCard({ name, price, image, stock, freeShipping, p
           )} */}
 
           {!client && (
-            <div className="flex gap-2 pt-4 absolute bottom-0">
+            <div className="flex gap-2 pt-4 absolute bottom-20 left-14">
               {!admin && (
                 <Button
                   color={"blue"}

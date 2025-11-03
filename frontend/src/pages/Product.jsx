@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Carrusel from "../components/Carrusel";
 import { useParams } from "react-router-dom";
 import CommentsSection from "../components/Comments";
+import { FaStar } from "react-icons/fa";
 
 
 export default function Product(productId) {
@@ -33,14 +34,6 @@ export default function Product(productId) {
   }
 
   function handleAddToCart() {
-    console.log('=== DEBUG FINAL ===');
-    console.log('selectedColorId:', selectedColorId);
-    console.log('selectedTalleId:', selectedTalleId);
-    console.log('selectedColor:', selectedColor);
-    console.log('selectedSize:', selectedSize);
-    console.log('data.colores[selectedColor]:', data.colores[selectedColor]);
-
-
     axios.post("/api/add_to_cart.php", {
       id_client: userId,
       id_product: id,
@@ -93,6 +86,39 @@ export default function Product(productId) {
       })
       .catch(err => console.error(err));
   }, [data]);
+
+  const [star, setStar] = useState(false);
+  const [initializedStar, setInitializedStar] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return; // si no está logueado no revisa favoritos
+
+    axios.post("/api/get_favorites.php", {
+      userId: userId,   // ✅ este faltaba
+      id_producto: id
+    })
+      .then((res) => {
+        if (res.data.favorites.length > 0) setStar(true);
+        setInitializedStar(true);
+        console.log(res)
+      })
+      .catch(err => console.error(err));
+  }, [id, userId]);
+
+
+  useEffect(() => {
+    if (!initializedStar) return; // ✅ Evita ejecutar en el render inicial
+
+    const endpoint = star ? "/api/add_favorite.php" : "/api/remove_favorite.php";
+
+    axios.post(endpoint, {
+      idUsuario: userId,
+      idProducto: id
+    })
+      .then(res => console.log(res))
+      .catch(err => console.error(err));
+  }, [star]);
+
 
 
 
@@ -322,7 +348,7 @@ export default function Product(productId) {
   return (
     <section className="">
       {width >= 500 ? (
-        <article className="w-[95%] lg:w-[85%] xl:w-[80%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-6 mx-auto text-left gap-8">
+        <article className="w-full max-w-[90%] rounded-md flex justify-between bg-white shadow-xl mt-10 p-6 mx-auto text-left gap-8">
           <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
             <div className="flex justify-center border-b border-gray-200 mb-6">
               <Carrusel
@@ -333,11 +359,16 @@ export default function Product(productId) {
                 images={getCurrentImages()}
               />
             </div>
-            <section className="text-gray-700  p-4 border-b border-gray-200">
+            <section className="text-gray-700 relative w-full  p-4 border-b border-gray-200">
               <h1 className="text-3xl mb-5">Descripción</h1>
               <p className="font-semibold text-gray-500 text-xl">
                 {data.descripcion}
               </p>
+              <FaStar
+                className={`text-3xl top-5.5 right-5 absolute mb-5 cursor-pointer transition-all ${star ? "text-yellow-400" : "text-gray-400"
+                  }`}
+                onClick={star ? () => setStar(false) : () => setStar(true)}
+              />
             </section>
             <section className="p-4 border-b border-gray-200 flex flex-col">
               <h1 className="text-3xl mb-5 text-gray-700">
@@ -351,7 +382,7 @@ export default function Product(productId) {
                     key={index}
                   >
                     <li
-                      className={`mb-0 h-12 break-inside-avoid-column flex items-center pl-5`}
+                      className={`mb-0 h-12 break-inside-avoid-column break-words overflow-hidden flex items-center pl-5`}
                     >
                       {caracteristica}
                     </li>
@@ -439,9 +470,10 @@ export default function Product(productId) {
             <div className="flex flex-col gap-3 w-full mt-6">
               <ProtectedComponent>
                 <Button
+                  onClick={() => handleAddToCart()}
                   color="sky"
                   text="Comprar ahora"
-                  className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                  className="bg-[#3884fc] hover:bg-[#306ccc] hover:scale-none! text-white rounded-md! transition-colors! duration-100! font-semibold w-full h-[3rem] m-auto"
                 />
               </ProtectedComponent>
 
@@ -451,7 +483,7 @@ export default function Product(productId) {
                   onClick={() => handleAddToCart()}
                   theme="blue"
                   text="Añadir al carrito"
-                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
+                  className="bg-[#e8ecfc]! text-[#3884fc]! hover:bg-[#e0e4fc]! hover:scale-none! rounded-md! transition-colors! duration-100! font-semibold w-full h-[3rem] m-auto"
                 />
               </ProtectedComponent>
             </div>
@@ -564,6 +596,7 @@ export default function Product(productId) {
               <div className="flex flex-col gap-3 w-full mt-4">
                 <ProtectedComponent>
                   <Button
+                    onClick={() => handleAddToCart()}
                     color="sky"
                     text="Comprar ahora"
                     className="bg-[#3884fc] hover:bg-[#306ccc] text-white rounded-md! transition-colors duration-300 font-semibold w-full h-[3rem] m-auto"
@@ -599,11 +632,16 @@ export default function Product(productId) {
               </section>
             </div>
 
-            <section className="text-gray-700 p-4 border-b border-gray-200 mt-6">
+            <section className="text-gray-700 relative p-4 border-b border-gray-200 mt-6">
               <h1 className="text-2xl mb-5">Descripción</h1>
-              <p className="font-semibold max-w-84 break-words text-gray-500 text-md">
+              <p className="font-semibold w-full break-words text-gray-500 text-md">
                 {data.descripcion}
               </p>
+              <FaStar
+                className={`text-3xl top-4 right-5 absolute mb-5 cursor-pointer transition-all ${star ? "text-yellow-400" : "text-gray-400"
+                  }`}
+                onClick={star ? () => setStar(false) : () => setStar(true)}
+              />
             </section>
             <section className="p-4 border-b border-gray-200 flex flex-col">
               <h1 className="text-2xl mb-5 text-gray-700">

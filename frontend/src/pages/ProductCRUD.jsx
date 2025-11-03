@@ -40,6 +40,38 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
     return jsx;
   }
 
+  function showProductsMobile(data) {
+    const jsx = [];
+
+    for (let i = 0; i < data.length; i += 2) {
+      const chunk = data.slice(i, i + 2);
+
+      jsx.push(
+        <AnimationScroll key={chunk[0].id_producto}>
+          <section className="flex flex-wrap items-start justify-start w-full">
+            {chunk.map((producto) => (
+              <ProductCard
+                isAdmin={isAdmin}
+                key={producto.id_producto}
+                name={producto.nombre_producto}
+                price={producto.precio}
+                image={`/api/${producto.ruta_imagen}`}
+                stock={producto.stock}
+                freeShipping={true}
+                phone={true}
+                client={false}
+                onDelete={() => deleteProduct(producto.id_producto)}
+                onUpdate={() => handleEdit(producto.id_producto)}
+              />
+            ))}
+          </section>
+        </AnimationScroll>
+      );
+    }
+
+    return jsx;
+  }
+
   let user = null;
   let userId = null;
   const token = localStorage.getItem("token");
@@ -80,7 +112,7 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
         if (res.data.success) {
           setProductData(res.data.data);
           setUpdate([true, id]);
-          console.log(res)
+          console.log(res);
         }
       })
       .catch((err) => console.log(err));
@@ -110,19 +142,21 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
 
   return (
     <div
-      className={`mb-20  ${windowWidth >= 500 ? "flex flex-wrap justify-center gap-4" : ""
-        }`}
+      className={`mb-20 ${
+        windowWidth >= 500 ? "flex flex-wrap justify-center gap-4" : ""
+      }`}
     >
       {user === "admin" && (
-        <div onClick={() => setProductCrud(false)} className="flex absolute z-50 cursor-pointer left-6 top-28 justify-start -translate-y-6 -translate-x-6 hover:scale-110 transition-transform duration-300">
+        <div
+          onClick={() => setProductCrud(false)}
+          className="flex absolute z-50 cursor-pointer left-6 top-28 justify-start -translate-y-6 -translate-x-6 hover:scale-110 transition-transform duration-300"
+        >
           <IoReturnUpBack className={`w-18 z-50 mr-2 text-[40px]`} />
         </div>
       )}
       {!update ? (
-        productos.length > 1 && windowWidth > 500 ? (
-          showProducts(productos)
-        ) : (
-          productos.map((producto) => (
+        windowWidth >= 500 ? (
+          productos.length > 1 ? showProducts(productos) : productos.map((producto) => (
             <AnimationScroll key={producto.id_producto}>
               <ProductCard
                 isAdmin={isAdmin}
@@ -132,13 +166,15 @@ export default function ProductCRUD({ isAdmin, setProductCrud = null }) {
                 image={`/api/${producto.ruta_imagen}`}
                 stock={producto.stock}
                 freeShipping={true}
-                phone={windowWidth >= 500 ? false : true}
+                phone={false}
                 client={false}
                 onDelete={() => deleteProduct(producto.id_producto)}
                 onUpdate={() => handleEdit(producto.id_producto)}
               />
             </AnimationScroll>
           ))
+        ) : (
+          showProductsMobile(productos)
         )
       ) : (
         <CreateProduct

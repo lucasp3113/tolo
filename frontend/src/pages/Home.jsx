@@ -555,6 +555,6 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                     </div>
                 )
             )}
-        </section >
+        </section>
     );
 }

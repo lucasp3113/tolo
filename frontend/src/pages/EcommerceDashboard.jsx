@@ -125,7 +125,7 @@ export default function EcommerceDashboard() {
     return (
         <SellerDashboard>
             <section className={`w-full ${windowWidth >= 500 ? "flex" : ""}`}>
-                <Card className={`w-full !rounded-none !shadow-md max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
+                <Card className={`w-full  !shadow-md max-w-md text-center mb-0.5  ${windowWidth < 500 ? "m-auto" : ""}`}>
                     <h2 className="text-3xl font-quicksand font-bold  
         mb-2">Tu rango actual</h2>
                     <h3 className={`text-3xl font-quicksand font-semibold ${colorsCurrentRange[currentRange] || 'text-gray-700'}`}>

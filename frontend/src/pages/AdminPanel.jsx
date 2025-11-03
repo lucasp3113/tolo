@@ -23,10 +23,10 @@ import {
 import { useForm } from "react-hook-form";
 
 
-const Chart = memo(({ chartData, chartType }) => {
+const Chart = memo(({ chartData, chartType }) => {  //parametro chartData de chart fuera de la funcion
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={chartData}>
+      <LineChart data={chartData}> {/*data es igual a chartdata dentro de funcion chart*/}
         <defs>
           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
             <stop
@@ -85,9 +85,9 @@ const Chart = memo(({ chartData, chartType }) => {
   );
 });
 
-const ChartMobile = memo(({ chartData, chartType }) => {
+const ChartMobile = memo(({ chartData, chartType }) => { // chartmobile ocn parametro chartdata dentro de funcion chart
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={300}> {/*data es igual a chartdata dentro de funcion chartmobile*/}
       <LineChart data={chartData}>
         <defs>
           <linearGradient id="colorValueMobile" x1="0" y1="0" x2="0" y2="1">
@@ -304,9 +304,10 @@ export default function AdminPanel() {
             cliente: order.cliente,
             fecha: order.fecha_compra,
             monto: order.total,
-            direccion: order.direccion || "Sin dirección",
+            vendedor: order.ecommerce || "N/A",
             estado: order.estado,
           }));
+          console.log("✅",  res)
           setOrdersTable(formatted);
           setDisplayedOrders([]);
           setPage(0);
@@ -336,55 +337,55 @@ export default function AdminPanel() {
     }, 300);
   };
 
-  const generateDummyData = useCallback(() => {
-    switch (timeRange) {
-      case "1dia":
-        return Array.from({ length: 24 }, (_, i) => ({
-          name: `${i}:00`,
-          Visitas: Math.floor(Math.random() * 10),
-          ganancias: Math.floor(Math.random() * 500),
-        }));
-      case "1semana":
-        return ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => ({
-          name: day,
-          Visitas: Math.floor(Math.random() * 50),
-          ganancias: Math.floor(Math.random() * 3000),
-        }));
-      case "1mes":
-        return Array.from({ length: 30 }, (_, i) => ({
-          name: `${i + 1}`,
-          Visitas: Math.floor(Math.random() * 20),
-          ganancias: Math.floor(Math.random() * 1500),
-        }));
-      case "5meses":
-        return ["Mes 1", "Mes 2", "Mes 3", "Mes 4", "Mes 5"].map((mes) => ({
-          name: mes,
-          Visitas: Math.floor(Math.random() * 200),
-          ganancias: Math.floor(Math.random() * 15000),
-        }));
-      case "1año":
-        return [
-          "Ene",
-          "Feb",
-          "Mar",
-          "Abr",
-          "May",
-          "Jun",
-          "Jul",
-          "Ago",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dic",
-        ].map((mes) => ({
-          name: mes,
-          Visitas: Math.floor(Math.random() * 150),
-          ganancias: Math.floor(Math.random() * 10000),
-        }));
-      default:
-        return [];
-    }
-  }, [timeRange]);
+  // const generateDummyData = useCallback(() => {
+  //   switch (timeRange) {
+  //     case "1dia":
+  //       return Array.from({ length: 24 }, (_, i) => ({
+  //         name: `${i}:00`,
+  //         Visitas: Math.floor(Math.random() * 10),
+  //         ganancias: Math.floor(Math.random() * 500),
+  //       }));
+  //     case "1semana":
+  //       return ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => ({
+  //         name: day,
+  //         Visitas: Math.floor(Math.random() * 50),
+  //         ganancias: Math.floor(Math.random() * 3000),
+  //       }));
+  //     case "1mes":
+  //       return Array.from({ length: 30 }, (_, i) => ({
+  //         name: `${i + 1}`,
+  //         Visitas: Math.floor(Math.random() * 20),
+  //         ganancias: Math.floor(Math.random() * 1500),
+  //       }));
+  //     case "5meses":
+  //       return ["Mes 1", "Mes 2", "Mes 3", "Mes 4", "Mes 5"].map((mes) => ({
+  //         name: mes,
+  //         Visitas: Math.floor(Math.random() * 200),
+  //         ganancias: Math.floor(Math.random() * 15000),
+  //       }));
+  //     case "1año":
+  //       return [
+  //         "Ene",
+  //         "Feb",
+  //         "Mar",
+  //         "Abr",
+  //         "May",
+  //         "Jun",
+  //         "Jul",
+  //         "Ago",
+  //         "Sep",
+  //         "Oct",
+  //         "Nov",
+  //         "Dic",
+  //       ].map((mes) => ({
+  //         name: mes,
+  //         Visitas: Math.floor(Math.random() * 150),
+  //         ganancias: Math.floor(Math.random() * 10000),
+  //       }));
+  //     default:
+  //       return [];
+  //   }
+  // }, [timeRange]);
 
 
   useEffect(() => {
@@ -466,13 +467,13 @@ export default function AdminPanel() {
     console.log(searchData);
   }, [searchData]);
 
-
+  
 
   return !productCrud ? (
     <section className=" bg-gradient-to-br from-gray-50 to-gray-100">
       {width >= 500 ? (
         <div className="gap-4 md:p-4 font-quicksand">
-          <section className="flex gap-4">
+          <section className="flex gap-4 min-h-[27rem]">
             <section className="w-[76%] bg-white shadow rounded-xl p-4 max-h-[28rem] overflow-y-auto">
               <table className="w-full">
                 <thead className="top-0 bg-white z-10">
@@ -480,8 +481,8 @@ export default function AdminPanel() {
                     <th className="px-4 py-2 font-semibold">Pedido</th>
                     <th className="px-4 py-2 font-semibold">Cliente</th>
                     <th className="px-4 py-2 font-semibold">Fecha</th>
-                    <th className="px-4 py-2 font-semibold">Monto</th>
-                    <th className="px-4 py-2 font-semibold">Dirección</th>
+                    <th className="px-4 py-2 font-semibold">Monto $U</th>
+                    <th className="px-4 py-2 font-semibold">Vendedor</th>
                     <th className="px-4 py-2 font-semibold">Estado</th>
                   </tr>
                 </thead>
@@ -501,11 +502,12 @@ export default function AdminPanel() {
                       <td className="px-4 py-2 border border-gray-200">
                         {order.fecha}
                       </td>
-                      <td className="px-4 py-2 border border-gray-200">
+                      <td className="flex px-4 py-2 border border-gray-200">
+                        <p className="mr-1">$</p>
                         {order.monto}
                       </td>
                       <td className="px-4 py-2 border border-gray-200">
-                        {order.direccion}
+                        {order.vendedor}
                       </td>
                       <td
                         className={`px-4 py-2 border border-gray-200 font-bold flex justify-center ${
@@ -813,7 +815,7 @@ export default function AdminPanel() {
                         {order.monto}
                       </td>
                       <td className="px-0.5 py-1 text-[9px] hidden sm:table-cell truncate">
-                        {order.direccion}
+                        {order.vendedor}
                       </td>
                       <td
                         className={`px-0.5 py-1 font-bold flex justify-center items-center gap-0.5 ${
@@ -942,6 +944,7 @@ export default function AdminPanel() {
     <ProductCRUD
       ecommerce={selectedEcommerce}
       setProductCrud={setProductCrud}
+      isAdmin={selectedEcommerce}
     />
   );
 }

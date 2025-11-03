@@ -1,9 +1,70 @@
 import React, { useState, useEffect, useCallback, memo } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useNavigate } from "react-router-dom";
+import { VscError } from "react-icons/vsc";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { useParams } from "react-router-dom";
+import { FiCopy } from "react-icons/fi";
+
+function ShareEcommerceLink({ nombreEcommerce }) {
+  const [copied, setCopied] = useState(false);
+
+  const encodedName = encodeURIComponent(nombreEcommerce);
+  const ecommerceUrl = `https://tolo.lat/${encodedName}`;
+
+  const copyToClipboard = async () => {
+    try {
+      // Intenta primero con la API moderna
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(ecommerceUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        // Fallback para navegadores que no soportan clipboard API
+        const textArea = document.createElement('textarea');
+        textArea.value = ecommerceUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand('copy');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+          console.error('Fallback: Error copiando', err);
+        }
+
+        document.body.removeChild(textArea);
+      }
+    } catch (err) {
+      console.error("Error copiando enlace:", err);
+    }
+  };
+
+  return (
+    <div className="relative flex justify-center w-full px-3 py-2">
+      <button
+        onClick={copyToClipboard}
+        className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg shadow-sm text-sm font-medium transition-colors active:bg-slate-300"
+      >
+        <FiCopy className="text-slate-600" />
+        <span>{copied ? "¡Copiado!" : "¡Copia el enlace!"}</span>
+      </button>
+    </div>
+  );
+}
 
 const RatingMeter = memo(({ progress, getColor }) => {
   const radius = 40;
@@ -87,7 +148,12 @@ const RatingMeterMobile = memo(({ progress, getColor }) => {
 
   return (
     <svg width="60" height="40" viewBox="0 0 100 50" className="flex-shrink-0">
-      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="transparent" stroke="#e5e7eb" strokeWidth="10" />
+      <path
+        d="M 10 50 A 40 40 0 0 1 90 50"
+        fill="transparent"
+        stroke="#e5e7eb"
+        strokeWidth="10"
+      />
       <path
         d="M 10 50 A 40 40 0 0 1 90 50"
         fill="transparent"
@@ -123,58 +189,91 @@ const RatingMeterMobile = memo(({ progress, getColor }) => {
 });
 
 const Chart = memo(({ chartData, chartType, isMobile }) => {
+  const noData =
+    !chartData ||
+    chartData.length === 0 ||
+    chartData.every((d) => d.valor === 0);
+
   return (
-    <ResponsiveContainer width="100%" height={isMobile ? 300 : "100%"}>
-      <LineChart data={chartData}>
-        <defs>
-          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'}
-              stopOpacity={0.3}
+    <div className="w-full h-[300px] flex justify-center items-center">
+      {noData ? (
+        <p className="flex flex-col text-gray-500 text-sm md:text-base font-[Quicksand]">
+          <VscError className="m-auto text-6xl mb-11 text-red-300" />
+          No se encontraron {chartType === "ganancias"
+            ? "ganancias"
+            : "ventas"}{" "}
+          en este período.
+        </p>
+      ) : (
+        <ResponsiveContainer width="100%" height={isMobile ? 300 : "100%"}>
+          <LineChart data={chartData}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor={chartType === "ventas" ? "#0ea5e9" : "#22c55e"}
+                  stopOpacity={0.3}
+                />
+                <stop
+                  offset="95%"
+                  stopColor={chartType === "ventas" ? "#0ea5e9" : "#22c55e"}
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
+
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#f1f5f9"
+              vertical={false}
             />
-            <stop
-              offset="95%"
-              stopColor={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'}
-              stopOpacity={0}
+            <XAxis
+              dataKey="name"
+              tick={{
+                fill: "#94a3b8",
+                fontSize: isMobile ? 10 : 11,
+                fontFamily: "Quicksand",
+              }}
+              axisLine={{ stroke: "#e2e8f0" }}
+              tickLine={false}
             />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-        <XAxis
-          dataKey="name"
-          tick={{ fill: '#94a3b8', fontSize: isMobile ? 10 : 11, fontFamily: 'Quicksand' }}
-          axisLine={{ stroke: '#e2e8f0' }}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fill: '#94a3b8', fontSize: isMobile ? 10 : 11, fontFamily: 'Quicksand' }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: '#1e293b',
-            borderRadius: '8px',
-            border: 'none',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            fontFamily: 'Quicksand',
-            fontSize: isMobile ? '12px' : '14px',
-            color: '#fff'
-          }}
-          labelStyle={{ color: "#94a3b8" }}
-        />
-        <Line
-          type="monotone"
-          dataKey={chartType === 'ventas' ? 'ventas' : 'ganancias'}
-          stroke={chartType === 'ventas' ? '#0ea5e9' : '#22c55e'}
-          strokeWidth={isMobile ? 2.5 : 3}
-          dot={false}
-          activeDot={{ r: isMobile ? 5 : 6, fill: chartType === 'ventas' ? '#0ea5e9' : '#22c55e' }}
-          fill="url(#colorValue)"
-        />
-      </LineChart>
-    </ResponsiveContainer>
+            <YAxis
+              tick={{
+                fill: "#94a3b8",
+                fontSize: isMobile ? 10 : 11,
+                fontFamily: "Quicksand",
+              }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1e293b",
+                borderRadius: "8px",
+                border: "none",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                fontFamily: "Quicksand",
+                fontSize: isMobile ? "12px" : "14px",
+                color: "#fff",
+              }}
+              labelStyle={{ color: "#94a3b8" }}
+            />
+            <Line
+              type="monotone"
+              dataKey="valor"
+              stroke={chartType === "ventas" ? "#0ea5e9" : "#22c55e"}
+              strokeWidth={isMobile ? 2.5 : 3}
+              dot={false}
+              activeDot={{
+                r: isMobile ? 5 : 6,
+                fill: chartType === "ventas" ? "#0ea5e9" : "#22c55e",
+              }}
+              fill="url(#colorValue)"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
+    </div>
   );
 });
 
@@ -182,11 +281,14 @@ export default function SellerDashboard({ children }) {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [logo, setLogo] = useState(null);
-  const rating = 4;
   const [progress, setProgress] = useState(0);
   const [timeRange, setTimeRange] = useState("1semana");
   const [chartData, setChartData] = useState([]);
   const [chartType, setChartType] = useState("ventas");
+  const [rating, setRating] = useState();
+  const [notFound, setNotFound] = useState(false);
+
+
 
   const [ecommerce, setEcommerce] = useState({
     nombre_ecommerce: "",
@@ -212,6 +314,49 @@ export default function SellerDashboard({ children }) {
     } catch (e) {
     }
   }, []);
+
+  useEffect(() => {
+    axios
+      .post("/api/ecommerce_rating.php", {
+        userId: userId,
+      })
+      .then((res) => {
+        console.log(res);
+        setRating(res.data.data[0].promedio_rating);
+      })
+      .catch((res) => console.log(res));
+  }, [userId]);
+
+  useEffect(() => {
+    const endpoint =
+      chartType === "ganancias"
+        ? "/api/ecommerce_earnings.php"
+        : "/api/ecommerce_sales.php";
+
+    axios
+      .post(endpoint, {
+        userId: userId,
+        timeRange: timeRange,
+      })
+      .then((res) => {
+        console.log("✅", res.data.data);
+
+        if (res.data.success && res.data.data) {
+          const formattedData = res.data.data.map((item) => ({
+            name: formatDate(item.date, timeRange),
+            valor:
+              chartType === "ganancias"
+                ? parseInt(item.total, 10)
+                : parseInt(item.count, 10),
+          }));
+          setChartData(formattedData);
+        } else {
+          console.log("No fue posible actualizar Chart");
+          setNotFound(true);
+        }
+      })
+      .catch((res) => console.log(res));
+  }, [chartType, timeRange, userId]);
 
   const [pendingStepsFromAPI, setPendingStepsFromAPI] = useState([]);
 
@@ -329,34 +474,20 @@ export default function SellerDashboard({ children }) {
     return () => cancelAnimationFrame(animationFrameId);
   }, [rating]);
 
-  const generateDummyData = useCallback(() => {
+  function formatDate(dateStr, timeRange) {
+    const date = new Date(dateStr);
+
     switch (timeRange) {
-      case '1dia':
-        return Array.from({ length: 24 }, (_, i) => ({
-          name: `${i}:00`,
-          ventas: Math.floor(Math.random() * 10),
-          ganancias: Math.floor(Math.random() * 500),
-        }));
+      case "1dia":
+        return `${date.getHours()}:00`;
       case "1semana":
-        return ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => ({
-          name: day,
-          ventas: Math.floor(Math.random() * 50),
-          ganancias: Math.floor(Math.random() * 3000),
-        }));
-      case '1mes':
-        return Array.from({ length: 30 }, (_, i) => ({
-          name: `${i + 1}`,
-          ventas: Math.floor(Math.random() * 20),
-          ganancias: Math.floor(Math.random() * 1500),
-        }));
+        const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+        return days[date.getDay()];
+      case "1mes":
+        return `${date.getDate()}`;
       case "5meses":
-        return ["Mes 1", "Mes 2", "Mes 3", "Mes 4", "Mes 5"].map((mes) => ({
-          name: mes,
-          ventas: Math.floor(Math.random() * 200),
-          ganancias: Math.floor(Math.random() * 15000),
-        }));
       case "1año":
-        return [
+        const months = [
           "Ene",
           "Feb",
           "Mar",
@@ -369,21 +500,12 @@ export default function SellerDashboard({ children }) {
           "Oct",
           "Nov",
           "Dic",
-        ].map((mes) => ({
-          name: mes,
-          ventas: Math.floor(Math.random() * 150),
-          ganancias: Math.floor(Math.random() * 10000),
-        }));
+        ];
+        return months[date.getMonth()];
       default:
-        return [];
+        return dateStr;
     }
-  }, [timeRange]);
-
-  const { ecommerce: nameEcommerce } = useParams();
-
-  useEffect(() => {
-    setChartData(generateDummyData());
-  }, [generateDummyData]);
+  }
 
   const getColor = useCallback((value) => {
     if (value < 2.5) return "red";
@@ -391,21 +513,20 @@ export default function SellerDashboard({ children }) {
     return "green";
   }, []);
 
-
   if (isMobile) {
     return (
       <div className="flex flex-col min-h-screen">
         {pendingSteps.length > 0 && (
           <section onMouseEnter={() => setHoverPendings(false)}
             onMouseLeave={() => setHoverPendings(true)}
-            className={`absolute z-50 text-green-500 font-quicksand font-semibold left-9 transition-colors ease-in-out duration-500 w-58 hover:h-38 p-1 whitespace-nowrap rounded-xl hover:bg-green-500 hover:text-white cursor-pointer text-lg bottom-0`}>
+            className={`absolute z-50 text-green-500 font-quicksand font-semibold left-22 transition-colors ease-in-out duration-500 w-58 hover:h-38 p-1 whitespace-nowrap rounded-3xl hover:border-2 hover:border-green-500 hover:bg-white hover:!text-green-500 cursor-pointer text-lg top-43`}>
             {!hoverPendings ? (
               <ul className="">
                 {pendingSteps.map(step => (
                   <li
                     key={step.key}
-                    onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}${step.path}`) : navigate(step.path)}
-                    className="hover:underline cursor-pointer text-white"
+                    onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}${step.path}`) : navigate(step.path)}
+                    className="hover:underline cursor-pointer "
                   >
                     {step.label}
                   </li>
@@ -421,12 +542,12 @@ export default function SellerDashboard({ children }) {
             <img
               src={logo}
               alt="Logo Comercio"
-              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             />
           ) : (
             <span
-              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
               className="font-quicksand flex text-md font-semibold cursor-pointer items-center justify-center w-16 h-16 object-contain bg-white border-2 border-sky-600 rounded-full flex-shrink-0 p-1 shadow-sm"
             >
               Añadir logo
@@ -434,11 +555,12 @@ export default function SellerDashboard({ children }) {
           )}
           <div className="flex-1 flex flex-col items-center">
             <h1 className="text-xl font-bold font-quicksand text-gray-800">
-              Arctec
+              {ecommerce.nombre_ecommerce}
             </h1>
-            <div className="flex items-center text-xs text-gray-600 font-quicksand mt-1">
-              <FaLocationDot className="mr-1 text-sky-600" size={10} />
-              <span>San José, Uruguay</span>
+            <div className="flex items-center justify-between w-full mt-2">
+              <ShareEcommerceLink
+                nombreEcommerce={ecommerce.nombre_ecommerce}
+              />
             </div>
           </div>
           <RatingMeterMobile progress={progress} getColor={getColor} />
@@ -447,13 +569,13 @@ export default function SellerDashboard({ children }) {
         <div className="flex-1 p-4 flex flex-col gap-4 pb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
-              + Añadir producto
+              Añadir producto
             </button>
             <button
-              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Ver mis productos
@@ -480,15 +602,19 @@ export default function SellerDashboard({ children }) {
 
               <div className="flex gap-1 bg-gray-50 p-1 rounded-lg">
                 <button
-                  onClick={() => setChartType('ventas')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ventas' ? 'bg-sky-600 text-white' : 'text-gray-600'
+                  onClick={() => setChartType("ventas")}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === "ventas"
+                    ? "bg-sky-600 text-white"
+                    : "text-gray-600"
                     }`}
                 >
                   Ventas
                 </button>
                 <button
-                  onClick={() => setChartType('ganancias')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ganancias' ? 'bg-green-600 text-white' : 'text-gray-600'
+                  onClick={() => setChartType("ganancias")}
+                  className={`px-3 py-1.5 rounded-md cursor-pointer text-xs font-semibold font-quicksand duration-150 ${chartType === "ganancias"
+                    ? "bg-green-600 text-white"
+                    : "text-gray-600"
                     }`}
                 >
                   Ganancias
@@ -507,7 +633,9 @@ export default function SellerDashboard({ children }) {
                 <button
                   key={key}
                   onClick={() => setTimeRange(key)}
-                  className={`px-3 py-1 rounded-md text-xs font-semibold font-quicksand whitespace-nowrap duration-150 ${timeRange === key ? 'bg-gray-800 text-white' : 'text-gray-500 bg-gray-50'
+                  className={`px-3 py-1 rounded-md text-xs font-semibold font-quicksand whitespace-nowrap duration-150 ${timeRange === key
+                    ? "bg-gray-800 text-white"
+                    : "text-gray-500 bg-gray-50"
                     }`}
                 >
                   {label}
@@ -515,7 +643,11 @@ export default function SellerDashboard({ children }) {
               ))}
             </div>
 
-            <Chart chartData={chartData} chartType={chartType} isMobile={true} />
+            <Chart
+              chartData={chartData}
+              chartType={chartType}
+              isMobile={true}
+            />
           </div>
         </div>
       </div>
@@ -525,43 +657,44 @@ export default function SellerDashboard({ children }) {
   // VERSIÓN DESKTOP
   return (
     <section className="w-full p-5 h-full flex justify-between items-center">
-
-      <section className="w-1/4 h-full relative shadow-md flex items-center flex-col p-4">
+      <section className="w-1/4 h-full relative shadow-md border border-gray-200 flex rounded-xl items-center flex-col p-4">
         {logo ? (
           <img
             src={logo}
             alt="Logo Comercio"
-            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="w-36 h-36 cursor-pointer mb-4 border-4 border-sky-600 rounded-full object-contain bg-white p-2 shadow-lg"
           />
         ) : (
           <span
-            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/profile_picture/`) : navigate("/profile_picture/")}
             className="font-quicksand w-36 h-36 mb-4 border-4 border-sky-600 rounded-full font-semibold flex text-xl cursor-pointer items-center justify-center bg-white p-2 shadow-lg"
           >
             Añadir logo
           </span>
         )}
-        <h1 className="text-3xl font-bold mb-2 font-quicksand text-gray-800"></h1>
+        <h1 className="text-3xl font-bold mb-2 font-quicksand text-gray-800">
+          {ecommerce.nombre_ecommerce}
+        </h1>
 
         <RatingMeter progress={progress} getColor={getColor} />
 
         {pendingSteps.length > 0 && (
           <section onMouseEnter={() => setHoverPendings(false)}
             onMouseLeave={() => setHoverPendings(true)}
-            className={`absolute bottom-36 
+            className={`absolute bottom-45 
       z-50 text-green-500 font-quicksand font-semibold 
       transition-all ease-in-out duration-500 
-      w-58 p-1 whitespace-nowrap rounded-xl left-1/2
-      hover:bg-green-500 hover:text-white 
+      w-58 p-1 whitespace-nowrap rounded-xl 
+      hover:bg-white hover:text-green-500  
       cursor-pointer text-lg`}>
             {!hoverPendings ? (
               <ul className="">
                 {pendingSteps.map(step => (
                   <li
                     key={step.key}
-                    onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}${step.path}`) : navigate(step.path)}
-                    className="hover:underline cursor-pointer text-white"
+                    onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}${step.path}`) : navigate(step.path)}
+                    className="hover:underline cursor-pointer "
                   >
                     {step.label}
                   </li>
@@ -573,16 +706,19 @@ export default function SellerDashboard({ children }) {
           </section>
         )}
 
+        <ShareEcommerceLink
+          nombreEcommerce={ecommerce.nombre_ecommerce}
+        />
+
         <section className="w-full flex flex-col mt-auto">
           <button
-            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center"
           >
-            <span className="text-xl">+</span>
             Añadir Producto
           </button>
           <button
-            onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+            onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
             className="w-full bg-gradient-to-r from-sky-800 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-semibold py-3 px-4 rounded-xl duration-200 shadow-md hover:shadow-lg font-quicksand flex items-center justify-center translate-y-1.5"
           >
             Ver Mis Productos
@@ -591,15 +727,13 @@ export default function SellerDashboard({ children }) {
       </section>
 
       <section className="w-1/3 flex items-center justify-center">
-        <section className="w-[90%]">
-          {children}
-        </section>
+        <section className="w-[90%]">{children}</section>
       </section>
 
-      <section className="w-2/5 mr-2 bg-white shadow-md flex flex-col h-full">
+      <section className="w-2/5 mr-2 bg-white shadow-md flex flex-col border p-3 rounded-xl border-gray-200 h-full">
         <section className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-800 font-quicksand flex items-center gap-2">
-            {chartType === 'ventas' ? (
+            {chartType === "ventas" ? (
               <>
                 <span className="text-sky-600"></span>
                 Ventas
@@ -614,19 +748,19 @@ export default function SellerDashboard({ children }) {
 
           <section className="flex gap-2 bg-gray-50 p-2 rounded-4xl">
             <button
-              onClick={() => setChartType('ventas')}
-              className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ventas'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+              onClick={() => setChartType("ventas")}
+              className={`px-4 py-2 rounded-md text-xs font-semibold cursor-pointer font-quicksand duration-150 ${chartType === "ventas"
+                ? "bg-sky-600 text-white shadow-sm"
+                : "text-gray-600 hover:text-gray-800"
                 }`}
             >
               Ventas
             </button>
             <button
-              onClick={() => setChartType('ganancias')}
-              className={`px-4 py-2 rounded-md text-xs font-semibold font-quicksand duration-150 ${chartType === 'ganancias'
-                ? 'bg-green-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+              onClick={() => setChartType("ganancias")}
+              className={`px-4 py-2 rounded-md text-xs cursor-pointer font-semibold font-quicksand duration-150 ${chartType === "ganancias"
+                ? "bg-green-600 text-white shadow-sm"
+                : "text-gray-600 hover:text-gray-800"
                 }`}
             >
               Ganancias
@@ -636,18 +770,18 @@ export default function SellerDashboard({ children }) {
 
         <section className="flex gap-2 mb-4">
           {[
-            { key: '1dia', label: '1D' },
-            { key: '1semana', label: '1S' },
-            { key: '1mes', label: '1M' },
-            { key: '5meses', label: '5M' },
-            { key: '1año', label: '1A' }
+            { key: "1dia", label: "1D" },
+            { key: "1semana", label: "1S" },
+            { key: "1mes", label: "1M" },
+            { key: "5meses", label: "5M" },
+            { key: "1año", label: "1A" },
           ].map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setTimeRange(key)}
-              className={`px-4 py-1.5 rounded-md text-xs font-semibold font-quicksand duration-150 ${timeRange === key
-                ? 'bg-gray-800 text-white'
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+              className={`px-4 py-1.5 rounded-md text-xs cursor-pointer font-semibold font-quicksand duration-150 ${timeRange === key
+                ? "bg-gray-800 text-white"
+                : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
                 }`}
             >
               {label}

@@ -9,6 +9,7 @@ import Button from "../components/Button";
 import ProtectedComponent from "../components/ProtectedComponent";
 import { motion, AnimatePresence } from "framer-motion";
 import Alert from "./Alert";
+import { section } from "framer-motion/client";
 
 const CommentsSection = ({ productId }) => {
   const [comments, setComments] = useState([]);
@@ -63,7 +64,6 @@ const CommentsSection = ({ productId }) => {
   const loadComments = async () => {
     setLoading(true);
     setError(null);
-    setError(null);
     try {
       const response = await axios.get(
         `/api/show_comments.php?productId=${productId}`
@@ -93,7 +93,9 @@ const CommentsSection = ({ productId }) => {
     );
 
     if (hasUserReplied) {
-      setError("Ya has comentado en este producto. Solo se permite un comentario por usuario.");
+      setError(
+        "Ya has comentado en este producto. Solo se permite un comentario por usuario."
+      );
       return;
     }
 
@@ -137,7 +139,6 @@ const CommentsSection = ({ productId }) => {
       setShowErrorMessage(true);
     }
   };
-
 
   const handleDeleteComment = async (commentId) => {
     try {
@@ -251,15 +252,14 @@ const CommentsSection = ({ productId }) => {
         if (response.data.success) {
           const nuevaRespuesta = response.data.respuesta;
 
-          // ESTA ES LA CLAVE
           setComments((prevComments) =>
             prevComments.map((c) =>
               c.id_comentario === comment.id_comentario
                 ? {
-                  ...c,
-                  respuestas: [...(c.respuestas || []), nuevaRespuesta],
-                  total_respuestas: (c.total_respuestas || 0) + 1,
-                }
+                    ...c,
+                    respuestas: [...(c.respuestas || []), nuevaRespuesta],
+                    total_respuestas: (c.total_respuestas || 0) + 1,
+                  }
                 : c
             )
           );
@@ -293,215 +293,231 @@ const CommentsSection = ({ productId }) => {
 
     const replyCount = comment.total_respuestas || replies.length;
 
+    const [width, setWidth] = useState(window.innerWidth);
+    useEffect(() => {
+      window.addEventListener("resize", () => {
+        setWidth(window.innerWidth);
+      });
+    });
+
+    const maxWidthComment = "";
+
+    // ${width >= 500 && (maxWidthComment = "max-w-4xl") : (maxWidthComment = "max-w-sm")} ${maxWidthComment}
+
     return (
-      <div className="flex flex-col mb-22 mt-2 md:mt-5 md:mb-12 gap-2 md:gap-4 max-w-full">
-        <div>
-          <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
-            <div className="flex-shrink-0">
-              <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
-                {getInitials(comment.nombre_usuario)}
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
-                <h2 className="font-semibold text-base md:text-xl text-gray-900">
-                  {comment.nombre_usuario}
-                </h2>
-                <h2 className="text-xs md:text-sm text-gray-500">
-                  {comment.tiempo_transcurrido}
-                </h2>
-              </div>
-              <div className="mb-1 md:mb-2">
-                <Rating
-                  id={`comment-rating-${comment.id_comentario}`}
-                  value={parseFloat(comment.rating)}
-                  readonly={true}
-                  showValue={true}
-                  size="md"
-                />
-              </div>
-
-              <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-                {comment.comentario}
-              </p>
-              <section className="-translate-x-3">
-                {replyCount > 0 && (
-                  <Button
-                    size="md"
-                    text={
-                      visibleReplies[comment.id_comentario]
-                        ? "Ocultar respuestas"
-                        : `Ver ${replyCount} ${replyCount === 1 ? "respuesta" : "respuestas"
-                        }`
-                    }
-                    onClick={toggleShowReplies}
-                    className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
-                  />
-                )}
-
-                {!activeReplyForm && (
-                  <Button
-                    size="md"
-                    text="Responder"
-                    onClick={toggleReplyForm}
-                    className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
-                  />
-                )}
-              </section>
-            </div>
-
-            {isOwner && (
-              <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
-                <button
-                  onClick={() => handleDeleteComment(comment.id_comentario)}
-                  className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                  title="Eliminar comentario"
-                >
-                  <ImBin className="scale-155 cursor-pointer" />
-                </button>
-              </div>
-            )}
-          </div>
-
-          <AnimatePresence>
-            {activeReplyForm === comment.id_comentario && (
-              <motion.section
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 12 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="w-full flex flex-col items-end"
-              >
-                <form
-                  onSubmit={handleSubmitReply(onSubmitAnswer)}
-                  className="w-full flex flex-col items-end"
-                >
-                  <input
-                    type="text"
-                    {...registerReply("answer", {
-                      required: true,
-                      minLength: 5,
-                    })}
-                    onChange={handleInputChange}
-                    placeholder="¿Qué opinas de este comentario?"
-                    className="w-[90%] p-2 md:p-3 mt-2 text-sm -translate-x-0.5 md:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  />
-                  <section className="w-full flex items-center justify-end mt-3">
-                    <Button
-                      size="md"
-                      text="Cancelar"
-                      type="button"
-                      onClick={toggleReplyForm}
-                      className="shadow-none hover:scale-none! -translate-y-3 transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black!"
-                    />
-                    <Button
-                      color="sky"
-                      size="md"
-                      text="Responder"
-                      type="submit"
-                      disabled={charCount < 4}
-                      className={`${charCount > 4
-                        ? "bg-[#3884fc] hover:bg-[#306ccc]"
-                        : "bg-gray-400 cursor-default! opacity-50"
-                        } shadow-none -translate-y-3 hover:scale-100! transition-colors! duration-100`}
-                    />
-                  </section>
-                </form>
-              </motion.section>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <AnimatePresence>
-          {visibleReplies[comment.id_comentario] && replies.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 0 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 12 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex gap-3 md:gap-4 ml-3 md:ml-5"
-            >
-              <div className="flex gap-3 md:gap-4 ml-3 md:ml-5">
-                <div className="relative flex-shrink-0">
-                  <div className="w-10 md:w-12 h-full flex flex-col items-center">
-                    <div className="w-[2px] bg-gray-300 flex-1"></div>
+      <section>
+          <div className={`flex flex-col mb-22 mt-2 md:mt-5 md:mb-12 gap-2 md:gap-4 w-full md:max-w-4xl max-w-sm`}>
+            <div className="w-full">
+              <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
+                <div className="flex-shrink-0">
+                  <div className="w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
+                    {getInitials(comment.nombre_usuario)}
                   </div>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                    <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                      {comment.nombre_usuario}
+                    </h2>
+                    <h2 className="text-xs md:text-sm text-gray-500">
+                      {comment.tiempo_transcurrido}
+                    </h2>
+                  </div>
+                  <div className="mb-1 md:mb-2">
+                    <Rating
+                      id={`comment-rating-${comment.id_comentario}`}
+                      value={parseFloat(comment.rating)}
+                      readonly={true}
+                      showValue={true}
+                      size="md"
+                    />
+                  </div>
 
-                <div className="flex-1 flex flex-col gap-4">
-                  {replies.map((reply, index) => {
-                    const isReplyOwner =
-                      currentUser &&
-                      currentUser.id_usuario === reply.id_usuario;
+                  <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                    {comment.comentario}
+                  </p>
+                  <section className="-translate-x-3">
+                    {replyCount > 0 && (
+                      <Button
+                        size="md"
+                        text={
+                          visibleReplies[comment.id_comentario]
+                            ? "Ocultar respuestas"
+                            : `Ver ${replyCount} ${
+                                replyCount === 1 ? "respuesta" : "respuestas"
+                              }`
+                        }
+                        onClick={toggleShowReplies}
+                        className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
+                      />
+                    )}
 
-                    const colorScheme = getReplyColor(index);
-
-                    return (
-                      <div
-                        key={reply.id_respuesta}
-                        className="relative w-[34.57rem]"
-                      >
-                        <svg
-                          className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
-                          viewBox="0 0 40 30"
-                          fill="none"
-                        >
-                          <path
-                            d="M0 0 C3 25, 15 25, 40 25"
-                            stroke="#d1d5db"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-
-                        <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
-                          <div className="flex-shrink-0">
-                            <div
-                              className={`w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md`}
-                            >
-                              {getInitials(reply.nombre_usuario)}
-                            </div>
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
-                              <h2 className="font-semibold text-base md:text-xl text-gray-900">
-                                {reply.nombre_usuario}
-                              </h2>
-
-                              <h2 className="text-xs md:text-sm text-gray-500">
-                                {reply.tiempo_transcurrido}
-                              </h2>
-                            </div>
-
-                            <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
-                              {reply.respuesta}
-                            </p>
-                          </div>
-
-                          {isReplyOwner && (
-                            <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
-                              <button
-                                onClick={() =>
-                                  handleDeleteReply(reply.id_respuesta)
-                                }
-                                className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
-                                title="Eliminar respuesta"
-                              >
-                                <ImBin className="scale-155 cursor-pointer" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                    {!activeReplyForm && (
+                      <Button
+                        size="md"
+                        text="Responder"
+                        onClick={toggleReplyForm}
+                        className="font-semibold! shadow-none hover:scale-none! transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black! mt-5! cursor-pointer"
+                      />
+                    )}
+                  </section>
                 </div>
+
+                {isOwner && (
+                  <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                    <button
+                      onClick={() => handleDeleteComment(comment.id_comentario)}
+                      className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                      title="Eliminar comentario"
+                    >
+                      <ImBin className="scale-155 cursor-pointer" />
+                    </button>
+                  </div>
+                )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+
+              <AnimatePresence>
+                {activeReplyForm === comment.id_comentario && (
+                  <motion.section
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 12 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="w-full flex flex-col items-end"
+                  >
+                    <form
+                      onSubmit={handleSubmitReply(onSubmitAnswer)}
+                      className="w-full flex flex-col items-end"
+                    >
+                      <input
+                        type="text"
+                        {...registerReply("answer", {
+                          required: true,
+                          minLength: 5,
+                        })}
+                        onChange={handleInputChange}
+                        placeholder="¿Qué opinas de este comentario?"
+                        className="w-[90%] p-2 md:p-3 mt-2 text-sm -translate-x-0.5 md:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      />
+                      <section className="w-full flex items-center justify-end mt-3">
+                        <Button
+                          size="md"
+                          text="Cancelar"
+                          type="button"
+                          onClick={toggleReplyForm}
+                          className="shadow-none hover:scale-none! -translate-y-3 transition-colors! duration-100 hover:bg-[#e8ecfc]! text-black!"
+                        />
+                        <Button
+                          color="sky"
+                          size="md"
+                          text="Responder"
+                          type="submit"
+                          disabled={charCount < 4}
+                          className={`${
+                            charCount > 4
+                              ? "bg-[#3884fc] hover:bg-[#306ccc]"
+                              : "bg-gray-400 cursor-default! opacity-50"
+                          } shadow-none -translate-y-3 hover:scale-100! transition-colors! duration-100`}
+                        />
+                      </section>
+                    </form>
+                  </motion.section>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <AnimatePresence>
+              {visibleReplies[comment.id_comentario] && replies.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 0 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 12 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="flex gap-3 md:gap-4 ml-3 md:ml-5"
+                >
+                  <div className="flex gap-3 md:gap-4 ml-3 md:ml-5">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-10 md:w-12 h-full flex flex-col items-center">
+                        <div className="w-[2px] bg-gray-300 flex-1"></div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 flex flex-col gap-4">
+                      {replies.map((reply, index) => {
+                        const isReplyOwner =
+                          currentUser &&
+                          currentUser.id_usuario === reply.id_usuario;
+
+                        const colorScheme = getReplyColor(index);
+
+                        return (
+                          <div
+                            key={reply.id_respuesta}
+                            className="relative w-full"
+                          >
+                            <svg
+                              className="absolute -left-[2.75rem] md:-left-[2.60rem] top-0 w-10 md:w-12 h-10"
+                              viewBox="0 0 40 30"
+                              fill="none"
+                            >
+                              <path
+                                d="M0 0 C3 25, 15 25, 40 25"
+                                stroke="#d1d5db"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+
+                            <div className="flex items-start gap-2 md:gap-3 border border-gray-200 bg-gray-100 rounded-[0.4rem] p-2 md:p-5 relative">
+                              <div className="flex-shrink-0">
+                                <div
+                                  className={`w-6 h-6 md:w-10 md:h-10 bg-gradient-to-br ${colorScheme.from} ${colorScheme.to} rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md`}
+                                >
+                                  {getInitials(reply.nombre_usuario)}
+                                </div>
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-0.5 sm:gap-2 mb-1 md:mb-2">
+                                  <h2 className="font-semibold text-base md:text-xl text-gray-900">
+                                    {reply.nombre_usuario}
+                                  </h2>
+
+                                  <h2 className="text-xs md:text-sm text-gray-500">
+                                    {reply.tiempo_transcurrido}
+                                  </h2>
+                                </div>
+
+                                <p className="break-words text-sm md:text-base text-gray-900 leading-snug md:leading-relaxed">
+                                  {reply.respuesta}
+                                </p>
+                              </div>
+
+                              {isReplyOwner && (
+                                <div className="absolute top-2 right-2 sm:static sm:flex sm:gap-2 sm:mt-0 sm:ml-auto">
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteReply(reply.id_respuesta)
+                                    }
+                                    className="text-red-500 hover:text-red-700 transition-all duration-200 hover:scale-110 p-1"
+                                    title="Eliminar respuesta"
+                                  >
+                                    <ImBin className="scale-155 cursor-pointer" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+      </section>
     );
   };
 
@@ -574,7 +590,7 @@ const CommentsSection = ({ productId }) => {
                   minLength: { value: 5, message: "Mínimo 5 caracteres" },
                   maxLength: { value: 500, message: "Máximo 500 caracteres" },
                 })}
-                maxLength={1000}
+                maxLength={500}
                 placeholder="Comparte tu experiencia con este producto..."
                 className="w-full h-20 sm:h-24 md:h-32 p-2 sm:p-3 text-xs sm:text-sm md:text-base border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -594,8 +610,9 @@ const CommentsSection = ({ productId }) => {
               size="md"
               type="submit"
               disabled={isSubmitting || !rating || rating === 0}
-              className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${isSubmitting || !rating ? " cursor-not-allowed" : ""
-                }`}
+              className={`-translate-y-8 text-white rounded-md transition-colors duration-300 font-semibold px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm md:text-base ${
+                isSubmitting || !rating ? " cursor-not-allowed" : ""
+              }`}
             />
           </form>
         </div>

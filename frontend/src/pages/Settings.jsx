@@ -18,6 +18,7 @@ import { TiShoppingCart } from "react-icons/ti";
 import { IoColorPalette } from "react-icons/io5";
 import { SiGo, SiGooglemaps } from "react-icons/si";
 import { TbFavicon } from "react-icons/tb";
+import { FaStar } from "react-icons/fa";
 import axios from 'axios';
 
 
@@ -207,7 +208,13 @@ export default function Settings() {
                             </div>
                             <p><IoIosArrowForward /></p>
                         </li>
-
+                        <li onClick={() => ecommerce ? navigate(`/${ecommerce}/favorites/`) : navigate("/favorites/")} className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
+                            <div className="flex items-center justify-center hover:scale-110 transition-transform duration-300">
+                                <FaStar className="text-yellow-400 mr-2 text-[30px]" />
+                                <h2 className="text-[20px]">Favoritos</h2>
+                            </div>
+                            <p><IoIosArrowForward /></p>
+                        </li>
                         <li className='flex cursor-pointer items-center justify-between mt-2 w-full mb-5 font-quicksand font-semibold text-[20px] text-gray-900 '>
                             <div className="flex items-center justify-center">
                                 <IoMoon className="text-violet-600 mr-2 text-[35px]" />

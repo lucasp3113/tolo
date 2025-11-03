@@ -147,7 +147,7 @@ export default function Layout({ children, search = false, setSearchData, logo =
 
 
   return (
-    <div className="grid min-h-dvh grid-rows-[auto_1fr_auto]">
+    <div className="grid min-h-dvh grid-rows-[auto_1fr_auto] mb-22 md:mb-0">
       {!notHeader && (
         <HeaderNav loginRegister={loginRegister} logoCenter={logoCenter} setGoodContrast3={setGoodContrast3} setLoading={setLoading} preview={preview} color={headerColor} setUserTypeForAdmin={setUserType} setPanelFilter={setPanelFilter} logoEcommerce={logoEcommerce} logo={logo} search={search} setSearchData={setSearchData} setDataCategories={setDataCategories} setWord={setWord} fixed={fixed} />
       )}
