@@ -192,7 +192,9 @@ const Dropdown = ({
     return text;
   };
 
-  const [selectedOption, setSelectedOption] = useState(getInitialSelectedOption());
+  const [selectedOption, setSelectedOption] = useState(
+    getInitialSelectedOption()
+  );
   const [displayText, setDisplayText] = useState(getInitialDisplayText());
   const navigate = useNavigate();
 
@@ -207,7 +209,7 @@ const Dropdown = ({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isOpen && !event.target.closest('.dropdown-container')) {
+      if (isOpen && !event.target.closest(".dropdown-container")) {
         setIsOpen(false);
         if (border) {
           const currentValue = inputValue || "1";
@@ -218,8 +220,8 @@ const Dropdown = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, border, inputValue]);
 
   useEffect(() => {
@@ -237,13 +239,19 @@ const Dropdown = ({
         if (showSelectedAsTitle || border) {
           setDisplayText(defaultOption.label);
         }
-        
+
         if (onSelectionChange) {
           onSelectionChange(defaultOption);
         }
       }
     }
-  }, [showSelectedAsTitle, border, defaultSelectedIndex, options, onSelectionChange]);
+  }, [
+    showSelectedAsTitle,
+    border,
+    defaultSelectedIndex,
+    options,
+    onSelectionChange,
+  ]);
 
   useEffect(() => {
     if ((!showSelectedAsTitle && !border) || !selectedOption) {
@@ -301,20 +309,20 @@ const Dropdown = ({
   // Handler para cambio en el input (solo para border mode)
   const handleInputChange = (e) => {
     let value = e.target.value;
-    
+
     // Prevenir que se ingrese más de 3 dígitos (para evitar números > 200)
     if (value.length > 3) {
       value = value.slice(0, 3);
     }
-    
+
     // Convertir a número y validar rango
     const num = parseInt(value);
-    if (value !== "" && (!isNaN(num) && num > max)) {
+    if (value !== "" && !isNaN(num) && num > max) {
       value = max;
     }
-    
+
     setInputValue(value);
-    
+
     // Si es un número válido en rango, actualizar el display text
     if (border && value && isValidNumber(value)) {
       setDisplayText(value);
@@ -347,7 +355,7 @@ const Dropdown = ({
     // 2. selectedOption y onSelectionChange SOLO si showSelectedAsTitle está activo
     if (showSelectedAsTitle && item.label && item.type !== "custom") {
       setSelectedOption(item);
-      
+
       // Ejecutar callback si existe
       if (onSelectionChange) {
         onSelectionChange(item);
@@ -371,7 +379,7 @@ const Dropdown = ({
       onMouseLeave={closeMenu}
     >
       {border ? (
-        <div 
+        <div
           className={`flex items-center justify-between border border-gray-300 rounded px-3 py-2 ${className}`}
         >
           <input
@@ -385,7 +393,12 @@ const Dropdown = ({
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               // Prevenir teclas que puedan causar valores inválidos
-              if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+              if (
+                e.key === "e" ||
+                e.key === "E" ||
+                e.key === "+" ||
+                e.key === "-"
+              ) {
                 e.preventDefault();
               }
             }}
@@ -480,31 +493,31 @@ const Dropdown = ({
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"
         }`}
-        style={{ 
-          width: border ? 'calc(100% + 0px)' : 'auto',
-          minWidth: border ? 'auto' : 'max-content'
+        style={{
+          width: border ? "calc(100% + 0px)" : "auto",
+          minWidth: border ? "auto" : "max-content",
         }}
       >
         {options.map((item, index) => (
           <li
-            key={index}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleOptionSelect(item, index);
-            }}
-            className={`py-2 px-4 transition-all duration-200 ease-in-out transform select-none ${
-              border ? '' : 'whitespace-nowrap'
+            key={index} // ...
+            className={`py-2 px-4 transition-all duration-200 ease-in-out transform select-none 
+           ${
+             border ? "w-full" : "w-full md:w-auto" // Aseguramos que el li ocupe el 100% de su contenedor
+           } ${
+              border ? "" : "whitespace-nowrap" // Mantenemos el nowrap para opciones normales si no es border
             } ${
               item.type === "custom"
                 ? "cursor-default hover:bg-transparent"
                 : "cursor-pointer hover:bg-gray-200 hover:scale-105"
             } ${
-              (showSelectedAsTitle || border) && selectedOption?.label === item.label
+              (showSelectedAsTitle || border) &&
+              selectedOption?.label === item.label
                 ? "bg-blue-100 text-blue-700"
                 : ""
             }`}
           >
-            {item.type === "custom" ? item.content : item.label}
+            {item.type === "custom" ? item.content : item.label}{" "}
           </li>
         ))}
       </ul>

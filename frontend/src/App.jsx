@@ -1,33 +1,34 @@
-import './App.css';
-import Layout from './components/Layout';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import SellerDashboard from './pages/SellerDashboard';
-import EcommerceDashboard from './pages/EcommerceDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider } from './components/AuthProvider';
-import CreateProduct from './pages/CreateProduct';
-import ProductCRUD from './pages/ProductCRUD';
-import Settings from './pages/Settings';
-import { DarkModeProvider } from './components/DarkModeProvider';
-import ChangePassword from './pages/ChangePassword';
-import { useState } from 'react';
-import Product from './pages/Product';
-import ShoppingCart from './pages/ShoppingCart';
-import AdminPanel from './pages/AdminPanel';
-import ChangeUser from './pages/ChangeUser';
-import ChangeEcommerce from './pages/ChangeEcommerce';
-import ProfilePicture from './pages/ProfilePicture';
-import Notifications from './pages/Notifications';
-import CustomizeStore from './pages/CustomizeStore';
-import PaymentsHistory from './pages/PaymentsHistory';
-import CustomHome from './pages/CustomHouse'
-import Maps from './pages/Maps';
-import Account from './pages/Account';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-
+import "./App.css";
+import Layout from "./components/Layout";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import SellerDashboard from "./pages/SellerDashboard";
+import EcommerceDashboard from "./pages/EcommerceDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./components/AuthProvider";
+import CreateProduct from "./pages/CreateProduct";
+import ProductCRUD from "./pages/ProductCRUD";
+import Settings from "./pages/Settings";
+import { DarkModeProvider } from "./components/DarkModeProvider";
+import ChangePassword from "./pages/ChangePassword";
+import { useState } from "react";
+import Product from "./pages/Product";
+import ShoppingCart from "./pages/ShoppingCart";
+import AdminPanel from "./pages/AdminPanel";
+import ChangeUser from "./pages/ChangeUser";
+import ChangeEcommerce from "./pages/ChangeEcommerce";
+import ProfilePicture from "./pages/ProfilePicture";
+import Notifications from "./pages/Notifications";
+import CustomizeStore from "./pages/CustomizeStore";
+import PaymentsHistory from "./pages/PaymentsHistory";
+import CustomHome from "./pages/CustomHouse";
+import Maps from "./pages/Maps";
+import Account from "./pages/Account";
+import RequestCode from "./pages/RequestCode";
+import VerifyCode from "./pages/VerifyCode";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function App() {
   //pasar el tipo de usuario de header nav, a layaut, de layaut a home, para verificar si es admin
@@ -37,10 +38,10 @@ function App() {
   /*esto es para conectar la peticion q hace el formualrio de busqueda en el
     componente HeaderNav con la page Home, para renderizar los productos
   */
-  const [searchData, setSearchData] = useState(null)
+  const [searchData, setSearchData] = useState(null);
 
   //esto es para cambiar de color la pagina
-  const [colors, setColors] = useState(null)
+  const [colors, setColors] = useState(null);
   const [change, setChange] = useState(0);
 
   //loading
@@ -56,8 +57,19 @@ function App() {
                 <Route
                   path="/:ecommerce?"
                   element={
-                    <Layout fixed={true} setLoading={setLoading} search={true} setUserType={setUserType} setSearchData={setSearchData}>
-                      <Home loading={loading} searchData={searchData} setSearchData={setSearchData} userType={admin} />
+                    <Layout
+                      fixed={true}
+                      setLoading={setLoading}
+                      search={true}
+                      setUserType={setUserType}
+                      setSearchData={setSearchData}
+                    >
+                      <Home
+                        loading={loading}
+                        searchData={searchData}
+                        setSearchData={setSearchData}
+                        userType={admin}
+                      />
                     </Layout>
                   }
                 />
@@ -80,7 +92,7 @@ function App() {
                 <Route
                   path="/:ecommerce?/register/"
                   element={
-                    <Layout >
+                    <Layout>
                       <Register />
                     </Layout>
                   }
@@ -88,7 +100,7 @@ function App() {
                 <Route
                   path="/:ecommerce?/seller_dashboard/"
                   element={
-                    <Layout >
+                    <Layout>
                       <ProtectedRoute>
                         <SellerDashboard />
                       </ProtectedRoute>
@@ -98,70 +110,90 @@ function App() {
                 <Route
                   path="/:ecommerce?/notifications/"
                   element={
-                    <Layout >
+                    <Layout>
                       <ProtectedRoute>
                         <Notifications />
                       </ProtectedRoute>
                     </Layout>
                   }
                 />
-                <Route path='/:ecommerce?/ecommerce_dashboard/' element={
-                  <Layout >
-                    <ProtectedRoute>
-                      <EcommerceDashboard />
-                    </ProtectedRoute>
-                  </Layout>
-                } />
-                <Route path='/:ecommerce?/create_product/' element={
-                  <Layout>
-                    <ProtectedRoute>
-                      <CreateProduct />
-                    </ProtectedRoute>
-                  </Layout>
-                } />
-                <Route path='/:ecommerce?/product_crud/' element={
-                  <Layout >
-                    <ProtectedRoute>
-                      <ProductCRUD />
-                    </ProtectedRoute>
-                  </Layout>
-                } />
-                <Route path='/:ecommerce?/settings/' element={
-                  <Layout >
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  </Layout>
-                } />
-                <Route path='/:ecommerce?/change_password' element={
-                  <Layout >
-                    <ProtectedRoute>
-                      <ChangePassword />
-                    </ProtectedRoute>
-                  </Layout>
-                }>
-                </Route>
-                <Route path='/:ecommerce?/product/:id' element={
-                  <Layout fixed={true}>
-                    <Product />
-                  </Layout>
-                }>
-                </Route>
-                <Route path='/:ecommerce?/shopping_cart/' element={
-                  <Layout logo={false} >
-                    <ProtectedRoute>
-                      <ShoppingCart />
-                    </ProtectedRoute>
-                  </Layout>
-                }
+                <Route
+                  path="/:ecommerce?/ecommerce_dashboard/"
+                  element={
+                    <Layout>
+                      <ProtectedRoute>
+                        <EcommerceDashboard />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
                 />
-                <Route path='/:ecommerce?/payments_history/' element={
-                  <Layout fixed={true} logo={false} >
-                    <ProtectedRoute>
-                      <PaymentsHistory />
-                    </ProtectedRoute>
-                  </Layout>
-                }
+                <Route
+                  path="/:ecommerce?/create_product/"
+                  element={
+                    <Layout>
+                      <ProtectedRoute>
+                        <CreateProduct />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/product_crud/"
+                  element={
+                    <Layout>
+                      <ProtectedRoute>
+                        <ProductCRUD />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/settings/"
+                  element={
+                    <Layout>
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/change_password"
+                  element={
+                    <Layout>
+                      <ProtectedRoute>
+                        <ChangePassword />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
+                ></Route>
+                <Route
+                  path="/:ecommerce?/product/:id"
+                  element={
+                    <Layout fixed={true}>
+                      <Product />
+                    </Layout>
+                  }
+                ></Route>
+                <Route
+                  path="/:ecommerce?/shopping_cart/"
+                  element={
+                    <Layout logo={false}>
+                      <ProtectedRoute>
+                        <ShoppingCart />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/payments_history/"
+                  element={
+                    <Layout fixed={true} logo={false}>
+                      <ProtectedRoute>
+                        <PaymentsHistory />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
                 />
                 <Route
                   path="/admin_panel/"
@@ -174,39 +206,75 @@ function App() {
                 <Route
                   path="/:ecommerce?/change_user/"
                   element={
-                    <Layout >
+                    <Layout>
                       <ChangeUser />
                     </Layout>
                   }
                 />
-                <Route path='/:ecommerce?/change_ecommerce/' element={
-                  <Layout >
-                    <ChangeEcommerce />
-                  </Layout>
-                } />
-                <Route path='/:ecommerce?/profile_picture/' element={
-                  <Layout >
-                    <ProfilePicture />
-                  </Layout>
-                } />
-                <Route path='/:ecommerce?/customize_home/' element={
-                  <Layout >
-                    <CustomHome />
-                  </Layout>
-                } />
                 <Route
-                  path="/:ecommerce?/customize_store/"
+                  path="/:ecommerce?/change_ecommerce/"
                   element={
-                    <Layout colors={colors} isCustomizeStore={true} change={change}>
-                      <CustomizeStore setChange={setChange} change={change} setColorsForLayaut={setColors} />
+                    <Layout>
+                      <ChangeEcommerce />
                     </Layout>
                   }
                 />
-                <Route path='/:ecommerce?/maps/' element={
-                  <Layout >
-                    <Maps />
-                  </Layout>
-                } />
+                <Route
+                  path="/:ecommerce?/profile_picture/"
+                  element={
+                    <Layout>
+                      <ProfilePicture />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/customize_home/"
+                  element={
+                    <Layout>
+                      <CustomHome />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/customize_store/"
+                  element={
+                    <Layout
+                      colors={colors}
+                      isCustomizeStore={true}
+                      change={change}
+                    >
+                      <CustomizeStore
+                        setChange={setChange}
+                        change={change}
+                        setColorsForLayaut={setColors}
+                      />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/:ecommerce?/maps/"
+                  element={
+                    <Layout>
+                      <Maps />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/verify_code/"
+                  element={
+                    <Layout>
+                      <VerifyCode />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/request_code/"
+                  element={
+                    <Layout>
+                      <RequestCode />
+                    </Layout>
+                  }
+                />
               </Routes>
             </AuthProvider>
           </BrowserRouter>

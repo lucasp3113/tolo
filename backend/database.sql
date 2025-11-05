@@ -23,6 +23,10 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE
 );
 
+SELECT * FROM usuarios;
+
+DELETE FROM usuarios WHERE id_usuario = 9;
+
 INSERT INTO
     usuarios (
         nombre_usuario,

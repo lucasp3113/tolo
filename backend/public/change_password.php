@@ -21,11 +21,11 @@ if ($data_base) {
             $password_now_hash = password_hash($data["passwordNow"], PASSWORD_DEFAULT);
             $query = $data_base->prepare("UPDATE usuarios SET contraseña = ? WHERE nombre_usuario = ?");
             $query->bind_param("ss", $password_now_hash, $user);
-            if($query->execute()) {
+            if ($query->execute()) {
                 echo http_response_code(200);
                 json_encode([
-                    "success"=> true,
-                    "message"=> "GOOOD"
+                    "success" => true,
+                    "message" => "GOOOD"
                 ]);
             }
         } else {
@@ -52,4 +52,3 @@ if ($data_base) {
     ]);
     exit;
 }
-?>

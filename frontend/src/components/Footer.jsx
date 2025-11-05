@@ -12,7 +12,7 @@ export default function Footer({ color }) {
     }, []);
 
     const handleFbClick = () => {
-        window.open("https://www.facebook.com", "_blank");
+        window.open("https://www.facebook.com/profile.php?id=61582518657936", "_blank");
     };
 
     const handleIgClick = () => {
