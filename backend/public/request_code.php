@@ -55,7 +55,7 @@ $stmt->close();
 
 if ($count == 0) {
     http_response_code(400);
-    echo json_encode(["success" => false, "message" => "El email no está registrado"]);
+    echo json_encode(["success" => false, "message" => "El email que ingresó no es el correcto"]);
     exit;
 }
 

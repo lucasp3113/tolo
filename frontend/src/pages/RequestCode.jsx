@@ -76,9 +76,6 @@ export default function RequestCode() {
         errors={errors}
         label={"E-Mail"}
       />
-      {errors.email && (
-        <p className="text-red-500 text-sm">{errors.email.message}</p>
-      )}
       <Button
         className="mt-4 bg-blue-500! hover:bg-blue-600! hover:scale-100! transition-colors! text-white px-4 py-2 rounded"
         size="md"
