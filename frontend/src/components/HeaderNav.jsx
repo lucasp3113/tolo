@@ -116,6 +116,7 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
     return () => setLogoEcommerce(null);
   }, [nameEcommerce]);
 
+  const [heightImg, setHeightImg] = useState(null)
 
   useEffect(() => {
     if (!logoEcommerce) return;
@@ -123,6 +124,8 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
     img.onload = () => {
       setLogoAspectRatio(img.width / img.height);
       setLogoLoaded(true);
+      setHeightImg(img.height)
+      console.log(img.height)
     };
     img.src = `/api/${logoEcommerce}`;
   }, [logoEcommerce]);
@@ -164,7 +167,7 @@ export default function HeaderNav({ logoCenter, search, setSearchData, setPanelF
               src={logoEcommerce ? `/api/${logoEcommerce}` : logoTolo}
               alt="Logo"
               loading="lazy"
-              className={`${!logoEcommerce && ""} ml-3 h-[80%] w-full object-contain`}
+              className={`${!logoEcommerce && ""}  ml-3 h-[80%] w-full object-contain`}
             />
           ) : (
             <img src={logoTolo} alt="Logo" loading='lazy' className="w-full h-full object-cover" />

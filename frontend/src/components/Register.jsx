@@ -114,13 +114,34 @@ export default function Register({ pc = false }) {
                 axios.post("/api/add_views.php")
             })
             .catch((err) => {
-                console.log(data)
-                sessionStorage.setItem('loginSuccess', 'error')
-                window.dispatchEvent(new CustomEvent('loginError'))
-                setError("user", {
-                    type: "manual",
-                    message: err.response.data.message
-                })
+                console.log("Data enviada:", data)
+                console.log("Error completo:", err)
+                console.log("Response:", err.response)
+                console.log("Response data:", err.response?.data)
+                if (err.response.data.message) {
+                    sessionStorage.setItem('loginSuccess', 'error')
+                    window.dispatchEvent(new CustomEvent('loginError'))
+                    const errorField = err.response?.data?.field || "user"
+                    setError(errorField, {
+                        type: "manual",
+                        message: err.response.data.message
+                    })
+                } else if (err.response?.data?.token) {
+                    const token = err.response.data.token
+                    const expiration = err.response.data.expiration
+                    login(token, expiration);
+                    const userType = data["select"] === "e-commerce(tienda)" ? "ecommerce" : data["select"] === "Vendedor" ? "vendedor_particular" : "cliente"
+                    const urls = {
+                        ecommerce: ecommerce ? `/${ecommerce}/ecommerce_dashboard` : "/ecommerce_dashboard",
+                        vendedor_particular: ecommerce ? `/${ecommerce}/seller_dashboard` : "/seller_dashboard",
+                        cliente: ecommerce ? `/${ecommerce}/` : "/"
+                    }
+                    sessionStorage.setItem('loginSuccess', 'success')
+                    navigate(urls[userType])
+                    axios.post("https://api.tolo.lat/add_views.php")
+                } else {
+                    console.error("Error desconocido, no hay mensaje ni token")
+                }
             })
     }
 

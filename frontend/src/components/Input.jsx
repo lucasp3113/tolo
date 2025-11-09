@@ -28,7 +28,7 @@ export default function Input({
   const errorActual = errors?.[name];
 
 
-  
+
   useEffect(() => {
     if (errorActual && 'vibrate' in navigator) {
       navigator.vibrate(300);

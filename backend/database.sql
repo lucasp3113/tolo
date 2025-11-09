@@ -7,6 +7,28 @@ CREATE DATABASE tolo;
 
 USE tolo;
 
+CREATE USER 'tolo'@'%' IDENTIFIED BY 'brbrpatacona';
+GRANT ALL PRIVILEGES ON *.* TO 'tolo'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+SELECT * FROM categorias;
+
+
+INSERT INTO
+    usuarios (
+        nombre_usuario,
+        email,
+        contraseña,
+        tipo_usuario
+    )
+VALUES (
+        'admin',
+        'tolostudiooficial@gmail.com',
+        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
+        'admin'
+    );
+
 CREATE TABLE usuarios (
     id_usuario INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
@@ -23,22 +45,6 @@ CREATE TABLE usuarios (
     estado BOOLEAN DEFAULT TRUE,
     tolo_coins DECIMAL (10,2) DEFAULT 0 
 );
-
-SELECT * FROM favoritos
-
-INSERT INTO
-    usuarios (
-        nombre_usuario,
-        email,
-        contraseña,
-        tipo_usuario
-    )
-VALUES (
-        'admin',
-        'tolostudiooficial@gmail.com',
-        '$2y$10$nQZNQkcq6aB4sEgRq4US3uKy3p9JyuAgqad8Hq3pAUHw2950oqnRG',
-        'admin'
-    );
 
 CREATE TABLE rangos (
     id_rango INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -79,9 +85,6 @@ CREATE TABLE ecommerces (
     REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (rango_actual) REFERENCES rangos (id_rango)
 );
-
-SELECT * FROM ecommerces
-
 
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -268,8 +271,6 @@ VALUES (
 
 INSERT INTO
     categorias (nombre_categoria, descripcion)
-INSERT INTO
-    categorias (nombre_categoria, descripcion)
 VALUES (
         'Alquiler de campos',
         'Campos disponibles para alquiler'
@@ -297,40 +298,6 @@ CREATE TABLE productos (
     FOREIGN KEY (id_vendedor) REFERENCES usuarios (id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_ecommerce) REFERENCES ecommerces (id_ecommerce) ON DELETE SET NULL
 );
-
-SELECT 
-    p.id_producto, 
-    p.id_ecommerce, 
-    p.nombre_producto, 
-    p.precio, 
-    SUM(d.cantidad) AS cantidad_vendida,
-    COUNT(DISTINCT c.id_cliente) AS compradores_distintos,
-    (
-    SELECT i.ruta_imagen FROM imagenes_productos i
-    WHERE i.id_producto = p.id_producto
-    LIMIT 1
-    ) AS ruta_imagen
-FROM productos p
-JOIN ecommerces e 
-    ON e.id_ecommerce = p.id_ecommerce
-JOIN detalles_compra d 
-    ON d.id_producto = p.id_producto
-JOIN compras c 
-    ON c.id_compra = d.id_compra
-WHERE e.nombre_ecommerce = 'Bohemian Design'
-GROUP BY 
-    p.id_producto, 
-    p.id_ecommerce, 
-    p.nombre_producto,
-    p.precio
-ORDER BY cantidad_vendida DESC
-LIMIT 30;
-
-
-
-SELECT * FROM usuarios
-
-UPDATE usuarios SET tolo_coins = 0
 
 CREATE TABLE productos_categorias (
     id_producto INT UNSIGNED NOT NULL,
@@ -364,17 +331,6 @@ CREATE TABLE comentarios_productos (
     UNIQUE KEY unique_user_product (id_usuario, id_producto)
 );
 
-SELECT
-    COUNT(*) as total_comentarios,
-    AVG(rating) as promedio_rating
-FROM
-    comentarios_productos
-    JOIN productos p ON p.id_producto = comentarios_productos.id_producto
-    JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
-WHERE
-    e.nombre_ecommerce = ?
-    AND activo = 1
-
 CREATE TABLE carrito (
     id_carrito INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT UNSIGNED NOT NULL,
@@ -401,10 +357,6 @@ CREATE TABLE items_carrito (
     UNIQUE KEY unique_item_variant (id_carrito, id_producto, id_color, id_talle_color_producto)
 );
 
-SELECT * FROM items_carrito
-
-
-
 CREATE TABLE compras (
     id_compra INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_cliente INT UNSIGNED NOT NULL,
@@ -424,28 +376,6 @@ CREATE TABLE compras (
     INDEX idx_ecommerce_fecha (id_ecommerce, fecha_compra)
 );
 
-SELECT * FROM compras;
-
-SELECT 
-  c.id_compra,
-  c.id_ecommerce,
-  e.nombre_ecommerce,
-  c.id_cliente,
-  u.nombre_usuario
-FROM compras c
-JOIN ecommerces e ON e.id_ecommerce = c.id_ecommerce
-JOIN usuarios u ON u.id_usuario = c.id_cliente
-ORDER BY c.fecha_compra DESC;
-
-SELECT id_compra, id_cliente, id_ecommerce
-FROM compras
-ORDER BY id_compra DESC
-LIMIT 10;
-
-
-
-SELECT * FROM ecommerces
-
 CREATE TABLE detalles_compra (
     id_detalle INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_compra INT UNSIGNED NOT NULL,
@@ -457,37 +387,6 @@ CREATE TABLE detalles_compra (
     FOREIGN KEY (id_compra) REFERENCES compras (id_compra) ON DELETE CASCADE,
     FOREIGN KEY (id_producto) REFERENCES productos (id_producto) ON DELETE RESTRICT
 );
-
-SELECT * FROM detalles_compra;
-
-SELECT
-    p.id_producto,
-    p.id_ecommerce,
-    p.nombre_producto,
-    p.precio,
-    SUM(d.cantidad) AS cantidad_vendida,
-    COUNT(DISTINCT c.id_cliente) AS compradores_distintos,
-    (
-        SELECT i.ruta_imagen
-        FROM imagenes_productos i
-        WHERE
-            i.id_producto = p.id_producto
-        LIMIT 1
-    ) AS ruta_imagen
-FROM
-    productos p
-    JOIN ecommerces e ON e.id_ecommerce = p.id_ecommerce
-    JOIN detalles_compra d ON d.id_producto = p.id_producto
-    JOIN compras c ON c.id_compra = d.id_compra
-WHERE
-    e.nombre_ecommerce = 'LaFerre'
-GROUP BY
-    p.id_producto,
-    p.id_ecommerce,
-    p.nombre_producto,
-    p.precio
-ORDER BY cantidad_vendida DESC
-LIMIT 30;
 
 CREATE TABLE pagos (
     id_pago INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -556,14 +455,6 @@ CREATE TABLE imagenes_color_producto (
     FOREIGN KEY (id_color) REFERENCES colores_producto (id_color) ON DELETE CASCADE
 );
 
-SELECT * FROM productos
-
-
-
-SELECT * FROM talles_color_producto WHERE id_talle_color_producto IN (49);
-
-SELECT * FROM items_carrito
-
 CREATE TABLE talles_color_producto (
     id_talle_color_producto INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_color INT UNSIGNED NOT NULL,
@@ -593,12 +484,6 @@ CREATE TABLE visitas (
     fecha DATETIME
 );
 
-SELECT * FROM productos;
-
-SELECT * FROM colores_producto;
-
-SELECT stock FROM productos WHERE id_producto = 7
-
 CREATE TABLE respuestas_comentario (
     id_respuesta INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_comentario INT NOT NULL,
@@ -619,17 +504,3 @@ CREATE TABLE favoritos (
     FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE
 );
 
-SELECT * FROM favoritos
-
-SELECT 
-    p.id_producto,
-    p.nombre_producto,
-    p.precio,
-    p.stock,
-    (SELECT ruta_imagen FROM imagenes_productos WHERE id_producto = p.id_producto LIMIT 1) as ruta_imagen,
-    p.envio_gratis
-FROM productos p
-JOIN favoritos f ON f.id_producto = p.id_producto
-WHERE f.id_usuario = 46;
-
-SELECT * FROM usuarios

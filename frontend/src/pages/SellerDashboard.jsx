@@ -287,6 +287,7 @@ export default function SellerDashboard({ children }) {
   const [chartType, setChartType] = useState("ventas");
   const [rating, setRating] = useState();
   const [notFound, setNotFound] = useState(false);
+  const {ecommerce: nameEcommerce} = useParams()
 
 
 
@@ -519,7 +520,7 @@ export default function SellerDashboard({ children }) {
         {pendingSteps.length > 0 && (
           <section onMouseEnter={() => setHoverPendings(false)}
             onMouseLeave={() => setHoverPendings(true)}
-            className={`absolute z-50 text-green-500 font-quicksand font-semibold left-22 transition-colors ease-in-out duration-500 w-58 hover:h-38 p-1 whitespace-nowrap rounded-3xl hover:border-2 hover:border-green-500 hover:bg-white hover:!text-green-500 cursor-pointer text-lg top-43`}>
+            className={`absolute z-50 text-green-500 font-quicksand font-semibold left-22 transition-colors ease-in-out duration-500 w-58 hover:h-38 p-1 whitespace-nowrap rounded-3xl hover:border-2 hover:border-green-500 bg-white hover:!text-green-500 cursor-pointer text-lg top-37`}>
             {!hoverPendings ? (
               <ul className="">
                 {pendingSteps.map(step => (
@@ -557,11 +558,13 @@ export default function SellerDashboard({ children }) {
             <h1 className="text-xl font-bold font-quicksand text-gray-800">
               {ecommerce.nombre_ecommerce}
             </h1>
-            <div className="flex items-center justify-between w-full mt-2">
-              <ShareEcommerceLink
-                nombreEcommerce={ecommerce.nombre_ecommerce}
-              />
-            </div>
+            {completedCount === totalSteps && (
+              <div className="flex items-center justify-between w-full mt-2">
+                <ShareEcommerceLink
+                  nombreEcommerce={ecommerce.nombre_ecommerce}
+                />
+              </div>
+            )}
           </div>
           <RatingMeterMobile progress={progress} getColor={getColor} />
         </div>
@@ -569,13 +572,13 @@ export default function SellerDashboard({ children }) {
         <div className="flex-1 p-4 flex flex-col gap-4 pb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
+              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/create_product/`) : navigate("/create_product/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Añadir producto
             </button>
             <button
-              onClick={() => ecommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
+              onClick={() => nameEcommerce ? navigate(`/${ecommerce.nombre_ecommerce}/product_crud/`) : navigate("/product_crud/")}
               className="flex-1 bg-gradient-to-r from-sky-800 to-sky-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md font-quicksand text-sm"
             >
               Ver mis productos
@@ -682,7 +685,7 @@ export default function SellerDashboard({ children }) {
         {pendingSteps.length > 0 && (
           <section onMouseEnter={() => setHoverPendings(false)}
             onMouseLeave={() => setHoverPendings(true)}
-            className={`absolute bottom-45 
+            className={`absolute bottom-38 
       z-50 text-green-500 font-quicksand font-semibold 
       transition-all ease-in-out duration-500 
       w-58 p-1 whitespace-nowrap rounded-xl 
@@ -705,10 +708,10 @@ export default function SellerDashboard({ children }) {
             )}
           </section>
         )}
-
-        <ShareEcommerceLink
-          nombreEcommerce={ecommerce.nombre_ecommerce}
-        />
+        {completedCount === totalSteps && (
+          <ShareEcommerceLink
+            nombreEcommerce={ecommerce.nombre_ecommerce}
+          />)}
 
         <section className="w-full flex flex-col mt-auto">
           <button

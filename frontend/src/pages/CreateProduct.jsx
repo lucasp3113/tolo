@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import Input from '../components/Input'
 import Button from '../components/Button'
-import logoToloBlue from '../assets/logoToloBlue.png'
 import { FaBoxOpen } from "react-icons/fa";
 import { FaDollarSign } from "react-icons/fa";
 import { FaBoxes } from "react-icons/fa";
@@ -43,12 +42,12 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
     const [currentStep, setCurrentStep] = useState(null)
     const [sizes, setSizes] = useState(false)
 
-    // Estados para las imágenes existentes del producto (sin color)
     const [existingProductImages, setExistingProductImages] = useState([]);
+
+    const [isDataReady, setIsDataReady] = useState(!edit);
 
     useEffect(() => {
         if (edit && productData) {
-            // Pre-llenar datos básicos del producto
             const defaultValues = {
                 nameProduct: productData.nombre_producto || '',
                 productPrice: productData.precio || '',
@@ -56,17 +55,14 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                 shipping: productData.envio_gratis === 1 || productData.envio_gratis === '1'
             };
 
-            // Si no tiene colores, agregar el stock y las imágenes
             if (!productData.colores || Object.keys(productData.colores).length === 0) {
                 defaultValues.productStock = productData.stock || '';
-                
-                // Guardar las imágenes existentes para mostrar preview
+
                 if (productData.imagenes && productData.imagenes.length > 0) {
                     setExistingProductImages(productData.imagenes);
                 }
             }
 
-            // Pre-marcar las categorías
             if (productData.categorias) {
                 productData.categorias.forEach(cat => {
                     defaultValues[cat] = true;
@@ -74,15 +70,23 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
             }
 
             formProduct.reset(defaultValues);
+            setIsDataReady(true);
 
-            // Detectar si tiene colores para setear el estado
             if (productData.colores && Object.keys(productData.colores).length > 0) {
                 setColor(true);
-                // Verificar si algún color tiene talles
                 const hasSizes = Object.values(productData.colores).some(color =>
                     color.talles && color.talles.length > 0
                 );
                 setSizes(hasSizes);
+            } else if (productData.categorias) {
+                const clothingCategories = ["Electrónica", "Ropa hombre", "Ropa mujer", "Ropa niño", "Ropa niña", "Ropa unisex", "Calzado", "Accesorios", "Juguetes", "Hogar y Cocina", "Salud y Belleza", "Deportes y Aire libre", "Bebés y niños", "Computación", "Celulares y accesorios", "Oficina y papelería", "Automotriz", "Jardín y exteriores", "Vehículos", "Repuestos y autopartes", "Motocicletas", "Náutica", "Electrodomésticos", "Instrumentos Musicales"];
+                const sizeCategories = ["Ropa hombre", "Ropa mujer", "Ropa niño", "Ropa niña", "Ropa unisex", "Calzado"];
+
+                const hasClothingCategory = productData.categorias.some(cat => clothingCategories.includes(cat));
+                const hasSizeCategory = productData.categorias.some(cat => sizeCategories.includes(cat));
+
+                setColor(hasClothingCategory);
+                setSizes(hasSizeCategory);
             }
         }
     }, [edit, productData])
@@ -107,96 +111,90 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
     const [categories, setCategories] = useState(null)
 
     useEffect(() => {
-        axios.post("/api/show_categories.php", {productId: id})
-            .then((res) => setCategories(res.data.data))
-            .catch((res) => console.log(res))
-    }, [])
+        if (edit && productData && productData.categorias) {
+            setCategories(productData.categorias.map(cat => ({ nombre_categoria: cat })));
+        } else if (id) {
+            axios.post("/api/show_categories.php", { productId: id })
+                .then((res) => setCategories(res.data.data))
+                .catch((res) => console.log(res))
+        }
+    }, [edit, productData, id])
 
     useEffect(() => {
         if (currentStep === "showColors") {
-            axios.post("/api/show_colors.php", {
-                productId: productId
-            })
-                .then((res) => {
-                    setDataColors(res.data.data)
+            if (edit && productData && productData.colores) {
+                const colorsArray = Object.entries(productData.colores).map(([nombre, data]) => ({
+                    id_color: data.id_color,
+                    nombre: nombre,
+                    ruta_imagen: data.imagenes?.[0] || '',
+                    talles: data.talles || [],
+                    stock: data.stock || 0
+                }));
+                setDataColors(colorsArray);
+            } else {
+                axios.post("/api/show_colors.php", {
+                    productId: productId
                 })
-                .catch((err) => console.log(err))
-
+                    .then((res) => {
+                        setDataColors(res.data.data)
+                    })
+                    .catch((err) => console.log(err))
+            }
         } else if (currentStep === "showCharac") {
-            axios.post("/api/show_charac.php", {
-                productId: productId
-            })
-                .then((res) => {
-                    setDataCharac(res.data.data)
+            if (edit && productData && productData.caracteristicas) {
+                setDataCharac(productData.caracteristicas.map((carac, index) => ({
+                    id_caracteristica: index,
+                    caracteristica: carac
+                })));
+            } else {
+                axios.post("/api/show_charac.php", {
+                    productId: productId
                 })
-                .catch((err) => console.log(err))
+                    .then((res) => {
+                        setDataCharac(res.data.data)
+                    })
+                    .catch((err) => console.log(err))
+            }
         }
-    }, [currentStep])
-
-    // Prellenar características al entrar en modo edición
-    useEffect(() => {
-        if (edit && productData && productData.caracteristicas && currentStep === "showCharac") {
-            setDataCharac(productData.caracteristicas.map((carac, index) => ({
-                id_caracteristica: index,
-                caracteristica: carac
-            })));
-        }
-    }, [edit, productData, currentStep]);
-
-    // Prellenar colores al entrar en modo edición
-    useEffect(() => {
-        if (edit && productData && productData.colores && currentStep === "showColors") {
-            const colorsArray = Object.entries(productData.colores).map(([nombre, data]) => ({
-                id_color: data.id_color,
-                nombre: nombre,
-                ruta_imagen: data.imagenes?.[0] || '',
-                talles: data.talles || []
-            }));
-            setDataColors(colorsArray);
-        }
-    }, [edit, productData, currentStep]);
+    }, [currentStep, edit, productData, productId])
 
     const [colorEdit, setColorEdit] = useState(null)
     const [editingColorData, setEditingColorData] = useState(null)
 
-    // Prellenar el formulario de color cuando se va a editar
     useEffect(() => {
         if (colorEdit && productData && productData.colores && currentStep === "addColor") {
-            // Buscar el color que se está editando
             const colorEntry = Object.entries(productData.colores).find(
                 ([nombre, data]) => data.id_color === colorEdit
             );
 
             if (colorEntry) {
                 const [colorName, colorData] = colorEntry;
-                
-                // Prellenar el nombre del color
+
                 formColor.setValue('nameColor1', colorName);
-                
-                // Si tiene talles, configurar el estado y prellenar
+
                 if (colorData.talles && colorData.talles.length > 0) {
                     setColorSizes([colorData.talles.length]);
                     setVisibleColorSizes([Array(colorData.talles.length).fill(true)]);
-                    
-                    // Prellenar cada talle y su stock
+
                     colorData.talles.forEach((talleObj, idx) => {
                         formColor.setValue(`nameSizeColor1${idx}`, talleObj.talle);
                         formColor.setValue(`nameStockSizeColor1${idx}`, talleObj.stock);
                     });
                 } else {
-                    // Si no tiene talles, prellenar solo el stock del color
-                    // Necesitarías tener el stock del color en los datos
                     setColorSizes([1]);
                     setVisibleColorSizes([[true]]);
+                    if (colorData.stock !== undefined) {
+                        formColor.setValue('nameStockColor', colorData.stock);
+                    }
                 }
 
-                // Guardar datos del color para mostrar imágenes existentes
                 setEditingColorData(colorData);
             }
         } else if (!colorEdit && currentStep === "addColor") {
-            // Limpiar al añadir un nuevo color
             setEditingColorData(null);
             formColor.reset();
+            setColorSizes([1]);
+            setVisibleColorSizes([[true]]);
         }
     }, [colorEdit, productData, currentStep]);
 
@@ -236,6 +234,9 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                     setCurrentStep("showColors")
                     setColorEdit(null)
                     setEditingColorData(null)
+                    formColor.reset()
+                    setColorSizes([1])
+                    setVisibleColorSizes([[true]])
                     console.log(res)
                     console.log(files)
                 })
@@ -257,11 +258,10 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
     function createCharac(dataForm) {
         const newData = Object.values(dataForm).filter(Boolean);
 
-        // Evitá enviar las que ya están en dataCharac
         const existing = dataCharac?.map(c => c.caracteristica) || [];
         const filtered = newData.filter(d => !existing.includes(d));
 
-        if (filtered.length === 0) return; // no hay nada nuevo que agregar
+        if (filtered.length === 0) return;
 
         axios.post("/api/create_charac.php", {
             productId,
@@ -375,7 +375,7 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
         const colorVisible = visibleColors[colorIdx] ?? false
         const sizesCount = colorSizes[colorIdx] ?? 1
         const visibleSizesForColor = visibleColorSizes[colorIdx] ?? Array.from({ length: sizesCount }).map((_, i) => i === 0)
-        
+
         return (
             <section key={colorIdx} className={`transition-opacity ease-in-out duration-700 ${colorVisible ? "opacity-100" : "opacity-0"}`}>
                 <Input
@@ -390,17 +390,16 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                     icon={<IoMdColorPalette />}
                 />
 
-                {/* Mostrar imágenes existentes del color al editar */}
                 {editingColorData && editingColorData.imagenes && editingColorData.imagenes.length > 0 && (
                     <div className="m-3">
                         <p className="text-sm text-gray-600 mb-2">Imágenes actuales del color:</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {editingColorData.imagenes.map((imagen, idx) => (
                                 <div key={`existing-${idx}`} className="relative">
-                                    <img 
-                                        src={`/api/uploads/products/${imagen}`} 
-                                        alt={`Color existente ${idx + 1}`} 
-                                        className="w-full h-24 object-cover rounded-lg border border-blue-300" 
+                                    <img
+                                        src={`/api/uploads/products/${imagen}`}
+                                        alt={`Color existente ${idx + 1}`}
+                                        className="w-full h-24 object-cover rounded-lg border border-blue-300"
                                     />
                                 </div>
                             ))}
@@ -667,28 +666,30 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
     const musicalInstruments = formProduct.watch("Instrumentos Musicales");
 
     useEffect(() => {
-        if (
-            electronics || men || women || boy || girl || unisex || footwear ||
-            accessories || toys || homeKitchen || healthBeauty || sportsOutdoor ||
-            baby || computing || cellphonesAccessories || officeStationery ||
-            automotive || gardenOutdoor || vehicles || spareParts || motorcycles ||
-            nautical || appliances || musicalInstruments
-        ) {
-            setColor(true)
-        } else {
-            setColor(false)
-        }
-        if (men || women || boy || girl || unisex || footwear) {
-            setSizes(true)
-        } else {
-            setSizes(false)
+        if (!edit || !productData) {
+            if (
+                electronics || men || women || boy || girl || unisex || footwear ||
+                accessories || toys || homeKitchen || healthBeauty || sportsOutdoor ||
+                baby || computing || cellphonesAccessories || officeStationery ||
+                automotive || gardenOutdoor || vehicles || spareParts || motorcycles ||
+                nautical || appliances || musicalInstruments
+            ) {
+                setColor(true)
+            } else {
+                setColor(false)
+            }
+            if (men || women || boy || girl || unisex || footwear) {
+                setSizes(true)
+            } else {
+                setSizes(false)
+            }
         }
     }, [
         electronics, men, women, boy, girl, unisex, footwear,
         accessories, toys, homeKitchen, healthBeauty, sportsOutdoor,
         baby, computing, cellphonesAccessories, officeStationery,
         automotive, gardenOutdoor, vehicles, spareParts, motorcycles,
-        nautical, appliances, musicalInstruments
+        nautical, appliances, musicalInstruments, edit, productData
     ])
 
 
@@ -706,21 +707,6 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                     )}
                     <section className='flex items-center justify-between'>
                         <Button type="submit" className={"w-50 m-auto"} color={"blue"} size={"md"} text={"Guardar"} />
-                        {/* {colorEdit && (
-                            <Button 
-                                type="button"
-                                onClick={() => {
-                                    setCurrentStep("showColors");
-                                    setColorEdit(null);
-                                    setEditingColorData(null);
-                                    formColor.reset();
-                                }} 
-                                className={"w-50"} 
-                                color={"gray"} 
-                                size={"md"} 
-                                text={"Cancelar"} 
-                            />
-                        )} */}
                     </section>
                 </form>
             );
@@ -788,7 +774,6 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
         default:
             return (
                 <form onSubmit={formProduct.handleSubmit(!edit ? addProduct : (data) => updateProduct(data, id))} className='w-85 mb-100 m-auto mt-5 bg-white p-3 shadow rounded-xl'>
-                    <img src={logoToloBlue} className='w-16 h-10 object-contain' alt="Logo" />
                     <div className="flex flex-col mt-3 ml-3 items-start ">
                         <h2 className='font-[Montserrat,sans-serif] text-2xl font-semibold'>{edit ? "Editar publicación" : "Crear publicación"}</h2>
                         <p className="text-sm whitespace-nowrap text-gray-600">{edit ? "Completá el formulario para editar la publicación." : "Completá el formulario para crear una publicación."}</p>
@@ -816,7 +801,9 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                         maxLength={20}
                         validate={value => Number(value) > 0 || "El precio no puede ser negativo ni 0"}
                     />
-                    <DropdownCategories selected={categories} watch={formProduct.watch} register={formProduct.register} errors={formProduct.formState.errors} direction={"b"} />
+                    {isDataReady && (
+                        <DropdownCategories selected={categories} edit={edit} watch={formProduct.watch} register={formProduct.register} errors={formProduct.formState.errors} direction={"b"} />
+                    )}
                     {!color && (
                         <Input
                             type={"number"}
@@ -832,7 +819,6 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                     )}
                     {!color && (
                         <>
-                            {/* Mostrar imágenes existentes del producto */}
                             {edit && existingProductImages.length > 0 && (
                                 <div className="m-3">
                                     <p className="text-sm text-gray-600 mb-2">Imágenes actuales del producto:</p>
@@ -856,7 +842,7 @@ export default function CreateProduct({ edit = false, onCancel, id, productData 
                                     <p className="text-xs text-gray-500 mt-2">Si seleccionas nuevas imágenes, reemplazarán las actuales</p>
                                 </div>
                             )}
-                            
+
                             <Input
                                 type="file"
                                 name="images"

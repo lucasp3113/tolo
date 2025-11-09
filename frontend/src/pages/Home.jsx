@@ -342,7 +342,7 @@ export default function Home({ searchData, userType, setSearchData, loading = fa
                 ecommerce ? (
                     <>
                         <section
-                            className="overflow-hidden relative flex items-start bg-black justify-start w-full"
+                            className="overflow-hidden relative flex items-start bg-black max-h-[700px] justify-start w-full"
                         >
                             <img
                                 loading="lazy"
